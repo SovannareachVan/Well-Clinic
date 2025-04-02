@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Patient - Well Clinic</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4a6fa5;
+            --primary-dark: #166088;
+            --accent: #4fc3f7;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --gray: #6c757d;
+            --success: #28a745;
+            --danger: #dc3545;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f5f7fa;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            height: 100vh;
+            position: fixed;
+            box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo i {
+            font-size: 24px;
+            margin-right: 12px;
+        }
+
+        .logo h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0 10px;
+        }
+
+        .nav-item {
+            padding: 12px 15px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-item i {
+            font-size: 1.1rem;
+            width: 30px;
+            text-align: center;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 30px;
+        }
+
+        .view-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .view-container h1 {
+            color: var(--primary-dark);
+            margin-bottom: 25px;
+            text-align: center;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .view-container h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background-color: var(--accent);
+        }
+
+        .patient-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .detail-group {
+            margin-bottom: 20px;
+        }
+
+        .detail-label {
+            font-weight: 500;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        .action-buttons {
+            grid-column: span 2;
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-edit {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-back {
+            background-color: var(--gray);
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+            
+            .logo h2, .nav-item span {
+                display: none;
+            }
+            
+            .logo {
+                justify-content: center;
+                padding: 20px 10px;
+            }
+            
+            .logo i {
+                margin-right: 0;
+                font-size: 28px;
+            }
+            
+            .nav-item {
+                justify-content: center;
+                padding: 15px 0;
+                margin: 5px 0;
+            }
+            
+            .main-content {
+                margin-left: 70px;
+                padding: 20px;
+            }
+            
+            .patient-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .full-width {
+                grid-column: span 1;
+            }
+            
+            .action-buttons {
+                grid-column: span 1;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-clinic-medical"></i>
+            <h2>Well Clinic</h2>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item" onclick="location.href='index.html'">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </li>
+            <li class="nav-item" onclick="location.href='receptionist.html'">
+                <i class="fas fa-user-tie"></i>
+                <span>Receptionist</span>
+            </li>
+            <li class="nav-item active" onclick="location.href='doctor.html'">
+                <i class="fas fa-user-md"></i>
+                <span>Doctor</span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="view-container">
+            <h1>Patient Details</h1>
+            
+            <div class="patient-details">
+                <div class="detail-group">
+                    <div class="detail-label">Full Name:</div>
+                    <div class="detail-value" id="viewFullName"></div>
+                </div>
+                
+                <div class="detail-group">
+                    <div class="detail-label">Age:</div>
+                    <div class="detail-value" id="viewAge"></div>
+                </div>
+                
+                <div class="detail-group">
+                    <div class="detail-label">Gender:</div>
+                    <div class="detail-value" id="viewGender"></div>
+                </div>
+                
+                <div class="detail-group">
+                    <div class="detail-label">Phone Number:</div>
+                    <div class="detail-value" id="viewPhone"></div>
+                </div>
+                
+                <div class="detail-group full-width">
+                    <div class="detail-label">Email Address:</div>
+                    <div class="detail-value" id="viewEmail"></div>
+                </div>
+                
+                <div class="detail-group full-width">
+                    <div class="detail-label">Notes:</div>
+                    <div class="detail-value" id="viewNotes"></div>
+                </div>
+                
+                <div class="detail-group">
+                    <div class="detail-label">Date Created:</div>
+                    <div class="detail-value" id="viewCreatedAt"></div>
+                </div>
+                
+                <div class="detail-group">
+                    <div class="detail-label">Last Updated:</div>
+                    <div class="detail-value" id="viewUpdatedAt"></div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-back" onclick="window.history.back()">Back to List</button>
+                    <button class="btn btn-edit" id="editButton">Edit Patient</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBVTJmwVZokfkEHH-F5hpfaWkTofqUBTBQ",
+            authDomain: "customer-management-61f84.firebaseapp.com",
+            databaseURL: "https://customer-management-61f84-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "customer-management-61f84",
+            storageBucket: "customer-management-61f84.firebasestorage.app",
+            messagingSenderId: "556155206627",
+            appId: "1:556155206627:web:2500614b6bf65aa23cfed6",
+            measurementId: "G-9F9RFH4TQZ"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Get patient ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const patientId = urlParams.get('id');
+
+        // Load patient data
+        function loadPatientData() {
+            if (patientId) {
+                database.ref('patients/' + patientId).once('value')
+                    .then((snapshot) => {
+                        const patient = snapshot.val();
+                        if (patient) {
+                            // Display patient data
+                            document.getElementById('viewFullName').textContent = patient.fullName || 'Not specified';
+                            document.getElementById('viewAge').textContent = patient.age || 'Not specified';
+                            document.getElementById('viewGender').textContent = patient.gender || 'Not specified';
+                            document.getElementById('viewPhone').textContent = patient.phone || 'Not specified';
+                            document.getElementById('viewEmail').textContent = patient.email || 'Not specified';
+                            document.getElementById('viewNotes').textContent = patient.notes || 'No notes available';
+                            
+                            // Format dates
+                            const createdAt = patient.createdAt ? new Date(patient.createdAt).toLocaleString() : 'Unknown';
+                            const updatedAt = patient.updatedAt ? new Date(patient.updatedAt).toLocaleString() : 'Never updated';
+                            
+                            document.getElementById('viewCreatedAt').textContent = createdAt;
+                            document.getElementById('viewUpdatedAt').textContent = updatedAt;
+                            
+                            // Set up edit button
+                            document.getElementById('editButton').onclick = () => {
+                                window.location.href = `edit-patient.html?id=${patientId}`;
+                            };
+                        } else {
+                            alert('Patient not found');
+                            window.location.href = 'doctor.html';
+                        }
+                    })
+                    .catch((error) => {
+                        alert('Error loading patient: ' + error.message);
+                    });
+            } else {
+                alert('No patient ID specified');
+                window.location.href = 'doctor.html';
+            }
+        }
+
+        // Load patient data when page loads
+        window.onload = loadPatientData;
+    </script>
+</body>
+</html>

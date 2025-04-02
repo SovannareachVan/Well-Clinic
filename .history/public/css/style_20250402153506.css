@@ -1,0 +1,224 @@
+
+    /* Unified Sidebar Styles */
+    .sidebar {
+        width: 250px;
+        background: linear-gradient(135deg, #4a6fa5, #166088);
+        color: white;
+        height: 100vh;
+        position: fixed;
+        box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        z-index: 100;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .logo i {
+        font-size: 24px;
+        margin-right: 10px;
+    }
+
+    .logo h2 {
+        font-size: 1.3rem;
+        font-weight: 600;
+    }
+
+    .nav-menu {
+        list-style: none;
+        padding: 0 15px;
+    }
+
+    .nav-item {
+        padding: 12px 15px;
+        margin-bottom: 5px;
+        border-radius: 5px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+
+    .nav-item:hover {
+        background-color: rgba(255, 255, 255, 0.35);
+    }
+
+    .nav-item.active {
+        background-color: rgba(255, 255, 255, 0.36);
+    }
+
+    .nav-item i {
+        font-size: 1.1rem;
+        width: 30px;
+        text-align: center;
+    }
+
+    .nav-item span {
+        font-size: 0.95rem;
+        font-weight: 500;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .sidebar {
+            width: 70px;
+        }
+        
+        .logo h2, .nav-item span {
+            display: none;
+        }
+        
+        .logo {
+            justify-content: center;
+            padding: 20px 10px;
+        }
+        
+        .logo i {
+            margin-right: 0;
+            font-size: 28px;
+        }
+        
+        .nav-item {
+            justify-content: center;
+            padding: 15px 0;
+            margin: 5px 0;
+        }
+        
+        .main-content {
+            margin-left: 70px;
+        }
+    }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        .role-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .role-container h1 {
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        .role-container p {
+            font-size: 1.1rem;
+            color: var(--gray);
+            margin-bottom: 40px;
+        }
+
+        .role-options {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .role-card {
+            width: 280px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--dark);
+        }
+
+        .role-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .role-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .role-card h3 {
+            padding: 20px;
+            font-size: 1.2rem;
+            background-color: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 80px;
+            }
+            
+            .logo h2, .nav-item span {
+                display: none;
+            }
+            
+            .nav-item {
+                justify-content: center;
+                padding: 15px 0;
+                margin: 5px 10px;
+            }
+            
+            .main-content {
+                margin-left: 80px;
+                padding: 20px;
+            }
+            
+            .role-options {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .role-container h1 {
+                font-size: 1.8rem;
+            }
+            
+            .role-container p {
+                font-size: 1rem;
+            }
+            
+            .role-card {
+                width: 100%;
+            }
+        }
+
+/* Khmer Font Face */
+@font-face {
+    font-family: 'Noto Sans Khmer';
+//
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap; /* Optional: improves performance */
+}
+
+/* Apply to entire body or specific elements */
+body {
+    font-family: 'Noto Sans Khmer', sans-serif;
+}
+
+/* Or apply to specific elements */
+.khmer-text {
+    font-family: 'Noto Sans Khmer', sans-serif;
+}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
