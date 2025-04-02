@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receptionist - Patient Data</title>
+    <link rel="stylesheet" href="public/css/receptionist.css"> <!-- Link to your CSS file -->
+</head>
+<body>
+
+    <div id="popup-container">
+        <div id="popup" class="popup">
+            <h2 id="popup-title"></h2>
+            <p id="popup-message"></p>
+            <button class="close-popup">Close</button>
+        </div>
+    </div>
+
+    <div class="form-container">
+        <h1>Patient Registration</h1>
+        <form id="patientForm">
+            <label for="fullName">Full Name:</label>
+            <input type="text" id="fullName" name="fullName" required>
+
+            <label for="age">Age:</label>
+            <input type="number" id="age" name="age" required>
+
+            <label for="gender">Gender:</label>
+            <select id="gender" name="gender" required>
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+            </select>
+
+            <label for="phone">Phone Number:</label>
+            <input type="tel" id="phone" name="phone" required>
+
+            <label for="email">Email Address:</label>
+            <input type="email" id="email" name="email">
+
+            <label for="notes">Notes:</label>
+            <textarea id="notes" name="notes"></textarea>
+
+            <div id="error-message" class="error-message"></div>
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <script src="firebase-config.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+    <script src="app.js"></script>  <!-- Link to your JavaScript file -->
+
+</body>
+</html>
