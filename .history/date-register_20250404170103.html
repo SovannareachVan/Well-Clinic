@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Date Register</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Check-in/Register</h2>
+        <button id="checkInBtn">Check-in</button>
+        <button id="checkOutBtn" disabled>Check-out</button>
+
+        <table id="checkInTable" border="1">
+            <thead>
+                <tr>
+                    <th>លេខរៀង</th>
+                    <th>ថ្ងៃចូលមន្ទីពេទ្យ</th>
+                    <th>ថ្ងៃចេញពីមន្ទីពេទ្យ</th>
+                    <th>មន្ទីពេទ្យ</th>
+                    <th>ពិគ្រោះដោយ</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamic Rows will be added here -->
+            </tbody>
+        </table>
+    </div>
+
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+
+    <!-- Custom JavaScript Files -->
+    <script type="module" src="/js/add-detail-page.js"></script>
+</body>
+</html>
