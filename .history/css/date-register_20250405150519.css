@@ -1,0 +1,428 @@
+:root {
+    --primary: #4a6fa5;
+    --primary-dark: #166088;
+    --accent: #4fc3f7;
+    --light: #f8f9fa;
+    --dark: #343a40;
+    --gray: #6c757d;
+    --success: #28a745;
+    --danger: #dc3545;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Global Styles */
+body {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f5f7fa;
+    font-family: "Noto Sans Khmer", sans-serif;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    width: 250px;
+    background: linear-gradient(135deg, #4a6fa5, #166088);
+    color: white;
+    height: 100vh;
+    position: fixed;
+    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    z-index: 100;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    gap: 10px;
+}
+
+.logo-image {
+    height: 90px;
+    width: auto;
+}
+
+.logo i {
+    font-size: 24px;
+    margin-right: 12px;
+}
+
+.logo h2 {
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.nav-menu {
+    list-style: none;
+    padding: 0 10px;
+}
+
+.nav-item {
+    padding: 12px 15px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-item.active {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.nav-item i {
+    font-size: 1.1rem;
+    width: 30px;
+    text-align: center;
+}
+
+/* Main Content Styles */
+.main-content {
+    flex: 1;
+    margin-left: 250px;
+    padding: 30px;
+    background-color: #fff;
+}
+
+.page-title {
+    text-align: center;
+    color: var(--primary-dark);
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+
+/* Patient Header */
+.patient-header {
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1.2rem;
+}
+
+/* Patient Details Section */
+.patient-details {
+    margin-bottom: 40px;
+}
+
+.detail-row {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.detail-label {
+    width: 150px;
+    font-weight: bold;
+}
+
+.detail-value {
+    flex: 1;
+}
+
+/* Button Styles */
+button {
+    background-color: var(--primary);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-bottom: 20px;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: var(--primary-dark);
+}
+
+button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+button + button {
+    margin-left: 10px;
+}
+
+button.delete {
+    background-color: #dc3545;
+    color: white;
+}
+
+button.delete:hover {
+    background-color: #c82333;
+}
+
+button.checkOut {
+    background-color: var(--success);
+    color: white;
+}
+
+button.checkOut:hover {
+    background-color: #218838;
+}
+
+/* Table Styles */
+#checkInTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 1rem;
+}
+
+#checkInTable th,
+#checkInTable td {
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+#checkInTable th {
+    background-color: var(--primary);
+    color: white;
+    font-weight: bold;
+}
+
+#checkInTable td {
+    background-color: white;
+}
+
+#checkInTable tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Dropdown Styles */
+select {
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: white;
+    font-size: 1rem;
+    width: 100%;
+}
+
+select:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 70px;
+    }
+
+    .logo {
+        justify-content: center;
+        padding: 15px;
+    }
+
+    .logo i {
+        margin-right: 0;
+        font-size: 28px;
+    }
+
+    .main-content {
+        margin-left: 70px;
+        padding: 20px;
+    }
+
+    #checkInTable {
+        font-size: 0.9rem;
+    }
+
+    button {
+        width: 100%;
+    }
+
+    #checkInTable th,
+    #checkInTable td {
+        padding: 8px 12px;
+    }
+}
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 70px;
+    }
+    
+    .logo h2, .nav-item span {
+        display: none;
+    }
+    
+    .logo {
+        justify-content: center;
+        padding: 20px 10px;
+    }
+    
+    .logo-image {
+        height: 40px;
+        padding-left: 0;
+    }
+    
+    .nav-item {
+        justify-content: center;
+        padding: 15px 0;
+        margin: 5px 0;
+    }
+    
+    .main-content {
+        margin-left: 70px;
+    }
+}
+
+@media (max-width: 992px) {
+    .logo-image {
+        height: 110px;
+        padding-left: 50%;
+    }
+    .sidebar {
+        left: -250px;
+    }
+    
+    .sidebar.active {
+        left: 0;
+    }
+    
+    .main-content {
+        margin-left: 0;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .sidebar {
+        left: 0 !important;
+        width: 250px;
+    }
+    
+    .main-content {
+        margin-left: 250px;
+    }
+    .logo-image {
+        height: 100px;
+        padding-left: 22%;
+    }
+}
+
+/* Add these styles to your existing CSS */
+
+@media (max-width: 1024px) {
+    /* Table responsive adjustments */
+    #checkInTable {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+    }
+    
+    #checkInTable thead,
+    #checkInTable tbody,
+    #checkInTable tr,
+    #checkInTable th,
+    #checkInTable td {
+        display: block;
+    }
+    
+    #checkInTable thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+    
+    #checkInTable tr {
+        border: 1px solid #ddd;
+        margin-bottom: 15px;
+    }
+    
+    #checkInTable td {
+        border: none;
+        border-bottom: 1px solid #eee;
+        position: relative;
+        padding-left: 50%;
+        text-align: right;
+    }
+    
+    #checkInTable td:before {
+        content: attr(data-label);
+        position: absolute;
+        left: 15px;
+        width: 45%;
+        padding-right: 10px;
+        font-weight: bold;
+        text-align: left;
+    }
+    
+    /* Add data labels for each column */
+    #checkInTable td:nth-of-type(1):before { content: "ID"; }
+    #checkInTable td:nth-of-type(2):before { content: "Name"; }
+    #checkInTable td:nth-of-type(3):before { content: "Gender"; }
+    #checkInTable td:nth-of-type(4):before { content: "Age"; }
+    #checkInTable td:nth-of-type(5):before { content: "Phone"; }
+    #checkInTable td:nth-of-type(6):before { content: "Check-in Date"; }
+    #checkInTable td:nth-of-type(7):before { content: "Status"; }
+    #checkInTable td:nth-of-type(8):before { content: "Actions"; }
+    
+    /* Button adjustments */
+    .action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .action-buttons button {
+        width: 100%;
+        margin-left: 0 !important;
+    }
+}
+
+/* For screens between 769px and 1024px (landscape tablets) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    #checkInTable {
+        font-size: 0.9rem;
+    }
+    
+    #checkInTable th,
+    #checkInTable td {
+        padding: 8px 10px;
+    }
+    
+    /* Optional: Hide less important columns if needed */
+    #checkInTable td:nth-child(5), /* Phone */
+    #checkInTable th:nth-child(5) {
+        display: none;
+    }
+}
+
+/* For mobile devices (portrait) */
+@media (max-width: 768px) {
+    #checkInTable td {
+        padding-left: 40%;
+    }
+    
+    /* Hide more columns on smaller screens */
+    #checkInTable td:nth-child(1), /* ID */
+    #checkInTable th:nth-child(1),
+    #checkInTable td:nth-child(3), /* Gender */
+    #checkInTable th:nth-child(3),
+    #checkInTable td:nth-child(5), /* Phone */
+    #checkInTable th:nth-child(5) {
+        display: none;
+    }
+    
+    /* Update data labels for remaining columns */
+    #checkInTable td:nth-of-type(1):before { content: "Name"; }
+    #checkInTable td:nth-of-type(2):before { content: "Age"; }
+    #checkInTable td:nth-of-type(3):before { content: "Check-in Date"; }
+    #checkInTable td:nth-of-type(4):before { content: "Status"; }
+    #checkInTable td:nth-of-type(5):before { content: "Actions"; }
+}
