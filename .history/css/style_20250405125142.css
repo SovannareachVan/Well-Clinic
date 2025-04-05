@@ -1,0 +1,292 @@
+:root {
+    /* Color Variables */
+    --primary: #4a6fa5;
+    --primary-dark: #166088;
+    --accent: #4fc3f7;
+    --light: #f8f9fa;
+    --dark: #343a40;
+    --gray: #6c757d;
+    --success: #28a745;
+    --danger: #dc3545;
+}
+
+/* Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Noto Sans Khmer", sans-serif;
+}
+
+body {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f5f7fa;
+    transition: all 0.3s;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    width: 250px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    height: 100vh;
+    position: fixed;
+    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    left: 0;
+}
+
+.sidebar.active {
+    left: 0 !important;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    gap: 10px;
+}
+
+.logo-image {
+    height: 1000px;
+    width: auto;
+    object-fit: contain;
+    transition: height 0.3s ease;
+}
+
+.nav-menu {
+    list-style: none;
+    padding: 0 15px;
+}
+
+.nav-item {
+    padding: 12px 15px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.35);
+}
+
+.nav-item.active {
+    background-color: rgba(255, 255, 255, 0.36);
+}
+
+.nav-item i {
+    font-size: 1.1rem;
+    width: 30px;
+    text-align: center;
+}
+
+.nav-item span {
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+/* Main Content Styles */
+.main-content {
+    flex: 1;
+    margin-left: 250px;
+    padding: 30px;
+    min-height: 100vh;
+    transition: margin-left 0.3s;
+}
+
+.role-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px;
+    text-align: center;
+}
+
+.logo-header {
+    text-align: center;
+    margin-bottom: 20px;
+    text-align: center;
+    margin: 0 auto 30px;
+    width: 100%;
+}
+.logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 800px; /* Control maximum logo size */
+    margin: 0 auto;
+}
+
+.main-logo {
+    width: 100%;
+    max-width: 400px; /* Default large size */
+    height: auto;
+    object-fit: contain;
+    transition: all 0.3s ease;
+}
+
+.welcome-text {
+    text-align: center;
+    font-size: 1.1rem;
+    color: var(--gray);
+    margin-bottom: 20px;
+}
+
+.role-options {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.role-card {
+    width: 280px;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: var(--dark);
+}
+
+.role-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.role-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.role-card h3 {
+    padding: 20px;
+    font-size: 1.2rem;
+    background-color: white;
+}
+
+/* Mobile Menu Toggle */
+.mobile-menu-toggle {
+    display: none;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1100;
+    font-size: 25px;
+    color: var(--primary);
+    cursor: pointer;
+    background: white;
+    padding: 10px;
+    border-radius: 20%;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Responsive Design */
+@media (min-width: 1600px) {
+    .main-logo {
+        max-width: 700px; /* Extra large screens */
+    }
+}
+@media (min-width: 1200px) {
+    .main-logo {
+        max-width: 500px;
+    }
+    
+    .logo-image {
+        height: 60px;
+    }
+}
+
+@media (max-width: 992px) {
+    .mobile-menu-toggle {
+        display: block;
+    }
+    
+    .sidebar {
+        left: -250px;
+    }
+    
+    .sidebar.active {
+        left: 0;
+    }
+    
+    .main-content {
+        margin-left: 0;
+    }
+    
+    .main-logo {
+        max-width: 350px;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 70px;
+    }
+    
+    .logo h2, .nav-item span {
+        display: none;
+    }
+    
+    .logo {
+        justify-content: center;
+        padding: 20px 10px;
+    }
+    
+    .logo-image {
+        height: 40px;
+    }
+    
+    .nav-item {
+        justify-content: center;
+        padding: 15px 0;
+        margin: 5px 0;
+    }
+    
+    .main-content {
+        margin-left: 0;
+        padding: 20px;
+    }
+    
+    .main-logo {
+        max-width: 300px;
+    }
+    
+    .role-options {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .role-card {
+        width: 90%;
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-logo {
+        max-width: 250px;
+    }
+    
+    .role-card {
+        width: 100%;
+    }
+    
+    .role-container {
+        padding: 30px 15px;
+    }
+}
+
+/* Utility Classes */
+.date-detail-btn {
+    background-color: red;
+}

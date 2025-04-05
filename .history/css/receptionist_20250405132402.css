@@ -1,0 +1,229 @@
+:root {
+    --primary: #4a6fa5;
+    --primary-dark: #166088;
+    --accent: #4fc3f7;
+    --light: #f8f9fa;
+    --dark: #343a40;
+    --gray: #6c757d;
+    --success: #28a745;
+    --danger: #dc3545;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Noto Sans Khmer", sans-serif;
+}
+
+body {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f5f7fa;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    width: 250px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    height: 100vh;
+    position: fixed;
+    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    gap: 10px;
+}
+
+.logo-image {
+    height: 90px;
+    width: auto;
+    object-fit: contain;
+}
+
+.nav-menu {
+    list-style: none;
+    padding: 0 15px;
+}
+
+.nav-item {
+    padding: 12px 15px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-item.active {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.nav-item i {
+    font-size: 1.1rem;
+    width: 30px;
+    text-align: center;
+}
+
+.nav-item span {
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    margin-left: 250px;
+    padding: 30px;
+}
+
+/* Form Styles */
+.form-container {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.form-container h1 {
+    color: var(--dark);
+    margin-bottom: 25px;
+    font-weight: 600;
+    text-align: center;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.form-container h1::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background-color: var(--accent);
+}
+
+#patientForm {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+#patientForm label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--dark);
+}
+
+#patientForm input,
+#patientForm select,
+#patientForm textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 15px;
+    transition: all 0.3s;
+}
+
+#patientForm input:focus,
+#patientForm select:focus,
+#patientForm textarea:focus {
+    border-color: var(--accent);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.2);
+}
+
+#patientForm textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.full-width {
+    grid-column: span 2;
+}
+
+button[type="submit"] {
+    grid-column: span 2;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    border: none;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: 500;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 10px;
+}
+
+button[type="submit"]:hover {
+    transform: translateY(-2px);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+    .mobile-menu-toggle {
+        display: block;
+    }
+    .sidebar {
+        left: -250px;
+    }
+    .sidebar.active {
+        left: 0;
+    }
+    .main-content {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 70px;
+        left: 0;
+    }
+    .sidebar.active {
+        width: 250px;
+    }
+    .logo h2, .nav-item span {
+        display: none;
+    }
+    #patientForm {
+        grid-template-columns: 1fr;
+    }
+    .full-width {
+        grid-column: span 1;
+    }
+    button[type="submit"] {
+        grid-column: span 1;
+    }
+}
+
+/* Utility Classes */
+.error-message {
+    color: var(--danger);
+    font-size: 14px;
+    margin-top: 5px;
+    display: none;
+}
