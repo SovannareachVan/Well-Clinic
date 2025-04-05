@@ -8,7 +8,7 @@ async function getPatientDetails(recordId) {
 
         if (snapshot.exists()) {
             const patientData = snapshot.val();
-            
+
             // Update patient info
             document.getElementById('patientFullName').textContent = patientData.fullName || 'N/A';
             document.getElementById('patientAge').textContent = patientData.age || 'N/A';
@@ -16,42 +16,39 @@ async function getPatientDetails(recordId) {
             document.getElementById('patientPhone').textContent = patientData.phone || 'N/A';
             document.getElementById('patientEmail').textContent = patientData.email || 'N/A';
 
-            // Check if notes exist and render them
             const notes = patientData.notes || {};
-            
-            // Display general notes from receptionist page
-            const generalNotes = notes.general || 'មិនមានវេជ្ជបញ្ជា';
-            
-            // Create medicine list HTML if medicines exist
+            const generalNotes = (notes && typeof notes.general === 'string' && notes.general.trim() !== '')
+                ? notes.general
+                : 'មិនមានវេជ្ជបញ្ជា';
+
             let medicineHtml = '<div class="medicine-empty">មិនទាន់បំពេញ</div>';
-            if (notes.medicines && notes.medicines.length > 0) {
+            if (Array.isArray(notes.medicines) && notes.medicines.length > 0) {
                 medicineHtml = `
-                <div class="medicine-container">
-                    <div class="medicine-header">
-                        <div class="medicine-col">ឈ្មោះថ្នាំ</div>
-                        <div class="medicine-col">ប្រភេទថ្នាំ</div>
-                        <div class="medicine-col">រយះពេល</div>
-                        <div class="medicine-col">ព្រឹក</div>
-                        <div class="medicine-col">ថ្ងៃ</div>
-                        <div class="medicine-col">ល្ងាច</div>
-                        <div class="medicine-col">ចំនួន</div>
-                    </div>
-                    ${notes.medicines.map(med => `
-                        <div class="medicine-row">
-                            <div class="medicine-col">${med.name || ''}</div>
-                            <div class="medicine-col">${med.dosage || ''}</div>
-                            <div class="medicine-col">${med.days || ''} ថ្ងៃ</div>
-                            <div class="medicine-col">${med.morningDose || ''}</div>
-                            <div class="medicine-col">${med.afternoonDose || ''}</div>
-                            <div class="medicine-col">${med.eveningDose || ''}</div>
-                            <div class="medicine-col">${med.quantity || ''}</div>
+                    <div class="medicine-container">
+                        <div class="medicine-header">
+                            <div class="medicine-col">ឈ្មោះថ្នាំ</div>
+                            <div class="medicine-col">ប្រភេទថ្នាំ</div>
+                            <div class="medicine-col">រយះពេល</div>
+                            <div class="medicine-col">ព្រឹក</div>
+                            <div class="medicine-col">ថ្ងៃ</div>
+                            <div class="medicine-col">ល្ងាច</div>
+                            <div class="medicine-col">ចំនួន</div>
                         </div>
-                    `).join('')}
-                </div>
+                        ${notes.medicines.map(med => `
+                            <div class="medicine-row">
+                                <div class="medicine-col">${med.name || ''}</div>
+                                <div class="medicine-col">${med.dosage || ''}</div>
+                                <div class="medicine-col">${med.days || ''} ថ្ងៃ</div>
+                                <div class="medicine-col">${med.morningDose || ''}</div>
+                                <div class="medicine-col">${med.afternoonDose || ''}</div>
+                                <div class="medicine-col">${med.eveningDose || ''}</div>
+                                <div class="medicine-col">${med.quantity || ''}</div>
+                            </div>
+                        `).join('')}
+                    </div>
                 `;
             }
 
-            // Display all notes with proper structure
             document.getElementById('patientNotes').innerHTML = `
                 <div class="note-item"><strong>វេជ្ជបញ្ជា:</strong> ${generalNotes}</div>
                 <div class="note-item"><strong>1. សញ្ញាណតម្អូញ:</strong> ${notes.note1 || 'មិនទាន់បំពេញ'}</div>
@@ -73,7 +70,7 @@ async function getPatientDetails(recordId) {
 }
 
 // Load patient data when page opens
-window.onload = function() {
+window.onload = function () {
     const recordId = new URLSearchParams(window.location.search).get('recordId');
     if (recordId) {
         getPatientDetails(recordId);

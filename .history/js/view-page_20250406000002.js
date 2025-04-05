@@ -15,12 +15,10 @@ async function getPatientDetails(recordId) {
             document.getElementById('patientGender').textContent = patientData.gender || 'N/A';
             document.getElementById('patientPhone').textContent = patientData.phone || 'N/A';
             document.getElementById('patientEmail').textContent = patientData.email || 'N/A';
+            document.getElementById('patientNotes').textContent = patientData.notes || 'No notes available.';
 
-            // Check if notes exist and render them
+            // Get notes data (including all 6 notes)
             const notes = patientData.notes || {};
-            
-            // Display general notes from receptionist page
-            const generalNotes = notes.general || 'មិនមានវេជ្ជបញ្ជា';
             
             // Create medicine list HTML if medicines exist
             let medicineHtml = '<div class="medicine-empty">មិនទាន់បំពេញ</div>';
@@ -51,9 +49,9 @@ async function getPatientDetails(recordId) {
                 `;
             }
 
-            // Display all notes with proper structure
+            // Display all 6 notes with proper fallbacks
             document.getElementById('patientNotes').innerHTML = `
-                <div class="note-item"><strong>វេជ្ជបញ្ជា:</strong> ${generalNotes}</div>
+                <div class="note-item"><strong>វេជ្ជបញ្ជា:</strong> ${notes.general || 'មិនមានវេជ្ជបញ្ជា'}</div>
                 <div class="note-item"><strong>1. សញ្ញាណតម្អូញ:</strong> ${notes.note1 || 'មិនទាន់បំពេញ'}</div>
                 <div class="note-item"><strong>2. ប្រវត្តិព្យាបាល:</strong> ${notes.note2 || 'មិនទាន់បំពេញ'}</div>
                 <div class="note-item"><strong>3. តេស្តមន្ទីពិសោធន៍:</strong> ${notes.note3 || 'មិនទាន់បំពេញ'}</div>
