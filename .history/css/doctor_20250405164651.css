@@ -334,18 +334,20 @@ body {
 
 /* Adjusts icon spacing======================================================== */
 
-.view-btn ,.edit-btn , .delete-btn, .date-detail-btn, .btn-default, .sidebar-toggle-btn ,.add-detail-btn{
+.view-btn ,.edit-btn , .delete-btn, .date-detail-btn, .btn-default, .sidebar-toggle-btn, .action-btn {
+    background-color: var(--primary);
     color: white;
-    padding: 5px 5px;
+    padding: 10px 20px;
     border: none;
     border-radius: 8px;
     cursor: pointer;
     font-size: 14px;
     font-weight: 500;
     transition: all 0.3s ease;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 15px;
+    min-width: 120px;
     text-align: center;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -368,7 +370,4 @@ body {
 
 .view-btn i {
     margin-right: 8px; /* Adjusts icon spacing */
-}
-.add-detail-btn{
-    background-color: rgb(105, 37, 168);
 }

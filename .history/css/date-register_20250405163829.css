@@ -384,6 +384,6 @@ select:focus {
 }
 @media (max-width: 768px) {
     button {
-        width: 20%;
+        width: 100%;
     }
 }

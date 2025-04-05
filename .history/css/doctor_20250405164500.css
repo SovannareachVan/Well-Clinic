@@ -334,24 +334,31 @@ body {
 
 /* Adjusts icon spacing======================================================== */
 
-.view-btn ,.edit-btn , .delete-btn, .date-detail-btn, .btn-default, .sidebar-toggle-btn ,.add-detail-btn{
-    color: white;
-    padding: 5px 5px;
+/* General Button Styles */
+.btn {
+    padding: 10px 20px;
     border: none;
     border-radius: 8px;
     cursor: pointer;
     font-size: 14px;
     font-weight: 500;
     transition: all 0.3s ease;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 15px;
+    min-width: 120px;
     text-align: center;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* View Button */
+.view-btn {
+    background-color: var(--primary);
+    color: white;
+}
+
 .view-btn:hover {
-    background-color: var(--primary-dark); /* Darker shade of primary */
+    background-color: var(--primary-dark);
     transform: translateY(-2px);
     opacity: 0.9;
 }
@@ -363,12 +370,116 @@ body {
 
 .view-btn:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(75, 90, 255, 0.5); /* Adds a focus ring */
+    box-shadow: 0 0 0 3px rgba(75, 90, 255, 0.5);
 }
 
-.view-btn i {
-    margin-right: 8px; /* Adjusts icon spacing */
+/* Edit Button */
+.edit-btn {
+    background-color: var(--success);
+    color: white;
 }
-.add-detail-btn{
-    background-color: rgb(105, 37, 168);
+
+.edit-btn:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+.edit-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.edit-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(75, 90, 255, 0.5);
+}
+
+/* Date Detail Button */
+.date-detail-btn {
+    background-color: rgb(75, 90, 255);
+    color: white;
+}
+
+.date-detail-btn:hover {
+    background-color: rgb(56, 69, 192);
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+.date-detail-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.date-detail-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(75, 90, 255, 0.5);
+}
+
+/* Add Detail Button */
+.add-detail-btn {
+    background-color: var(--accent);
+    color: white;
+}
+
+.add-detail-btn:hover {
+    background-color: #32a8d1;
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+.add-detail-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.add-detail-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(75, 90, 255, 0.5);
+}
+
+/* Delete Button */
+.delete-btn {
+    background-color: var(--danger);
+    color: white;
+}
+
+.delete-btn:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+.delete-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.delete-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(75, 90, 255, 0.5);
+}
+
+/* Icon Spacing */
+.btn i {
+    margin-right: 8px; /* Adjust icon spacing if needed */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .btn {
+        padding: 8px 15px;
+        font-size: 13px;
+        min-width: 100px;
+    }
+}
+
+/* For smaller screens (mobile view), adjust buttons' font size and padding */
+@media (max-width: 576px) {
+    .btn {
+        font-size: 12px;
+        padding: 6px 12px;
+        min-width: 90px;
+    }
 }
