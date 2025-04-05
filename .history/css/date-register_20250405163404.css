@@ -365,11 +365,6 @@ select:focus {
     
 }
 /* Default Sidebar Style */
-.sidebar {
-    width: 250px;
-    background-color: #fff;
-    transition: all 0.3s ease;
-}
 
 /* HIDE SIDEBAR ON SMALLER SCREENS */
 @media (max-width: 1024px) {

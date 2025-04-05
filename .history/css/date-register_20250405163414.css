@@ -364,21 +364,3 @@ select:focus {
     }
     
 }
-/* Default Sidebar Style */
-.sidebar {
-    width: 250px;
-    background-color: #fff;
-    transition: all 0.3s ease;
-}
-
-/* HIDE SIDEBAR ON SMALLER SCREENS */
-@media (max-width: 1024px) {
-    .sidebar {
-        display: none;
-    }
-
-    .patient-card {
-        margin-left: 0; /* remove left space */
-        width: 100%; /* take full width */
-    }
-}
