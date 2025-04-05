@@ -89,6 +89,7 @@ body {
 /* Main Content Styles */
 .main-content {
     flex: 1;
+    margin-left: 250px;
     padding: 30px;
 }
 
@@ -443,14 +444,13 @@ body {
         margin-left: 0;
     }
 }
-@media (max-width: 1024px) {
+@media (min-width: 1280px) {
     .sidebar {
         display: none;
     }
 
-    
+    .main-content {
+        margin-left: 0;
+        padding: 30px; /* Adjust the padding as needed */
+    }
 }
-.sidebar {
-    display: none;
-}
-

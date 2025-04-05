@@ -9,25 +9,23 @@
     --danger: #dc3545;
 }
 
-/* Global Styles */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* Global Styles */
 body {
     display: flex;
     min-height: 100vh;
     background-color: #f5f7fa;
     font-family: "Noto Sans Khmer", sans-serif;
 }
-
 .logo-image {
     height: 110px;
     padding-left: 22%;
 }
-
 /* Sidebar Styles */
 .sidebar {
     width: 250px;
@@ -107,13 +105,16 @@ body {
     font-size: 1.5rem;
 }
 
+/* Patient Header */
 .patient-header {
     margin-bottom: 20px;
     text-align: center;
     font-size: 1.2rem;
 }
 
+/* Patient Details Section */
 .patient-details {
+
     margin-bottom: 40px;
 }
 
@@ -237,7 +238,6 @@ select:focus {
 
     .main-content {
         padding: 20px;
-        margin-left: 70px;
     }
 
     #checkInTable {
@@ -253,21 +253,50 @@ select:focus {
         padding: 8px 12px;
     }
 }
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 70px;
+    }
+    
+    .logo h2, .nav-item span {
+        display: none;
+    }
+    
+    .logo {
+        justify-content: center;
+        padding: 20px 10px;
+    }
+    
+    .logo-image {
+        height: 40px;
+        padding-left: 0;
+    }
+    
+    .nav-item {
+        justify-content: center;
+        padding: 15px 0;
+        margin: 5px 0;
+    }
+    
+    .main-content {
+        margin-left: 70px;
+    }
+}
 
 @media (max-width: 992px) {
     .logo-image {
         height: 110px;
         padding-left: 50%;
     }
-
     .sidebar {
         left: -250px;
     }
-
+    
     .sidebar.active {
         left: 0;
     }
-
+    
     .main-content {
         margin-left: 0;
     }
@@ -278,18 +307,17 @@ select:focus {
         left: 0 !important;
         width: 250px;
     }
-
+    
     .main-content {
-        margin-left: 0;
+        margin-left: 250px;
     }
-
     .logo-image {
         height: 100px;
         padding-left: 22%;
     }
 }
 
-@media (max-width: 1440px) {
+@media (max-width: 1024px) {
     .main-content {
         padding: 15px;
     }
@@ -306,7 +334,7 @@ select:focus {
         border-collapse: collapse;
     }
 
-    #checkInTable th,
+    #checkInTable th, 
     #checkInTable td {
         padding: 6px 6px;
         word-break: break-word;
@@ -332,23 +360,86 @@ select:focus {
         font-size: 0.9rem;
         padding: 8px 12px;
     }
+    
 }
-
-@media (max-width: 768px) {
-    button {
-        width: 20%;
-    }
-}
-
 /* Default Sidebar Style */
 .sidebar {
     width: 250px;
     background-color: #fff;
     transition: all 0.3s ease;
 }
+
+/* HIDE SIDEBAR ON SMALLER SCREENS */
 @media (max-width: 1024px) {
-    .main-content {
-        margin-left: 0;
+    .sidebar {
+        display: none;
+    }
+
+    .patient-card {
+        margin-left: 0; /* remove left space */
+        width: 100%; /* take full width */
     }
 }
-/* Hide Sidebar on Smaller Screens */
+@media (max-width: 768px) {
+    button {
+        width: 20%;
+    }
+}
+@media (min-width: 769px) and (max-width: 1024px) {
+    .sidebar {
+        left: 0 !important;
+        width: 250px;
+    }
+    
+    .main-content {
+        margin-left: 0; /* Remove the margin */
+    }
+    .logo-image {
+        height: 100px;
+        padding-left: 22%;
+    }
+}
+/* Main Content Styles */
+.main-content {
+    flex: 1;
+    padding: 30px;
+    background-color: #fff;
+    margin-left: 250px; /* This matches the sidebar width */
+    max-width: 1200px; /* Or whatever maximum width you prefer */
+    margin-right: auto;
+    margin-left: auto;
+    position: relative;
+}
+
+/* Adjust for sidebar */
+@media (min-width: 1025px) {
+    body {
+        padding-left: 250px; /* Push everything right to account for fixed sidebar */
+    }
+    
+    .main-content {
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+    
+    .sidebar {
+        left: 0;
+    }
+}
+
+/* For very large screens, you might want to center everything */
+@media (min-width: 1600px) {
+    body {
+        padding-left: calc((100% - 1400px)/2); /* Center the sidebar */
+    }
+    
+    .sidebar {
+        left: calc((100% - 1400px)/2);
+    }
+    
+    .main-content {
+        margin-left: 250px; /* Keep the content aligned with sidebar */
+    }
+}

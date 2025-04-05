@@ -89,6 +89,7 @@ body {
 /* Main Content Styles */
 .main-content {
     flex: 1;
+    margin-left: 250px;
     padding: 30px;
 }
 
@@ -447,10 +448,4 @@ body {
     .sidebar {
         display: none;
     }
-
-    
 }
-.sidebar {
-    display: none;
-}
-

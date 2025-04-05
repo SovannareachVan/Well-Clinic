@@ -346,9 +346,15 @@ select:focus {
     background-color: #fff;
     transition: all 0.3s ease;
 }
+
+/* Hide Sidebar on Smaller Screens */
 @media (max-width: 1024px) {
-    .main-content {
+    .sidebar {
+        display: none;
+    }
+
+    .patient-card {
         margin-left: 0;
+        width: 100%;
     }
 }
-/* Hide Sidebar on Smaller Screens */

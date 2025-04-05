@@ -89,6 +89,7 @@ body {
 /* Main Content Styles */
 .main-content {
     flex: 1;
+    margin-left: 250px;
     padding: 30px;
 }
 
@@ -443,14 +444,15 @@ body {
         margin-left: 0;
     }
 }
-@media (max-width: 1024px) {
+/* Adjustments for smaller screens */
+/* Hide Sidebar for screens 1025px and wider */
+@media (min-width: 1025px) {
     .sidebar {
         display: none;
     }
 
-    
+    .main-content {
+        margin-left: 0;
+        padding: 30px; /* Adjust padding as necessary */
+    }
 }
-.sidebar {
-    display: none;
-}
-

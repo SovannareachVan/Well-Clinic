@@ -9,23 +9,18 @@
     --danger: #dc3545;
 }
 
-/* Global Styles */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* Global Styles */
 body {
     display: flex;
     min-height: 100vh;
     background-color: #f5f7fa;
     font-family: "Noto Sans Khmer", sans-serif;
-}
-
-.logo-image {
-    height: 110px;
-    padding-left: 22%;
 }
 
 /* Sidebar Styles */
@@ -38,6 +33,7 @@ body {
     box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
     z-index: 100;
+    left: 0;
 }
 
 .logo {
@@ -52,6 +48,7 @@ body {
 .logo-image {
     height: 90px;
     width: auto;
+    padding-left: 22%;
 }
 
 .logo i {
@@ -98,6 +95,11 @@ body {
     flex: 1;
     padding: 30px;
     background-color: #fff;
+    margin-left: 250px;
+    max-width: 1200px;
+    width: 100%;
+    margin-right: auto;
+    margin-left: auto;
 }
 
 .page-title {
@@ -107,12 +109,14 @@ body {
     font-size: 1.5rem;
 }
 
+/* Patient Header */
 .patient-header {
     margin-bottom: 20px;
     text-align: center;
     font-size: 1.2rem;
 }
 
+/* Patient Details Section */
 .patient-details {
     margin-bottom: 40px;
 }
@@ -220,112 +224,34 @@ select:focus {
 }
 
 /* Responsive Styles */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .sidebar {
-        width: 70px;
+        display: none;
     }
-
-    .logo {
-        justify-content: center;
-        padding: 15px;
-    }
-
-    .logo i {
-        margin-right: 0;
-        font-size: 28px;
-    }
-
-    .main-content {
-        padding: 20px;
-        margin-left: 70px;
-    }
-
-    #checkInTable {
-        font-size: 0.9rem;
-    }
-
-    button {
-        width: 100%;
-    }
-
-    #checkInTable th,
-    #checkInTable td {
-        padding: 8px 12px;
-    }
-}
-
-@media (max-width: 992px) {
-    .logo-image {
-        height: 110px;
-        padding-left: 50%;
-    }
-
-    .sidebar {
-        left: -250px;
-    }
-
-    .sidebar.active {
-        left: 0;
-    }
-
+    
     .main-content {
         margin-left: 0;
-    }
-}
-
-@media (min-width: 769px) and (max-width: 1024px) {
-    .sidebar {
-        left: 0 !important;
-        width: 250px;
-    }
-
-    .main-content {
-        margin-left: 0;
-    }
-
-    .logo-image {
-        height: 100px;
-        padding-left: 22%;
-    }
-}
-
-@media (max-width: 1440px) {
-    .main-content {
         padding: 15px;
     }
-
+    
     .table-responsive {
         width: 100%;
         overflow-x: auto;
     }
 
     #checkInTable {
-        width: 100%;
-        table-layout: auto;
         font-size: 0.85rem;
-        border-collapse: collapse;
     }
 
-    #checkInTable th,
+    #checkInTable th, 
     #checkInTable td {
         padding: 6px 6px;
         word-break: break-word;
-        white-space: normal;
-        text-align: center;
     }
 
-    #checkInTable td button,
-    #checkInTable td .btn {
+    #checkInTable td button {
         padding: 4px 6px;
         font-size: 0.75rem;
-        width: auto;
-        display: inline-block;
-        margin: 2px auto;
-    }
-
-    /* Optional: Make header text wrap if needed */
-    #checkInTable th {
-        white-space: normal;
     }
 
     button {
@@ -336,19 +262,41 @@ select:focus {
 
 @media (max-width: 768px) {
     button {
-        width: 20%;
+        width: 100%;
+    }
+    
+    .logo-image {
+        height: 40px;
+        padding-left: 0;
+    }
+    
+    .detail-row {
+        flex-direction: column;
+    }
+    
+    .detail-label {
+        width: 100%;
+        margin-bottom: 5px;
     }
 }
 
-/* Default Sidebar Style */
-.sidebar {
-    width: 250px;
-    background-color: #fff;
-    transition: all 0.3s ease;
-}
-@media (max-width: 1024px) {
-    .main-content {
-        margin-left: 0;
+@media (min-width: 769px) and (max-width: 1024px) {
+    .logo-image {
+        height: 100px;
     }
 }
-/* Hide Sidebar on Smaller Screens */
+
+/* For very large screens */
+@media (min-width: 1600px) {
+    body {
+        padding-left: calc((100% - 1400px)/2);
+    }
+    
+    .sidebar {
+        left: calc((100% - 1400px)/2);
+    }
+    
+    .main-content {
+        margin-left: 250px;
+    }
+}

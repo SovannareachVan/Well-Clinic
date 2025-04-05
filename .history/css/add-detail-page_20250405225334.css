@@ -447,10 +447,11 @@ body {
     .sidebar {
         display: none;
     }
-
-    
+    .logo-image {
+        height: 100px;
+        padding-left: 22%;
+    }
 }
 .sidebar {
     display: none;
 }
-
