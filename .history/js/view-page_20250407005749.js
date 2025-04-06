@@ -16,13 +16,31 @@ async function getPatientDetails(recordId) {
             document.getElementById('patientPhone').textContent = patientData.phone || 'N/A';
             document.getElementById('patientEmail').textContent = patientData.email || 'N/A';
 
-            // Get notes data - check both locations
-            const notes = patientData.structuredNotes || {};
-            const generalNotes = typeof patientData.notes === 'string' ? patientData.notes : 'មិនមានវេជ្ជបញ្ជា';
+            // Handle both old and new note formats
+            let notes = {};
+            if (typeof patientData.notes === 'string') {
+                // Old format - simple string notes
+                document.getElementById('patientNotes').textContent = patientData.notes || 'No notes available.';
+                return;
+            } else if (patientData.notes?.original) {
+                // New format with original notes
+                notes.original = patientData.notes.original;
+                notes.structured = patientData.notes.structured || {};
+            } else if (patientData.structuredNotes) {
+                // New format with separate structuredNotes
+                notes.structured = patientData.structuredNotes;
+                notes.original = typeof patientData.notes === 'string' ? patientData.notes : '';
+            }
+
+            // Get structured notes (from either location)
+            const structured = notes.structured || {};
+            
+            // Display general notes (original notes)
+            const generalNotes = notes.original || 'មិនមានវេជ្ជបញ្ជា';
             
             // Create medicine list HTML if medicines exist
             let medicineHtml = '<div class="medicine-empty">មិនទាន់បំពេញ</div>';
-            if (notes.medicines && notes.medicines.length > 0) {
+            if (structured.medicines && structured.medicines.length > 0) {
                 medicineHtml = `
                 <div class="medicine-container">
                     <div class="medicine-header">
@@ -34,7 +52,7 @@ async function getPatientDetails(recordId) {
                         <div class="medicine-col">ល្ងាច</div>
                         <div class="medicine-col">ចំនួន</div>
                     </div>
-                    ${notes.medicines.map(med => `
+                    ${structured.medicines.map(med => `
                         <div class="medicine-row">
                             <div class="medicine-col">${med.name || ''}</div>
                             <div class="medicine-col">${med.dosage || ''}</div>
@@ -52,11 +70,11 @@ async function getPatientDetails(recordId) {
             // Display all notes with proper structure
             document.getElementById('patientNotes').innerHTML = `
                 <div class="note-item"><strong>វេជ្ជបញ្ជា:</strong> ${generalNotes}</div>
-                <div class="note-item"><strong>1. សញ្ញាណតម្អូញ:</strong> ${notes.note1 || 'មិនទាន់បំពេញ'}</div>
-                <div class="note-item"><strong>2. ប្រវត្តិព្យាបាល:</strong> ${notes.note2 || 'មិនទាន់បំពេញ'}</div>
-                <div class="note-item"><strong>3. តេស្តមន្ទីពិសោធន៍:</strong> ${notes.note3 || 'មិនទាន់បំពេញ'}</div>
-                <div class="note-item"><strong>4. រោគវិនិច្ឆ័យ:</strong> ${notes.note4 || 'មិនទាន់បំពេញ'}</div>
-                <div class="note-item"><strong>5. រោគវិនិច្ឆ័យញែក:</strong> ${notes.note5 || 'មិនទាន់បំពេញ'}</div>
+                <div class="note-item"><strong>1. សញ្ញាណតម្អូញ:</strong> ${structured.note1 || 'មិនទាន់បំពេញ'}</div>
+                <div class="note-item"><strong>2. ប្រវត្តិព្យាបាល:</strong> ${structured.note2 || 'មិនទាន់បំពេញ'}</div>
+                <div class="note-item"><strong>3. តេស្តមន្ទីពិសោធន៍:</strong> ${structured.note3 || 'មិនទាន់បំពេញ'}</div>
+                <div class="note-item"><strong>4. រោគវិនិច្ឆ័យ:</strong> ${structured.note4 || 'មិនទាន់បំពេញ'}</div>
+                <div class="note-item"><strong>5. រោគវិនិច្ឆ័យញែក:</strong> ${structured.note5 || 'មិនទាន់បំពេញ'}</div>
                 <div class="note-item"><strong>6. របៀបប្រើប្រាស់ថ្នាំ:</strong></div>
                 ${medicineHtml}
             `;

@@ -51,16 +51,19 @@ function initDiagnosisDropdown() {
     });
 }
 
-// Function to parse dose values
+// Function to parse dose values (including fractions)
 function parseDoseValue(dose) {
     if (!dose || dose.trim() === "") return 0;
+
     if (dose.includes('+')) {
         return dose.split('+').reduce((sum, part) => sum + parseDoseValue(part), 0);
     }
+
     if (dose.includes('/')) {
         const [numerator, denominator] = dose.split('/');
         return parseFloat(numerator) / parseFloat(denominator);
     }
+
     return parseFloat(dose) || 0;
 }
 
@@ -83,7 +86,7 @@ function calculateMedicationQuantity(item) {
     quantityInput.value = totalQuantity % 1 === 0 ? totalQuantity : totalQuantity.toFixed(1);
 }
 
-// Function to fetch patient data
+// Function to fetch patient data and populate the details
 async function getPatientDetails(recordId) {
     try {
         const patientRef = ref(db, 'patients/' + recordId);
@@ -92,50 +95,109 @@ async function getPatientDetails(recordId) {
         if (snapshot.exists()) {
             const patientData = snapshot.val();
 
-            // Display basic info
             document.getElementById('patientFullName').textContent = patientData.fullName;
             document.getElementById('patientAge').textContent = patientData.age;
             document.getElementById('patientGender').textContent = patientData.gender;
             document.getElementById('patientPhone').textContent = patientData.phone;
             document.getElementById('patientEmail').textContent = patientData.email || 'N/A';
             document.getElementById('patientName').textContent = patientData.fullName;
+            displayNotes(patientData.notes);
+
+            function displayNotes(notes) {
+                const notesContainer = document.getElementById('patientNotes');
+                notesContainer.innerHTML = '';
+                
+                if (!notes) {
+                    notesContainer.textContent = 'No notes available.';
+                    return;
+                }
             
-            // Handle notes display - always show original text
-            if (typeof patientData.notes === 'string') {
-                document.getElementById('patientNotes').textContent = patientData.notes;
-            } else if (patientData.notes?.original) {
-                document.getElementById('patientNotes').textContent = patientData.notes.original;
-            } else {
-                document.getElementById('patientNotes').textContent = '';
+                if (typeof notes === 'string') {
+                    notesContainer.textContent = notes;
+                    return;
+                }
+            
+                const notesList = document.createElement('div');
+                notesList.className = 'notes-list';
+            
+                if (notes.note1) {
+                    const note1 = document.createElement('div');
+                    note1.innerHTML = `<strong>1. សញ្ញាណតម្អូញ:</strong> ${notes.note1}`;
+                    notesList.appendChild(note1);
+                }
+            
+                if (notes.note2) {
+                    const note2 = document.createElement('div');
+                    note2.innerHTML = `<strong>2. ប្រវត្តិព្យាបាល:</strong> ${notes.note2}`;
+                    notesList.appendChild(note2);
+                }
+            
+                if (notes.note3) {
+                    const note3 = document.createElement('div');
+                    note3.innerHTML = `<strong>3. តេស្តមន្ទីពិសោធន៍:</strong> ${notes.note3}`;
+                    notesList.appendChild(note3);
+                }
+            
+                if (notes.note4) {
+                    const note4 = document.createElement('div');
+                    note4.innerHTML = `<strong>4. រោគវិនិច្ឆ័យ:</strong> ${notes.note4}`;
+                    notesList.appendChild(note4);
+                }
+            
+                if (notes.note5) {
+                    const note5 = document.createElement('div');
+                    note5.innerHTML = `<strong>5. រោគវិនិច្ឆ័យញែក:</strong> ${notes.note5}`;
+                    notesList.appendChild(note5);
+                }
+            
+                if (notes.medicines && notes.medicines.length > 0) {
+                    const medTitle = document.createElement('div');
+                    medTitle.innerHTML = '<strong>6. របៀបប្រើប្រាស់ថ្នាំ:</strong>';
+                    notesList.appendChild(medTitle);
+            
+                    const medList = document.createElement('ul');
+                    notes.medicines.forEach(med => {
+                        const li = document.createElement('li');
+                        li.textContent = `${med.name} - ${med.dosage}: ${med.morningDose || '0'} (ព្រឹក), ${med.afternoonDose || '0'} (ថ្ងៃ), ${med.eveningDose || '0'} (ល្ងាច), ${med.days} ថ្ងៃ, សរុប: ${med.quantity}`;
+                        medList.appendChild(li);
+                    });
+                    notesList.appendChild(medList);
+                }
+            
+                notesContainer.appendChild(notesList);
             }
 
-            // Load structured notes
-            const structured = patientData.structuredNotes || 
-                            (patientData.notes?.structured) || {};
-            
-            document.getElementById('patientNote1').value = structured.note1 || '';
-            document.getElementById('patientNote2').value = structured.note2 || '';
-            document.getElementById('patientNote3').value = structured.note3 || '';
-            document.getElementById('patientNote4').value = structured.note4 || '';
-            document.getElementById('patientNote5').value = structured.note5 || '';
 
-            // Load medicines
-            const ul = document.getElementById('medicineList');
-            ul.innerHTML = '';
-            if (structured.medicines) {
-                structured.medicines.forEach(med => {
-                    const li = addMedicineItem(med);
-                    // Calculate quantity for loaded medicines
-                    calculateMedicationQuantity(li);
+            document.getElementById('patientNote1').value = patientData.notes?.note1 || '';
+            document.getElementById('patientNote2').value = patientData.notes?.note2 || '';
+            document.getElementById('patientNote3').value = patientData.notes?.note3 || '';
+            document.getElementById('patientNote4').value = patientData.notes?.note4 || '';
+            document.getElementById('patientNote5').value = patientData.notes?.note5 || '';
+
+            if (patientData.notes?.medicines) {
+                const ul = document.getElementById('medicineList');
+                patientData.notes.medicines.forEach(med => {
+                    addMedicineItem();
+                    const lastItem = ul.lastChild;
+                    const medicineInput = lastItem.querySelector('.medicine-input');
+                    medicineInput.value = med.name;
+                    lastItem.querySelector('.dosage-select').value = med.dosage;
+                    lastItem.querySelector('.time-input').value = med.days || '';
+                    lastItem.querySelectorAll('.dosage-select')[1].value = med.morningDose || '';
+                    lastItem.querySelectorAll('.dosage-select')[2].value = med.afternoonDose || '';
+                    lastItem.querySelectorAll('.dosage-select')[3].value = med.eveningDose || '';
+                    lastItem.querySelector('.quantity-input').value = med.quantity || '';
                 });
             }
+        } else {
+            console.log('No data available for this patient.');
         }
     } catch (error) {
         console.error('Error fetching patient details:', error);
     }
 }
 
-// Function to save patient notes
+// Function to save new patient notes
 async function savePatientNotes(recordId) {
     const medicines = [];
     document.querySelectorAll('.medicine-item').forEach(item => {
@@ -150,7 +212,7 @@ async function savePatientNotes(recordId) {
         });
     });
 
-    const structuredNotes = {
+    const notes = {
         note1: document.getElementById('patientNote1').value.trim(),
         note2: document.getElementById('patientNote2').value.trim(),
         note3: document.getElementById('patientNote3').value.trim(),
@@ -161,22 +223,10 @@ async function savePatientNotes(recordId) {
 
     try {
         const patientRef = ref(db, 'patients/' + recordId);
-        const snapshot = await get(patientRef);
-        const currentData = snapshot.val();
-        
-        // Preserve original notes if they exist
-        const originalNotes = typeof currentData.notes === 'string' ? currentData.notes : 
-                            (currentData.notes?.original || '');
-
-        await update(patientRef, { 
-            notes: originalNotes,  // Keep original notes as string
-            structuredNotes: structuredNotes  // Store structured notes separately
-        });
-        
+        await update(patientRef, { notes: notes });
         alert('Notes saved successfully!');
     } catch (error) {
         console.error('Error saving patient notes:', error);
-        alert('Failed to save notes.');
     }
 }
 
@@ -227,17 +277,18 @@ function initMedicineDropdown(parentElement) {
 }
 
 // Function to add medicine list item
-window.addMedicineItem = function (medicineData = null) {
+window.addMedicineItem = function () {
     const ul = document.getElementById('medicineList');
+
     if (!ul) {
         console.error("Error: 'medicineList' element not found!");
-        return null;
+        return;
     }
 
     const li = document.createElement('li');
     li.classList.add('medicine-item');
 
-    li.innerHTML = `
+    const tableHTML = `
     <table class="medicine-table">
         <thead>
             <tr>
@@ -269,6 +320,7 @@ window.addMedicineItem = function (medicineData = null) {
                     </select>
                 </td>
                 <td><input type="number" class="time-input" placeholder="ថ្ងៃ" min="1"></td>
+             
                 <td><select class="dosage-select morning-dose">
                     <option value="" selected disabled>...</option>
                     <option value="1/2">1/2</option>
@@ -280,6 +332,8 @@ window.addMedicineItem = function (medicineData = null) {
                     <option value="3">3</option>
                     <option value="1/4">1/4</option>
                 </select></td>
+           
+           
                 <td><select class="dosage-select afternoon-dose">
                     <option value="" selected disabled>...</option>
                     <option value="1/2">1/2</option>
@@ -291,8 +345,11 @@ window.addMedicineItem = function (medicineData = null) {
                     <option value="3">3</option>
                     <option value="1/4">1/4</option>
                 </select></td>
-                <td><select class="dosage-select evening-dose">
-                    <option value="" selected disabled>...</option>
+           
+           
+                <td>
+                <select class="dosage-select evening-dose">
+                                    <option value="" selected disabled>...</option>
                     <option value="1/2">1/2</option>
                     <option value="1">1</option>
                     <option value="1+1/4">1+1/4</option>
@@ -302,27 +359,20 @@ window.addMedicineItem = function (medicineData = null) {
                     <option value="3">3</option>
                     <option value="1/4">1/4</option>
                 </select></td>
+              
+              
                 <td><input type="text" class="quantity-input" readonly></td>
                 <td><button class="btn-delete" onclick="this.closest('li').remove()">❌</button></td>
             </tr>
         </tbody>
-    </table>`;
+    </table>
+    `;
 
+    li.innerHTML = tableHTML;
     ul.appendChild(li);
+
     initMedicineDropdown(li);
 
-    // If medicine data provided, populate the fields
-    if (medicineData) {
-        li.querySelector('.medicine-input').value = medicineData.name || '';
-        li.querySelector('.dosage-select').value = medicineData.dosage || '';
-        li.querySelector('.time-input').value = medicineData.days || '';
-        li.querySelectorAll('.dosage-select')[1].value = medicineData.morningDose || '';
-        li.querySelectorAll('.dosage-select')[2].value = medicineData.afternoonDose || '';
-        li.querySelectorAll('.dosage-select')[3].value = medicineData.eveningDose || '';
-        li.querySelector('.quantity-input').value = medicineData.quantity || '';
-    }
-
-    // Setup calculation listeners
     const daysInput = li.querySelector('.time-input');
     const morningSelect = li.querySelector('.morning-dose');
     const afternoonSelect = li.querySelector('.afternoon-dose');
@@ -343,8 +393,6 @@ window.addMedicineItem = function (medicineData = null) {
     morningSelect.addEventListener('change', calculateQuantity);
     afternoonSelect.addEventListener('change', calculateQuantity);
     eveningSelect.addEventListener('change', calculateQuantity);
-
-    return li;
 };
 
 // Initialize when DOM is loaded
@@ -357,12 +405,15 @@ document.addEventListener('DOMContentLoaded', function () {
             savePatientNotes(recordId);
         });
         document.getElementById('addMedicineBtn').addEventListener('click', addMedicineItem);
+        document.querySelectorAll('.medicine-item').forEach(item => {
+            initMedicineDropdown(item);
+        });
     }
 
-    // Close dropdowns when clicking outside
     document.addEventListener('click', function (event) {
         const note4Dropdown = document.getElementById('note4-dropdown');
         const note4Input = document.getElementById('patientNote4');
+
         if (note4Dropdown && note4Input && !note4Input.contains(event.target) && !note4Dropdown.contains(event.target)) {
             note4Dropdown.style.display = 'none';
         }

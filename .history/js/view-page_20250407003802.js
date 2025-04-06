@@ -15,10 +15,13 @@ async function getPatientDetails(recordId) {
             document.getElementById('patientGender').textContent = patientData.gender || 'N/A';
             document.getElementById('patientPhone').textContent = patientData.phone || 'N/A';
             document.getElementById('patientEmail').textContent = patientData.email || 'N/A';
+            document.getElementById('patientNotes').textContent = patientData.notes || 'No notes available.';
 
-            // Get notes data - check both locations
-            const notes = patientData.structuredNotes || {};
-            const generalNotes = typeof patientData.notes === 'string' ? patientData.notes : 'មិនមានវេជ្ជបញ្ជា';
+            // Check if notes exist and render them
+            const notes = patientData.notes || {};
+            
+            // Display general notes from receptionist page
+            const generalNotes = notes.general || 'មិនមានវេជ្ជបញ្ជា';
             
             // Create medicine list HTML if medicines exist
             let medicineHtml = '<div class="medicine-empty">មិនទាន់បំពេញ</div>';
