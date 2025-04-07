@@ -573,14 +573,3 @@
         .medication-row > div:nth-child(6)::before { content: "ល្ងាច:"; }
         .medication-row > div:nth-child(7)::before { content: "ចំនួន:"; }
     }
-
-    @media (min-width: 769px) {
-        .sidebar {
-            display: none !important;
-        }
-    
-        .main-content {
-            margin-left: 0 !important;
-        }
-    }
-    
