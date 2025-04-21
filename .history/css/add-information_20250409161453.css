@@ -1,0 +1,152 @@
+/* General Reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Body styling */
+  body.add-detail-page {
+    background-color: #f2f2f2;
+    padding: 20px;
+    font-family: "Noto Sans Khmer", sans-serif;
+    color: #333;
+  }
+  
+  /* Card styling */
+  .patient-card {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+  }
+  
+  /* Header */
+  .patient-header h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 28px;
+    font-weight: 700;
+  }
+  
+  /* Divider line */
+  .divider {
+    height: 1px;
+    background: #ddd;
+    margin-bottom: 20px;
+  }
+  
+  /* Detail Rows */
+  .patient-details .detail-row {
+    margin-bottom: 20px;
+  }
+  
+  .detail-label {
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  
+  /* Textarea */
+  .note-box {
+    width: 100%;
+    min-height: 80px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    font-size: 16px;
+    resize: vertical;
+  }
+  
+  /* Dropdown input */
+  .dropdown-wrapper {
+    position: relative;
+  }
+  
+  .dropdown-wrapper input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+  
+  /* Dropdown menu */
+  .dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 0 0 8px 8px;
+    z-index: 10;
+    display: none;
+  }
+  
+  .dropdown-item {
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .dropdown-item:hover {
+    background-color: #f0f0f0;
+  }
+  
+  /* Medicine List */
+  #medicineList {
+    list-style-type: disc;
+    margin-left: 20px;
+    margin-top: 10px;
+  }
+  
+  .btn-add {
+    margin-top: 10px;
+    padding: 8px 16px;
+    background-color: #e0f0ff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  .btn-add:hover {
+    background-color: #cce4ff;
+  }
+  
+  /* Action Buttons */
+  .action-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+  }
+  
+  .btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: none;
+  }
+  
+  .btn-save {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  .btn-save:hover {
+    background-color: #45a049;
+  }
+  
+  .btn-back {
+    background-color: #f44336;
+    color: white;
+  }
+  
+  .btn-back:hover {
+    background-color: #da190b;
+  }
+  

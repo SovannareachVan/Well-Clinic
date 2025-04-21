@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ព័ត៌មានលម្អិត</title>
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="/image/DC1D71C0-68A8-47C5-8634-5585C79D5CF4_1_102_o.jpeg" type="image/png">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@100..900&family=Siemreap&display=swap" rel="stylesheet">
+    
+    <style>
+        body, input, textarea, select, button {
+            font-family: "Noto Sans Khmer", sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .patient-card {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .patient-header h1 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        
+        .divider {
+            height: 1px;
+            background-color: #e0e0e0;
+            margin: 20px 0;
+        }
+        
+        .detail-row {
+            display: flex;
+            margin-bottom: 20px;
+            align-items: flex-start;
+        }
+        
+        .detail-label {
+            width: 200px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .detail-value {
+            flex: 1;
+        }
+        
+        .note-box {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .dropdown-wrapper {
+            position: relative;
+            width: 100%;
+        }
+        
+        #patientNote4 {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .dropdown-item {
+            padding: 8px 10px;
+            cursor: pointer;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-save {
+            background-color: #27ae60;
+            color: white;
+        }
+        
+        .btn-save:hover {
+            background-color: #2ecc71;
+        }
+        
+        .btn-back {
+            background-color: #95a5a6;
+            color: white;
+        }
+        
+        .btn-back:hover {
+            background-color: #bdc3c7;
+        }
+    </style>
+</head>
+<body>
+    <div class="patient-card">
+        <div class="patient-header">
+            <h1 id="patientName">Patient Name</h1>
+        </div>
+    
+        <div class="divider"></div>
+    
+        <div class="patient-details">
+            <!-- Basic Patient Info -->
+            <div class="detail-row">
+                <div class="detail-label">Full Name:</div>
+                <div class="detail-value" id="patientFullName"></div>
+            </div>
+    
+            <div class="detail-row">
+                <div class="detail-label">Age:</div>
+                <div class="detail-value" id="patientAge"></div>
+            </div>
+    
+            <div class="detail-row">
+                <div class="detail-label">Gender:</div>
+                <div class="detail-value" id="patientGender"></div>
+            </div>
+    
+            <div class="detail-row">
+                <div class="detail-label">Visit Date:</div>
+                <div class="detail-value" id="visitDate"></div>
+            </div>
+    
+            <!-- Notes Fields -->
+            <div class="detail-row note">
+                <div class="detail-label">1. ប្រវត្តិព្យាបាល:</div>
+                <textarea class="note-box" id="patientNote2" placeholder="Enter treatment history here..."></textarea>
+            </div>
+    
+            <div class="detail-row note">
+                <div class="detail-label">2. តេស្តមន្ទីពិសោធន៍:</div>
+                <textarea class="note-box" id="patientNote3" placeholder="Enter lab test results here..."></textarea>
+            </div>
+
+            <div class="detail-row note">
+                <div class="detail-label">3. រោគវិនិច្ឆ័យ:</div>
+                <div class="dropdown-wrapper">
+                    <input type="text" id="patientNote4" placeholder="Select or enter diagnosis..." autocomplete="off">
+                    <div id="note4-dropdown" class="dropdown"></div>
+                </div>
+            </div>
+        </div>
+    
+        <!-- Save & Back Buttons -->
+        <div class="action-buttons">
+            <button class="btn btn-save" id="saveBtn">Save Notes</button>
+            <button class="btn btn-back" onclick="window.history.back()">Back</button>
+        </div>
+    </div>
+
+    <!-- Firebase JS SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+
+    <!-- Custom JavaScript Files -->
+    <script type="module" src="/js/add-detail-page.js"></script>
+    <script type="module" src="/js/dropdown.js"></script>
+</body>
+</html>

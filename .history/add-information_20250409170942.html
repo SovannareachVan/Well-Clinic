@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>បញ្ចូលព័ត៌មានអំពីអ្នកជម្ងឺ</title>
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@100..900&family=Siemreap&display=swap" rel="stylesheet">
+    
+    <style>
+        body, input, textarea, select, button {
+            font-family: "Noto Sans Khmer", sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+        
+        .form-section {
+            margin-bottom: 25px;
+        }
+        
+        .form-section h2 {
+            font-size: 18px;
+            color: #3498db;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            min-height: 100px;
+            resize: vertical;
+            font-size: 14px;
+        }
+        
+        .dropdown-wrapper {
+            position: relative;
+            margin-bottom: 15px;
+        }
+        
+        .dropdown-wrapper input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 0 0 5px 5px;
+            z-index: 100;
+            display: none;
+        }
+        
+        .dropdown-item {
+            padding: 8px 10px;
+            cursor: pointer;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .medicine-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        
+        .medicine-table th, .medicine-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        
+        .medicine-table th {
+            background-color: #f5f5f5;
+            font-weight: normal;
+        }
+        
+        .medicine-input {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        
+        .dosage-select, .time-input {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        
+        .quantity-input {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            background-color: #f9f9f9;
+        }
+        
+        .btn-add {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        .btn-add:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-delete {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px;
+            border-radius: 3px;
+            cursor: pointer;
+            width: 25px;
+            height: 25px;
+        }
+        
+        .btn-delete:hover {
+            background-color: #c0392b;
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .btn-save {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .btn-save:hover {
+            background-color: #27ae60;
+        }
+        
+        .btn-back {
+            background-color: #95a5a6;
+            color: white;
+        }
+        
+        .btn-back:hover {
+            background-color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>បញ្ចូលព័ត៌មានអំពីអ្នកជម្ងឺ</h1>
+        
+        <div class="form-section">
+            <h2>1. ប្រវត្តិព្យាបាល</h2>
+            <textarea id="treatmentHistory" placeholder="បញ្ចូលប្រវត្តិព្យាបាលនៃអ្នកជម្ងឺ..."></textarea>
+        </div>
+        
+        <div class="form-section">
+            <h2>2. តេស្តមន្ទីពិសោធន៍</h2>
+            <textarea id="labTest" placeholder="បញ្ចូលលទ្ធផលតេស្តមន្ទីពិសោធន៍..."></textarea>
+        </div>
+        
+        <div class="form-section">
+            <h2>3. រោគវិនិច្ឆ័យ</h2>
+            <div class="dropdown-wrapper">
+                <input type="text" id="diagnosis" placeholder="សូមជ្រើសរើសរោគវិនិច្ឆ័យ..." autocomplete="off">
+                <div id="diagnosis-dropdown" class="dropdown"></div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h2>4. របៀបប្រើប្រាស់ថ្នាំ</h2>
+            <ul id="medicineList"></ul>
+            <button type="button" onclick="addMedicineItem()" class="btn-add">➕ បន្ថែមថ្នាំ</button>
+        </div>
+        
+        <div class="action-buttons">
+            <button class="btn btn-save" id="saveBtn">រក្សាទុក</button>
+            <button class="btn btn-back" onclick="window.history.back()">ត្រឡប់ក្រោយ</button>
+        </div>
+    </div>
+
+    <!-- Firebase JS SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+
+    <!-- Custom JavaScript Files -->
+    <script type="module" src="/js/add-page.js"></script>
+</body>
+</html>
