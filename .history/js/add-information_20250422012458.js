@@ -396,6 +396,7 @@ function clearForm() {
 
 // MODIFIED: Initialize when DOM is loaded with proper sequencing
 document.addEventListener('DOMContentLoaded', async function() {
+    // Initialize diagnosis dropdown
     initDiagnosisDropdown();
     
     // Get patient and visit IDs from URL
@@ -403,46 +404,57 @@ document.addEventListener('DOMContentLoaded', async function() {
     const patientId = urlParams.get('patientId');
     const visitId = urlParams.get('visitId');
     
-    if (patientId && visitId) {
-        try {
-            // Load saved information for this specific visit
+    // Load or initialize medicine list
+    try {
+        if (patientId && visitId) {
             const infoRef = ref(db, `patients/${patientId}/visits/${visitId}/information`);
             const snapshot = await get(infoRef);
             
             if (snapshot.exists()) {
-                const patientInfo = snapshot.val();
-                displaySavedInfoInForm(patientInfo);
+                displaySavedInfoInForm(snapshot.val());
             } else {
-                // Add one empty medicine item by default
                 addMedicineItem(null, true);
             }
-        } catch (error) {
-            console.error('Error loading patient information:', error);
-            // Add one empty medicine item by default
+        } else {
             addMedicineItem(null, true);
         }
-    } else {
-        // Add one empty medicine item by default
+    } catch (error) {
+        console.error('Error loading patient information:', error);
         addMedicineItem(null, true);
     }
     
-    // Set up event listeners
-    document.getElementById('saveBtn').addEventListener('click', savePatientInformation);
-    document.getElementById('clearBtn').addEventListener('click', clearForm);
+    // Safely add event listeners
+    const saveBtn = document.getElementById('saveBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    
+    if (saveBtn) {
+        saveBtn.addEventListener('click', savePatientInformation);
+    } else {
+        console.error('Save button not found');
+    }
+    
+    if (clearBtn) {
+        clearBtn.addEventListener('click', clearForm);
+    } else {
+        console.error('Clear button not found');
+    }
 
     // Close dropdowns when clicking outside
     document.addEventListener('click', function(event) {
         const diagnosisDropdown = document.getElementById('diagnosis-dropdown');
         const diagnosisInput = document.getElementById('diagnosis');
-        if (diagnosisDropdown && diagnosisInput && !diagnosisInput.contains(event.target) && !diagnosisDropdown.contains(event.target)) {
+        
+        if (diagnosisDropdown && diagnosisInput && 
+            !diagnosisInput.contains(event.target) && 
+            !diagnosisDropdown.contains(event.target)) {
             diagnosisDropdown.style.display = 'none';
         }
 
         document.querySelectorAll('.medicine-dropdown').forEach(dropdown => {
             const input = dropdown.previousElementSibling;
-            if (!input.contains(event.target) && !dropdown.contains(event.target)) {
+            if (input && !input.contains(event.target) && !dropdown.contains(event.target)) {
                 dropdown.style.display = 'none';
             }
         });
     });
-});
+});   

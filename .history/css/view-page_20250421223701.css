@@ -148,9 +148,9 @@
     }
 
     .notes-section {
-        margin-top: 10px;
+        margin-top: 30px;
+        padding-top: 15px;
         border-top: 1px dashed #ddd;
-        padding-top: 10px;
     }
 
     .action-buttons {
@@ -590,75 +590,4 @@
         }
     }
     
-/* Visit Header Styles */
-/* Visit Notes Styling */
-.visit-note {
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 20px;
-    background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.visit-note-header {
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #eee;
-}
-
-.visit-note-header h3 {
-    margin: 0 0 10px 0;
-    color: #2c3e50;
-}
-
-.visit-meta {
-    display: grid;
-    gap: 10px;
-}
-
-.visit-meta div {
-    display: flex;
-    gap: 5px;
-}
-
-.visit-meta strong {
-    white-space: nowrap;
-}
-
-
-/* General Notes Section */
-.patient-general-notes {
-    margin-top: 30px;
-    padding: 15px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    background-color: #f8f9fa;
-}
-
-.patient-general-notes h3 {
-    margin-top: 0;
-    color: #2c3e50;
-    border-bottom: 2px solid #3498db;
-    padding-bottom: 5px;
-}
-
-/* Note Items */
-.note-item {
-    margin-bottom: 10px;
-    padding: 8px;
-    background-color: #fff;
-    border-radius: 4px;
-    border-left: 3px solid #3498db;
-}
-
-/* Medicine Table (keep your existing styles) */
-.medicine-container {
-    margin-top: 10px;
-}
-
-.medicine-empty {
-    padding: 10px;
-    color: #999;
-    font-style: italic;
-}
+    

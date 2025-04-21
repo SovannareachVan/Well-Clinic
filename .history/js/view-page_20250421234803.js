@@ -26,52 +26,68 @@ async function getPatientDetails(recordId) {
                 medicineHtml = generateMedicineTable(notes.medicines);
             }
 
-            // ===== VISIT NOTES SECTION =====
-            let visitsHtml = '';
+            // ===== VISIT INFORMATION SECTION =====
+            let visitHeaderHtml = '';
+            let visitInfoHtml = '';
             
             if (patientData.visits) {
-                const visits = Object.entries(patientData.visits);
+                const visits = Object.values(patientData.visits);
+                const mostRecentVisit = visits[visits.length - 1];
                 
-                // Sort visits by check-in date (newest first)
-                visits.sort((a, b) => new Date(b[1].checkIn) - new Date(a[1].checkIn));
-                
-                visits.forEach(([visitId, visit], index) => {
-                    const visitInfo = visit.information || {};
-                    const visitNumber = index + 1; // Changed from visits.length - index
-                    
+                // Visit header information (from date-register)
+                visitHeaderHtml = `
+                <div class="visit-header-container">
+                    <div class="visit-header-box">
+                        <div class="visit-header-row">
+                            <span class="visit-header-label">លេខរៀង:</span>
+                            <span class="visit-header-value">${visits.length}</span>
+                        </div>
+                        <div class="visit-header-row">
+                            <span class="visit-header-label">ថ្ងៃចូលមន្ទីពេទ្យ:</span>
+                            <span class="visit-header-value">${mostRecentVisit.checkIn || 'N/A'}</span>
+                        </div>
+                        <div class="visit-header-row">
+                            <span class="visit-header-label">ថ្ងៃចេញពីមន្ទីពេទ្យ:</span>
+                            <span class="visit-header-value">${mostRecentVisit.checkOut || 'N/A'}</span>
+                        </div>
+                        <div class="visit-header-row">
+                            <span class="visit-header-label">មន្ទីពេទ្យ:</span>
+                            <span class="visit-header-value">${mostRecentVisit.clinic || 'N/A'}</span>
+                        </div>
+                        <div class="visit-header-row">
+                            <span class="visit-header-label">ពិគ្រោះដោយ:</span>
+                            <span class="visit-header-value">${mostRecentVisit.doctor || 'N/A'}</span>
+                        </div>
+                    </div>
+                </div>
+                `;
+
+                // Medical information from visit (from add-information)
+                if (mostRecentVisit.information) {
+                    const visitInfo = mostRecentVisit.information;
                     let visitMedicineHtml = '<div class="medicine-empty">មិនទាន់បំពេញ</div>';
+                    
                     if (visitInfo.medicines && visitInfo.medicines.length > 0) {
                         visitMedicineHtml = generateMedicineTable(visitInfo.medicines);
                     }
 
-                    visitsHtml += `
-                    <div class="visit-note">
-                        <div class="visit-note-header">
-                            <h3>មកឡើកទី ${visitNumber}</h3>
-                            <div class="visit-meta">
-                                <div><strong>លេខរៀង:</strong> ${visitNumber}</div>
-                                <div><strong>ថ្ងៃចូលមន្ទីពេទ្យ:</strong> ${visit.checkIn || 'N/A'}</div>
-                                <div><strong>ថ្ងៃចេញពីមន្ទីពេទ្យ:</strong> ${visit.checkOut || 'N/A'}</div>
-                                <div><strong>មន្ទីពេទ្យ:</strong> ${visit.clinic || 'N/A'}</div>
-                                <div><strong>ពិគ្រោះដោយ:</strong> ${visit.doctor || 'N/A'}</div>
-                            </div>
-                        </div>
-                        <div class="visit-note-content">
-                            <div class="note-item"><strong>ប្រវត្តិព្យាបាល:</strong> ${visitInfo.treatmentHistory || 'មិនទាន់បំពេញ'}</div>
-                            <div class="note-item"><strong>តេស្តមន្ទីពិសោធន៍:</strong> ${visitInfo.labTest || 'មិនទាន់បំពេញ'}</div>
-                            <div class="note-item"><strong>រោគវិនិច្ឆ័យ:</strong> ${visitInfo.diagnosis || 'មិនទាន់បំពេញ'}</div>
-                            <div class="note-item"><strong>របៀបប្រើប្រាស់ថ្នាំ:</strong></div>
-                            ${visitMedicineHtml}
-                        </div>
+                    visitInfoHtml = `
+                    <div class="medical-info-section">
+                        <div class="section-title">ព័ត៌មានពិនិត្យថ្មីបំផុត</div>
+                        <div class="note-item"><strong>ប្រវត្តិព្យាបាល:</strong> ${visitInfo.treatmentHistory || 'មិនទាន់បំពេញ'}</div>
+                        <div class="note-item"><strong>តេស្តមន្ទីពិសោធន៍:</strong> ${visitInfo.labTest || 'មិនទាន់បំពេញ'}</div>
+                        <div class="note-item"><strong>រោគវិនិច្ឆ័យ:</strong> ${visitInfo.diagnosis || 'មិនទាន់បំពេញ'}</div>
+                        <div class="note-item"><strong>របៀបប្រើប្រាស់ថ្នាំ:</strong></div>
+                        ${visitMedicineHtml}
                     </div>
                     `;
-                });
+                }
             }
 
             // ===== PATIENT NOTES SECTION =====
             const patientNotesHtml = `
-                <div class="patient-general-notes">
-                    <h3>ព័ត៌មានទូទៅ</h3>
+                <div class="medical-info-section">
+                    <div class="section-title">ព័ត៌មានអ្នកជំងឺ</div>
                     <div class="note-item"><strong>វេជ្ជបញ្ជា:</strong> ${generalNotes}</div>
                     <div class="note-item"><strong>1. សញ្ញាណតម្អូញ:</strong> ${notes.note1 || 'មិនទាន់បំពេញ'}</div>
                     <div class="note-item"><strong>2. ប្រវត្តិព្យាបាល:</strong> ${notes.note2 || 'មិនទាន់បំពេញ'}</div>
@@ -85,7 +101,8 @@ async function getPatientDetails(recordId) {
 
             // Combine all sections
             document.getElementById('patientNotes').innerHTML = `
-                ${visitsHtml}
+                ${visitHeaderHtml}
+                ${visitInfoHtml}
                 ${patientNotesHtml}
             `;
         } else {

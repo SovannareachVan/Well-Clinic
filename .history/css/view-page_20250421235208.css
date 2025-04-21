@@ -148,9 +148,9 @@
     }
 
     .notes-section {
-        margin-top: 10px;
+        margin-top: 30px;
+        padding-top: 15px;
         border-top: 1px dashed #ddd;
-        padding-top: 10px;
     }
 
     .action-buttons {
@@ -614,6 +614,7 @@
 
 .visit-meta {
     display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 10px;
 }
 
@@ -626,6 +627,9 @@
     white-space: nowrap;
 }
 
+.visit-note-content {
+    padding: 10px 0;
+}
 
 /* General Notes Section */
 .patient-general-notes {

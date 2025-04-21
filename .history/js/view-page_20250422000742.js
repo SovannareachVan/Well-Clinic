@@ -37,7 +37,7 @@ async function getPatientDetails(recordId) {
                 
                 visits.forEach(([visitId, visit], index) => {
                     const visitInfo = visit.information || {};
-                    const visitNumber = index + 1; // Changed from visits.length - index
+                    const visitNumber = visits.length - index; // Show Note 1, Note 2, etc. in order
                     
                     let visitMedicineHtml = '<div class="medicine-empty">មិនទាន់បំពេញ</div>';
                     if (visitInfo.medicines && visitInfo.medicines.length > 0) {
@@ -47,7 +47,7 @@ async function getPatientDetails(recordId) {
                     visitsHtml += `
                     <div class="visit-note">
                         <div class="visit-note-header">
-                            <h3>មកឡើកទី ${visitNumber}</h3>
+                            <h3>Note ${visitNumber}</h3>
                             <div class="visit-meta">
                                 <div><strong>លេខរៀង:</strong> ${visitNumber}</div>
                                 <div><strong>ថ្ងៃចូលមន្ទីពេទ្យ:</strong> ${visit.checkIn || 'N/A'}</div>

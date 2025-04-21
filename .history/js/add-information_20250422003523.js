@@ -2,9 +2,6 @@
 import { db } from './firebase-config.js';
 import { ref, get, update, push, set } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js';
 
-// Track initialization state
-let medicinesInitialized = false;
-
 const diagnosisOptions = [
     "ជំងឺគ្រុនចាញ់",
     "ជំងឺគ្រុនចាញ់ធ្ងន់ធ្ងរ",
@@ -176,15 +173,9 @@ function initMedicineDropdown(parentElement) {
     });
 }
 
-// MODIFIED: Function to add medicine list item with duplicate prevention
-window.addMedicineItem = function(medicineData = null, forceAdd = false) {
+// Function to add medicine list item
+window.addMedicineItem = function(medicineData = null) {
     const ul = document.getElementById('medicineList');
-    
-    // Prevent empty duplicates unless forced
-    if (!forceAdd && !medicineData && medicinesInitialized) {
-        return null;
-    }
-
     const li = document.createElement('li');
     li.classList.add('medicine-item');
 
@@ -289,11 +280,10 @@ window.addMedicineItem = function(medicineData = null, forceAdd = false) {
         calculateQuantity();
     }
 
-    medicinesInitialized = true;
     return li;
 };
 
-// MODIFIED: Function to save patient information with duplicate check
+// Function to save patient information
 async function savePatientInformation() {
     const urlParams = new URLSearchParams(window.location.search);
     const patientId = urlParams.get('patientId');
@@ -315,12 +305,9 @@ async function savePatientInformation() {
     }
 
     const medicines = [];
-    const medicineNames = new Set(); // Track names to prevent duplicates
-
     document.querySelectorAll('.medicine-item').forEach(item => {
         const medicineName = item.querySelector('.medicine-input').value.trim();
-        if (medicineName && !medicineNames.has(medicineName)) {
-            medicineNames.add(medicineName);
+        if (medicineName) { // Only include medicines with names
             medicines.push({
                 name: medicineName,
                 dosage: item.querySelector('.dosage-select').value,
@@ -357,7 +344,6 @@ async function savePatientInformation() {
     }
 }
 
-// MODIFIED: Function to display saved info in form with initialization control
 function displaySavedInfoInForm(info) {
     // Populate form fields with saved data
     document.getElementById('treatmentHistory').value = info.treatmentHistory !== "N/A" ? info.treatmentHistory : '';
@@ -371,15 +357,16 @@ function displaySavedInfoInForm(info) {
     // Add medicine items if they exist
     if (info.medicines && info.medicines.length > 0) {
         info.medicines.forEach(med => {
-            addMedicineItem(med, true);
+            addMedicineItem(med);
         });
     } else {
         // Add one empty medicine item by default
-        addMedicineItem(null, true);
+        addMedicineItem();
     }
+    
+    // No external display - everything stays in the form fields
 }
 
-// MODIFIED: Function to clear form with controlled initialization
 function clearForm() {
     // Clear form inputs
     document.getElementById('treatmentHistory').value = '';
@@ -387,14 +374,17 @@ function clearForm() {
     document.getElementById('diagnosis').value = '';
     document.getElementById('medicineList').innerHTML = '';
     
-    // Reset initialization flag
-    medicinesInitialized = false;
+    // Hide saved data displays
+    document.getElementById('savedTreatmentHistory').style.display = 'none';
+    document.getElementById('savedLabTest').style.display = 'none';
+    document.getElementById('savedDiagnosis').style.display = 'none';
+    document.getElementById('savedMedicines').style.display = 'none';
     
     // Add one empty medicine item
-    addMedicineItem(null, true);
+    addMedicineItem();
 }
 
-// MODIFIED: Initialize when DOM is loaded with proper sequencing
+// Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', async function() {
     initDiagnosisDropdown();
     
@@ -412,21 +402,31 @@ document.addEventListener('DOMContentLoaded', async function() {
             if (snapshot.exists()) {
                 const patientInfo = snapshot.val();
                 displaySavedInfoInForm(patientInfo);
+                
+                // Populate form fields
+                document.getElementById('treatmentHistory').value = patientInfo.treatmentHistory !== "N/A" ? patientInfo.treatmentHistory : '';
+                document.getElementById('labTest').value = patientInfo.labTest !== "N/A" ? patientInfo.labTest : '';
+                document.getElementById('diagnosis').value = patientInfo.diagnosis || '';
+                
+                // Add medicine items
+                if (patientInfo.medicines && patientInfo.medicines.length > 0) {
+                    patientInfo.medicines.forEach(med => {
+                        addMedicineItem(med);
+                    });
+                } else {
+                    addMedicineItem(); // Add one empty medicine item by default
+                }
             } else {
-                // Add one empty medicine item by default
-                addMedicineItem(null, true);
+                addMedicineItem(); // Add one empty medicine item by default
             }
         } catch (error) {
             console.error('Error loading patient information:', error);
-            // Add one empty medicine item by default
-            addMedicineItem(null, true);
+            addMedicineItem(); // Add one empty medicine item by default
         }
     } else {
-        // Add one empty medicine item by default
-        addMedicineItem(null, true);
+        addMedicineItem(); // Add one empty medicine item by default
     }
     
-    // Set up event listeners
     document.getElementById('saveBtn').addEventListener('click', savePatientInformation);
     document.getElementById('clearBtn').addEventListener('click', clearForm);
 

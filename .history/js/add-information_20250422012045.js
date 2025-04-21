@@ -178,96 +178,89 @@ function initMedicineDropdown(parentElement) {
 
 // MODIFIED: Function to add medicine list item with duplicate prevention
 window.addMedicineItem = function(medicineData = null, forceAdd = false) {
-    const ul = document.getElementById('medicineList');
+    const tbody = document.getElementById('medicineTableBody');
     
     // Prevent empty duplicates unless forced
     if (!forceAdd && !medicineData && medicinesInitialized) {
         return null;
     }
 
-    const li = document.createElement('li');
-    li.classList.add('medicine-item');
+    const newRow = document.createElement('tr');
+    newRow.className = 'medicine-row';
 
-    li.innerHTML = `
-    <table class="medicine-table">
-        <thead>
-            <tr>
-                <th>ឈ្មោះថ្នាំ</th>
-                <th>ប្រភេទថ្នាំ</th>
-                <th>រយះពេល (ថ្ងៃ)</th>
-                <th>ព្រឹក</th>
-                <th>ថ្ងៃ</th>
-                <th>ល្ងាច</th>
-                <th>ចំនួនថ្នាំ</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>
-                    <div class="dropdown-wrapper">
-                        <input type="text" class="medicine-input" placeholder="សូមជ្រើសរើសថ្នាំ..." autocomplete="off" value="${medicineData ? medicineData.name : ''}">
-                        <div class="medicine-dropdown dropdown"></div>
-                    </div>
-                </td>
-                <td>
-                    <select class="dosage-select">
-                        <option value="" ${!medicineData?.dosage ? 'selected disabled' : ''}>...</option>
-                        <option value="ថ្នាំគ្រាប់" ${medicineData?.dosage === 'ថ្នាំគ្រាប់' ? 'selected' : ''}>ថ្នាំគ្រាប់</option>
-                        <option value="អំពូល" ${medicineData?.dosage === 'អំពូល' ? 'selected' : ''}>អំពូល</option>
-                        <option value="កញ្ចប់" ${medicineData?.dosage === 'កញ្ចប់' ? 'selected' : ''}>កញ្ចប់</option>
-                        <option value="បន្ទះ" ${medicineData?.dosage === 'បន្ទះ' ? 'selected' : ''}>បន្ទះ</option>
-                    </select>
-                </td>
-                <td><input type="number" class="time-input" placeholder="ថ្ងៃ" min="1" value="${medicineData?.days || ''}"></td>
-                <td><select class="dosage-select morning-dose">
-                    <option value="" ${!medicineData?.morningDose ? 'selected' : ''}>...</option>
-                    <option value="1/2" ${medicineData?.morningDose === '1/2' ? 'selected' : ''}>1/2</option>
-                    <option value="1" ${medicineData?.morningDose === '1' ? 'selected' : ''}>1</option>
-                    <option value="1+1/4" ${medicineData?.morningDose === '1+1/4' ? 'selected' : ''}>1+1/4</option>
-                    <option value="1+1/2" ${medicineData?.morningDose === '1+1/2' ? 'selected' : ''}>1+1/2</option>
-                    <option value="2" ${medicineData?.morningDose === '2' ? 'selected' : ''}>2</option>
-                    <option value="2+1/2" ${medicineData?.morningDose === '2+1/2' ? 'selected' : ''}>2+1/2</option>
-                    <option value="3" ${medicineData?.morningDose === '3' ? 'selected' : ''}>3</option>
-                    <option value="1/4" ${medicineData?.morningDose === '1/4' ? 'selected' : ''}>1/4</option>
-                </select></td>
-                <td><select class="dosage-select afternoon-dose">
-                    <option value="" ${!medicineData?.afternoonDose ? 'selected' : ''}>...</option>
-                    <option value="1/2" ${medicineData?.afternoonDose === '1/2' ? 'selected' : ''}>1/2</option>
-                    <option value="1" ${medicineData?.afternoonDose === '1' ? 'selected' : ''}>1</option>
-                    <option value="1+1/4" ${medicineData?.afternoonDose === '1+1/4' ? 'selected' : ''}>1+1/4</option>
-                    <option value="1+1/2" ${medicineData?.afternoonDose === '1+1/2' ? 'selected' : ''}>1+1/2</option>
-                    <option value="2" ${medicineData?.afternoonDose === '2' ? 'selected' : ''}>2</option>
-                    <option value="2+1/2" ${medicineData?.afternoonDose === '2+1/2' ? 'selected' : ''}>2+1/2</option>
-                    <option value="3" ${medicineData?.afternoonDose === '3' ? 'selected' : ''}>3</option>
-                    <option value="1/4" ${medicineData?.afternoonDose === '1/4' ? 'selected' : ''}>1/4</option>
-                </select></td>
-                <td><select class="dosage-select evening-dose">
-                    <option value="" ${!medicineData?.eveningDose ? 'selected' : ''}>...</option>
-                    <option value="1/2" ${medicineData?.eveningDose === '1/2' ? 'selected' : ''}>1/2</option>
-                    <option value="1" ${medicineData?.eveningDose === '1' ? 'selected' : ''}>1</option>
-                    <option value="1+1/4" ${medicineData?.eveningDose === '1+1/4' ? 'selected' : ''}>1+1/4</option>
-                    <option value="1+1/2" ${medicineData?.eveningDose === '1+1/2' ? 'selected' : ''}>1+1/2</option>
-                    <option value="2" ${medicineData?.eveningDose === '2' ? 'selected' : ''}>2</option>
-                    <option value="2+1/2" ${medicineData?.eveningDose === '2+1/2' ? 'selected' : ''}>2+1/2</option>
-                    <option value="3" ${medicineData?.eveningDose === '3' ? 'selected' : ''}>3</option>
-                    <option value="1/4" ${medicineData?.eveningDose === '1/4' ? 'selected' : ''}>1/4</option>
-                </select></td>
-                <td><input type="text" class="quantity-input" readonly value="${medicineData?.quantity || ''}"></td>
-                <td><button class="btn-delete" onclick="this.closest('li').remove()">❌</button></td>
-            </tr>
-        </tbody>
-    </table>`;
+    newRow.innerHTML = `
+        <td>
+            <div class="dropdown-wrapper">
+                <input type="text" class="medicine-input" placeholder="Select medicine..." 
+                       value="${medicineData?.name || ''}" autocomplete="off">
+                <div class="medicine-dropdown dropdown"></div>
+            </div>
+        </td>
+        <td>
+            <select class="dosage-select">
+                <option value="" ${!medicineData?.dosage ? 'selected disabled' : ''}>...</option>
+                <option value="ថ្នាំគ្រាប់" ${medicineData?.dosage === 'ថ្នាំគ្រាប់' ? 'selected' : ''}>ថ្នាំគ្រាប់</option>
+                <option value="អំពូល" ${medicineData?.dosage === 'អំពូល' ? 'selected' : ''}>អំពូល</option>
+                <option value="កញ្ចប់" ${medicineData?.dosage === 'កញ្ចប់' ? 'selected' : ''}>កញ្ចប់</option>
+                <option value="បន្ទះ" ${medicineData?.dosage === 'បន្ទះ' ? 'selected' : ''}>បន្ទះ</option>
+            </select>
+        </td>
+        <td>
+            <input type="number" class="time-input" min="1" 
+                   value="${medicineData?.days || ''}" placeholder="Days">
+        </td>
+        <td>
+            <select class="dosage-select morning-dose">
+                <option value="" ${!medicineData?.morningDose ? 'selected' : ''}>-</option>
+                <option value="1/4" ${medicineData?.morningDose === '1/4' ? 'selected' : ''}>1/4</option>
+                <option value="1/2" ${medicineData?.morningDose === '1/2' ? 'selected' : ''}>1/2</option>
+                <option value="1" ${medicineData?.morningDose === '1' ? 'selected' : ''}>1</option>
+                <option value="2" ${medicineData?.morningDose === '2' ? 'selected' : ''}>2</option>
+            </select>
+        </td>
+        <td>
+            <select class="dosage-select afternoon-dose">
+                <option value="" ${!medicineData?.afternoonDose ? 'selected' : ''}>-</option>
+                <option value="1/4" ${medicineData?.afternoonDose === '1/4' ? 'selected' : ''}>1/4</option>
+                <option value="1/2" ${medicineData?.afternoonDose === '1/2' ? 'selected' : ''}>1/2</option>
+                <option value="1" ${medicineData?.afternoonDose === '1' ? 'selected' : ''}>1</option>
+                <option value="2" ${medicineData?.afternoonDose === '2' ? 'selected' : ''}>2</option>
+            </select>
+        </td>
+        <td>
+            <select class="dosage-select evening-dose">
+                <option value="" ${!medicineData?.eveningDose ? 'selected' : ''}>-</option>
+                <option value="1/4" ${medicineData?.eveningDose === '1/4' ? 'selected' : ''}>1/4</option>
+                <option value="1/2" ${medicineData?.eveningDose === '1/2' ? 'selected' : ''}>1/2</option>
+                <option value="1" ${medicineData?.eveningDose === '1' ? 'selected' : ''}>1</option>
+                <option value="2" ${medicineData?.eveningDose === '2' ? 'selected' : ''}>2</option>
+            </select>
+        </td>
+        <td>
+            <input type="text" class="quantity-input" readonly 
+                   value="${medicineData?.quantity || ''}">
+        </td>
+        <td>
+            <button class="btn-delete" onclick="this.closest('tr').remove()">❌</button>
+        </td>
+    `;
 
-    ul.appendChild(li);
-    initMedicineDropdown(li);
+    tbody.appendChild(newRow);
+    initMedicineDropdown(newRow);
 
     // Setup calculation listeners
-    const daysInput = li.querySelector('.time-input');
-    const morningSelect = li.querySelector('.morning-dose');
-    const afternoonSelect = li.querySelector('.afternoon-dose');
-    const eveningSelect = li.querySelector('.evening-dose');
-    const quantityInput = li.querySelector('.quantity-input');
+    setupDoseCalculators(newRow);
+
+    medicinesInitialized = true;
+    return newRow;
+};
+
+function setupDoseCalculators(row) {
+    const daysInput = row.querySelector('.time-input');
+    const morningSelect = row.querySelector('.morning-dose');
+    const afternoonSelect = row.querySelector('.afternoon-dose');
+    const eveningSelect = row.querySelector('.evening-dose');
+    const quantityInput = row.querySelector('.quantity-input');
 
     function calculateQuantity() {
         const days = parseFloat(daysInput.value) || 0;
@@ -284,14 +277,16 @@ window.addMedicineItem = function(medicineData = null, forceAdd = false) {
     afternoonSelect.addEventListener('change', calculateQuantity);
     eveningSelect.addEventListener('change', calculateQuantity);
 
-    // If we have data, calculate the quantity immediately
-    if (medicineData) {
+    // Calculate immediately if we have data
+    if (daysInput.value || morningSelect.value || afternoonSelect.value || eveningSelect.value) {
         calculateQuantity();
     }
+}
 
-    medicinesInitialized = true;
-    return li;
-};
+// Initialize with one empty row when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    addMedicineItem(null, true);
+});
 
 // MODIFIED: Function to save patient information with duplicate check
 async function savePatientInformation() {
@@ -445,4 +440,4 @@ document.addEventListener('DOMContentLoaded', async function() {
             }
         });
     });
-});
+});     

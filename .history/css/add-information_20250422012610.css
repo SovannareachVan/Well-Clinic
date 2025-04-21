@@ -189,3 +189,6 @@ textarea {
 .btn-save:hover {
     background-color: #27ae60;
 }
+#saveBtn, #clearBtn {
+    display: inline-block;
+}
