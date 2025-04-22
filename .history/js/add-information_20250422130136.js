@@ -1,10 +1,57 @@
 // Diagnosis options
 import { db } from './firebase-config.js';
 import { ref, get, update, push, set } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js';
-import { diagnosisOptions } from './add-info-dropdown.js';
+import { note4Options } from './dropdown.js';
+
 // Track initialization state
 let medicinesInitialized = false;
 
+function initNote4Dropdown() {
+    const input = document.getElementById('note4-input'); // Change to your actual input ID
+    const dropdown = document.getElementById('note4-dropdown'); // Change to your dropdown ID
+
+    if (!input || !dropdown) return; // Safety check
+
+    input.addEventListener('input', function() {
+        const query = this.value.toLowerCase();
+        dropdown.innerHTML = '';
+
+        const filteredOptions = query 
+            ? note4Options.filter(option => option.toLowerCase().includes(query))
+            : note4Options;
+
+        filteredOptions.forEach(option => {
+            const div = document.createElement("div");
+            div.classList.add("dropdown-item");
+            div.textContent = option;
+            div.onclick = function() {
+                input.value = option;
+                dropdown.innerHTML = '';
+                dropdown.style.display = 'none';
+            };
+            dropdown.appendChild(div);
+        });
+
+        dropdown.style.display = filteredOptions.length ? 'block' : 'none';
+    });
+
+    input.addEventListener('click', function() {
+        dropdown.style.display = 'block';
+        if (dropdown.innerHTML === '') {
+            note4Options.forEach(option => {
+                const div = document.createElement("div");
+                div.classList.add("dropdown-item");
+                div.textContent = option;
+                div.onclick = function() {
+                    input.value = option;
+                    dropdown.innerHTML = '';
+                    dropdown.style.display = 'none';
+                };
+                dropdown.appendChild(div);
+            });
+        }
+    });
+}
 
 // Medicine options
 const medicineOptions = [
@@ -154,27 +201,13 @@ function initMedicineDropdown(parentElement) {
     });
 }
 
-// Add this at the top of your script (global variable)
-
+// MODIFIED: Function to add medicine list item with duplicate prevention
 window.addMedicineItem = function(medicineData = null, forceAdd = false) {
     const ul = document.getElementById('medicineList');
     
-    // Only prevent empty duplicates if we're not forcing and medicines are initialized
-    if (!forceAdd && !medicineData && medicinesInitialized && ul.querySelectorAll('li').length > 0) {
-        const lastLi = ul.lastElementChild;
-        const inputs = lastLi.querySelectorAll('input');
-        const selects = lastLi.querySelectorAll('select');
-        
-        // Check if last item is empty
-        let isEmpty = true;
-        inputs.forEach(input => {
-            if (input.value) isEmpty = false;
-        });
-        selects.forEach(select => {
-            if (select.value) isEmpty = false;
-        });
-        
-        if (isEmpty) return null;
+    // Prevent empty duplicates unless forced
+    if (!forceAdd && !medicineData && medicinesInitialized) {
+        return null;
     }
 
     const li = document.createElement('li');
@@ -261,15 +294,6 @@ window.addMedicineItem = function(medicineData = null, forceAdd = false) {
     const eveningSelect = li.querySelector('.evening-dose');
     const quantityInput = li.querySelector('.quantity-input');
 
-    function parseDoseValue(value) {
-        if (!value) return 0;
-        if (value.includes('+')) {
-            const parts = value.split('+');
-            return parseFloat(parts[0]) + parseFloat(parts[1]);
-        }
-        return parseFloat(value);
-    }
-
     function calculateQuantity() {
         const days = parseFloat(daysInput.value) || 0;
         const morningValue = parseDoseValue(morningSelect.value);
@@ -293,11 +317,6 @@ window.addMedicineItem = function(medicineData = null, forceAdd = false) {
     medicinesInitialized = true;
     return li;
 };
-
-// Initialize the first medicine item when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    addMedicineItem();
-});
 
 // MODIFIED: Function to save patient information with duplicate check
 async function savePatientInformation() {

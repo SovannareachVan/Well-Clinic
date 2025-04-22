@@ -1,10 +1,32 @@
 // Diagnosis options
 import { db } from './firebase-config.js';
 import { ref, get, update, push, set } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js';
-import { diagnosisOptions } from './add-info-dropdown.js';
+import { diagnosisOptions } from './medicine-dropdown.js';
 // Track initialization state
 let medicinesInitialized = false;
 
+const diagnosisOptions = [
+    "ជំងឺគ្រុនចាញ់",
+    "ជំងឺគ្រុនចាញ់ធ្ងន់ធ្ងរ",
+    "ជំងឺគ្រុនឈាម",
+    "ជំងឺរលាកបំពង់ក",
+    "ជំងឺរលាកសួត",
+    "ជំងឺហឺតៗ",
+    "ជំងឺផ្តាសាយ",
+    "ជំងឺគ្រុនក្តៅ",
+    "ជំងឺរលាកពោះវៀន",
+    "ជំងឺរលាកក្រពះ",
+    "ជំងឺរលាកសួតធ្ងន់ធ្ងរ",
+    "ជំងឺមហារីក",
+    "ជំងឺស្វាយ",
+    "ជំងឺឆ្កួតជ្រូក",
+    "ជំងឺហើមសរសៃប្រសាទ",
+    "ជំងឺហើមសរសៃប្រសាទភ្នែក",
+    "ជំងឺមហារីកថ្លើម",
+    "ជំងឺមហារីកពោះវៀន",
+    "ជំងឺមហារីកសួត",
+    "ជំងឺមហារីកឈាម"
+];
 
 // Medicine options
 const medicineOptions = [
@@ -154,27 +176,13 @@ function initMedicineDropdown(parentElement) {
     });
 }
 
-// Add this at the top of your script (global variable)
-
+// MODIFIED: Function to add medicine list item with duplicate prevention
 window.addMedicineItem = function(medicineData = null, forceAdd = false) {
     const ul = document.getElementById('medicineList');
     
-    // Only prevent empty duplicates if we're not forcing and medicines are initialized
-    if (!forceAdd && !medicineData && medicinesInitialized && ul.querySelectorAll('li').length > 0) {
-        const lastLi = ul.lastElementChild;
-        const inputs = lastLi.querySelectorAll('input');
-        const selects = lastLi.querySelectorAll('select');
-        
-        // Check if last item is empty
-        let isEmpty = true;
-        inputs.forEach(input => {
-            if (input.value) isEmpty = false;
-        });
-        selects.forEach(select => {
-            if (select.value) isEmpty = false;
-        });
-        
-        if (isEmpty) return null;
+    // Prevent empty duplicates unless forced
+    if (!forceAdd && !medicineData && medicinesInitialized) {
+        return null;
     }
 
     const li = document.createElement('li');
@@ -261,15 +269,6 @@ window.addMedicineItem = function(medicineData = null, forceAdd = false) {
     const eveningSelect = li.querySelector('.evening-dose');
     const quantityInput = li.querySelector('.quantity-input');
 
-    function parseDoseValue(value) {
-        if (!value) return 0;
-        if (value.includes('+')) {
-            const parts = value.split('+');
-            return parseFloat(parts[0]) + parseFloat(parts[1]);
-        }
-        return parseFloat(value);
-    }
-
     function calculateQuantity() {
         const days = parseFloat(daysInput.value) || 0;
         const morningValue = parseDoseValue(morningSelect.value);
@@ -293,11 +292,6 @@ window.addMedicineItem = function(medicineData = null, forceAdd = false) {
     medicinesInitialized = true;
     return li;
 };
-
-// Initialize the first medicine item when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    addMedicineItem();
-});
 
 // MODIFIED: Function to save patient information with duplicate check
 async function savePatientInformation() {

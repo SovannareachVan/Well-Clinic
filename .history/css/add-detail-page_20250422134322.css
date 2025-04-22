@@ -201,7 +201,7 @@ body {
     padding: 5px 0;
 }
 #patientNote4 {
-    width: 100%; /* Set the width of the input field */
+    width: 100; /* Set the width of the input field */
     padding: 10px;
     border-radius: 5px;
     border: 1px solid #ccc;

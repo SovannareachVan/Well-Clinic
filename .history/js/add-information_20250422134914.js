@@ -155,6 +155,7 @@ function initMedicineDropdown(parentElement) {
 }
 
 // Add this at the top of your script (global variable)
+let medicinesInitialized = false;
 
 window.addMedicineItem = function(medicineData = null, forceAdd = false) {
     const ul = document.getElementById('medicineList');

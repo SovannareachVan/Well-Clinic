@@ -47,7 +47,7 @@ async function getPatientDetails(recordId) {
                     visitsHtml += `
                     <div class="visit-note">
                         <div class="visit-note-header">
-                            <h3>មកលើកទី ${visitNumber}</h3>
+                            <h3>មកលទី ${visitNumber}</h3>
                             <div class="visit-meta">
                                 <div><strong>លេខរៀង:</strong> ${visitNumber}</div>
                                 <div><strong>ថ្ងៃចូលមន្ទីពេទ្យ:</strong> ${visit.checkIn || 'N/A'}</div>
