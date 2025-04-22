@@ -84,8 +84,8 @@ async function getPatientDetails(recordId) {
 
             // Combine all sections
             document.getElementById('patientNotes').innerHTML = `
-    ${patientNotesHtml}
-    ${visitsHtml}
+                ${visitsHtml}
+                ${patientNotesHtml}
             `;
         } else {
             console.log('No patient data found.');

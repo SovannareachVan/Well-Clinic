@@ -28,7 +28,19 @@ async function getPatientDetails(recordId) {
 
             // ===== VISIT NOTES SECTION =====
             let visitsHtml = '';
-            
+            const patientNotesHtml = `
+            <div class="patient-general-notes">
+                <h3>ព័ត័មានទូទៅ(ចុះឈ្មោះលើកដំបូង​)</h3>
+                <div class="note-item"><strong>វេជ្ជបញ្ជា:</strong> ${generalNotes}</div>
+                <div class="note-item"><strong>1. សញ្ញាណតម្អូញ:</strong> ${notes.note1 || 'មិនទាន់បំពេញ'}</div>
+                <div class="note-item"><strong>2. ប្រវត្តិព្យាបាល:</strong> ${notes.note2 || 'មិនទាន់បំពេញ'}</div>
+                <div class="note-item"><strong>3. តេស្តមន្ទីពិសោធន៍:</strong> ${notes.note3 || 'មិនទាន់បំពេញ'}</div>
+                <div class="note-item"><strong>4. រោគវិនិច្ឆ័យ:</strong> ${notes.note4 || 'មិនទាន់បំពេញ'}</div>
+                <div class="note-item"><strong>5. រោគវិនិច្ឆ័យញែក:</strong> ${notes.note5 || 'មិនទាន់បំពេញ'}</div>
+                <div class="note-item"><strong>6. របៀបប្រើប្រាស់ថ្នាំ:</strong></div>
+                ${medicineHtml}
+            </div>
+        `;
             if (patientData.visits) {
                 const visits = Object.entries(patientData.visits);
                 
@@ -66,26 +78,13 @@ async function getPatientDetails(recordId) {
                     `;
                 });
             }
+        / ===== PATIENT NOTES SECTION =====
 
-            // ===== PATIENT NOTES SECTION =====
-            const patientNotesHtml = `
-                <div class="patient-general-notes">
-                    <h3>ព័ត័មានទូទៅ(ចុះឈ្មោះលើកដំបូង​)</h3>
-                    <div class="note-item"><strong>វេជ្ជបញ្ជា:</strong> ${generalNotes}</div>
-                    <div class="note-item"><strong>1. សញ្ញាណតម្អូញ:</strong> ${notes.note1 || 'មិនទាន់បំពេញ'}</div>
-                    <div class="note-item"><strong>2. ប្រវត្តិព្យាបាល:</strong> ${notes.note2 || 'មិនទាន់បំពេញ'}</div>
-                    <div class="note-item"><strong>3. តេស្តមន្ទីពិសោធន៍:</strong> ${notes.note3 || 'មិនទាន់បំពេញ'}</div>
-                    <div class="note-item"><strong>4. រោគវិនិច្ឆ័យ:</strong> ${notes.note4 || 'មិនទាន់បំពេញ'}</div>
-                    <div class="note-item"><strong>5. រោគវិនិច្ឆ័យញែក:</strong> ${notes.note5 || 'មិនទាន់បំពេញ'}</div>
-                    <div class="note-item"><strong>6. របៀបប្រើប្រាស់ថ្នាំ:</strong></div>
-                    ${medicineHtml}
-                </div>
-            `;
 
             // Combine all sections
             document.getElementById('patientNotes').innerHTML = `
-    ${patientNotesHtml}
-    ${visitsHtml}
+                ${visitsHtml}
+                ${patientNotesHtml}
             `;
         } else {
             console.log('No patient data found.');

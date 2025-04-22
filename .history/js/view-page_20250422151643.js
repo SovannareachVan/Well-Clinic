@@ -49,6 +49,7 @@ async function getPatientDetails(recordId) {
                         <div class="visit-note-header">
                             <h3>មកលើកទី ${visitNumber}</h3>
                             <div class="visit-meta">
+                                <div><strong>លេខរៀង:</strong> ${visitNumber}</div>
                                 <div><strong>ថ្ងៃចូលមន្ទីពេទ្យ:</strong> ${visit.checkIn || 'N/A'}</div>
                                 <div><strong>ថ្ងៃចេញពីមន្ទីពេទ្យ:</strong> ${visit.checkOut || 'N/A'}</div>
                                 <div><strong>មន្ទីពេទ្យ:</strong> ${visit.clinic || 'N/A'}</div>
@@ -70,7 +71,7 @@ async function getPatientDetails(recordId) {
             // ===== PATIENT NOTES SECTION =====
             const patientNotesHtml = `
                 <div class="patient-general-notes">
-                    <h3>ព័ត័មានទូទៅ(ចុះឈ្មោះលើកដំបូង​)</h3>
+                    <h3>ព័ត័មានទូទៅ(ចុះ</h3>
                     <div class="note-item"><strong>វេជ្ជបញ្ជា:</strong> ${generalNotes}</div>
                     <div class="note-item"><strong>1. សញ្ញាណតម្អូញ:</strong> ${notes.note1 || 'មិនទាន់បំពេញ'}</div>
                     <div class="note-item"><strong>2. ប្រវត្តិព្យាបាល:</strong> ${notes.note2 || 'មិនទាន់បំពេញ'}</div>
@@ -84,8 +85,8 @@ async function getPatientDetails(recordId) {
 
             // Combine all sections
             document.getElementById('patientNotes').innerHTML = `
-    ${patientNotesHtml}
-    ${visitsHtml}
+                ${visitsHtml}
+                ${patientNotesHtml}
             `;
         } else {
             console.log('No patient data found.');

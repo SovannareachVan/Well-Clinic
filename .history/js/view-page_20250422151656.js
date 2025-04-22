@@ -49,6 +49,7 @@ async function getPatientDetails(recordId) {
                         <div class="visit-note-header">
                             <h3>មកលើកទី ${visitNumber}</h3>
                             <div class="visit-meta">
+                                <div><strong>លេខរៀង:</strong> ${visitNumber}</div>
                                 <div><strong>ថ្ងៃចូលមន្ទីពេទ្យ:</strong> ${visit.checkIn || 'N/A'}</div>
                                 <div><strong>ថ្ងៃចេញពីមន្ទីពេទ្យ:</strong> ${visit.checkOut || 'N/A'}</div>
                                 <div><strong>មន្ទីពេទ្យ:</strong> ${visit.clinic || 'N/A'}</div>
@@ -84,8 +85,8 @@ async function getPatientDetails(recordId) {
 
             // Combine all sections
             document.getElementById('patientNotes').innerHTML = `
-    ${patientNotesHtml}
-    ${visitsHtml}
+                ${visitsHtml}
+                ${patientNotesHtml}
             `;
         } else {
             console.log('No patient data found.');

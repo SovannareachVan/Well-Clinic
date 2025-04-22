@@ -28,21 +28,20 @@ async function getPatientDetails(recordId) {
 
             // ===== VISIT NOTES SECTION =====
             let visitsHtml = '';
-            
+
             if (patientData.visits) {
                 const visits = Object.entries(patientData.visits);
                 
-                // Sort visits by check-in date (newest first)
+                // Sort visits by check-in date (NEWEST first)
                 visits.sort((a, b) => new Date(b[1].checkIn) - new Date(a[1].checkIn));
                 
-                visits.forEach(([visitId, visit], index) => {
-                    const visitInfo = visit.information || {};
-                    const visitNumber = index + 2; // Changed from visits.length - index
-                    
-                    let visitMedicineHtml = '<div class="medicine-empty">មិនទាន់បំពេញ</div>';
-                    if (visitInfo.medicines && visitInfo.medicines.length > 0) {
-                        visitMedicineHtml = generateMedicineTable(visitInfo.medicines);
+                // Find the highest existing visit number or start from 1
+                let highestVisitNumber = 1;
+                visits.forEach(([_, visit]) => {
+                    if (visit.visitNumber && visit.visitNumber > highestVisitNumber) {
+                        highestVisitNumber = visit.visitNumber;
                     }
+                });
 
                     visitsHtml += `
                     <div class="visit-note">
@@ -84,8 +83,8 @@ async function getPatientDetails(recordId) {
 
             // Combine all sections
             document.getElementById('patientNotes').innerHTML = `
-    ${patientNotesHtml}
-    ${visitsHtml}
+                ${visitsHtml}
+                ${patientNotesHtml}
             `;
         } else {
             console.log('No patient data found.');
