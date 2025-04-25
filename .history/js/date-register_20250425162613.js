@@ -118,17 +118,7 @@ async function loadSavedVisits(patientId) {
                 const deleteBtn = document.createElement('button');
                 deleteBtn.classList.add('btn', 'btn-delete');                
                 deleteBtn.textContent = 'Delete';
-                deleteBtn.onclick = () => {
-                    const password = prompt('Enter password to delete this visit:');
-                    if (password === '12345') {
-                        if (confirm('Are you sure you want to delete this visit?')) {
-                            deleteRow(newRow);
-                        }
-                    } else {
-                        alert('Incorrect password. Deletion cancelled.');
-                    }
-                };
-                
+                deleteBtn.onclick = () => confirm('Delete this visit?') && deleteRow(newRow);
 
                 // Check-out button
                 const checkOutBtn = document.createElement('button');
