@@ -41,7 +41,6 @@ patientForm.addEventListener('submit', async (event) => {
     const district = document.getElementById('district').value;
     const commune = document.getElementById('commune').value;
     const village = document.getElementById('village').value;
-    const street = document.getElementById('street').value.trim();
     const notes = document.getElementById('notes').value.trim();
 
     // Validate inputs

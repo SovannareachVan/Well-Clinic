@@ -76,7 +76,7 @@ window.editPatient = function (patientId) {
 
 // Function to delete patient
 window.deletePatient = function (patientId) {
-    const password = prompt("បញ្ចូលលេខសំងាត់12345 ដើម្បីលុប:");
+    const password = prompt("បញ្ចូល លេខសំងាត់12345 ដើម្បីលុប:");
 
     if (password === "12345") {
         if (confirm("Are you sure you want to delete this patient?")) {

@@ -119,7 +119,7 @@ async function loadSavedVisits(patientId) {
                 deleteBtn.classList.add('btn', 'btn-delete');                
                 deleteBtn.textContent = 'Delete';
                 deleteBtn.onclick = () => {
-                    const password = prompt('បញ្ចូល 12345 ដើម្បីលុប:');
+                    const password = prompt('បញ្ជ:');
                     if (password === '12345') {
                         if (confirm('Are you sure you want to delete this visit?')) {
                             deleteRow(newRow);

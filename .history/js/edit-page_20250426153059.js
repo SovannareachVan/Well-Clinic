@@ -31,6 +31,7 @@ const editProvince = document.getElementById("editProvince");
 const editDistrict = document.getElementById("editDistrict");
 const editCommune = document.getElementById("editCommune");
 const editVillage = document.getElementById("editVillage");
+const editStreet = document.getElementById("editStreet");
 const editNotes = document.getElementById("editNotes");
 
 // Function to populate districts based on province
