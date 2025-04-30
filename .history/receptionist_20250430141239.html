@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>ចុះឈ្មោះអ្នកជំងឺ</title>
+    <link rel="stylesheet" href="/css/receptionist.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="icon" href="/image/DC1D71C0-68A8-47C5-8634-5585C79D5CF4_1_102_o.jpeg" type="image/png"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@100..900&family=Siemreap&display=swap" rel="stylesheet"/>
+    <style>
+        body, input, textarea, select, button {
+            font-family: "Noto Sans Khmer", sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <img src="/image/Logo copy - Copy-01.png" alt="Well Clinic Logo" class="logo-image">
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item" onclick="location.href='index.html'">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </li>
+            <li class="nav-item active" onclick="location.href='receptionist.html'">
+                <i class="fas fa-user-tie"></i>
+                <span>Receptionist</span>
+            </li>
+            <li class="nav-item" onclick="location.href='doctor.html'">
+                <i class="fas fa-user-md"></i>
+                <span>Doctor</span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="form-container">
+            <h1>ចុះឈ្មោះអ្នកជំងឺ</h1>
+            <form id="patientForm">
+                <div class="form-group">
+                    <label for="fullName">ឈ្មោះ:</label>
+                    <input type="text" id="fullName" name="fullName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="age">អាយុ:</label>
+                    <input type="number" id="age" name="age" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="gender">ភេទ:</label>
+                    <select id="gender" name="gender" required>
+                        <option value="">ជ្រើសរើសភេទ</option>
+                        <option value="Male">ប្រុស</option>
+                        <option value="Female">ស្រី</option>
+                        <option value="Other">ផ្សេងៗ</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">លេខទូរស័ព្ទ:</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="address">អាស័យដ្ឋាន:</label>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <input type="text" id="village" name="village" required placeholder="វាយបញ្ចូលភូមិ" style="flex: 1; min-width: 150px;">
+
+                        <div class="address-group">
+                            <input type="text" id="commune" placeholder="Choose Commune" autocomplete="off" />
+                            <div class="dropdown" id="commune-suggestions"></div>
+                        </div>
+
+                        <div class="address-group">
+                            <input type="text" id="district" placeholder="Choose District" autocomplete="off" />
+                            <div class="dropdown" id="district-suggestions"></div>
+                        </div>
+
+                        <div class="address-group">
+                            <input type="text" id="province" placeholder="Choose Province" autocomplete="off" />
+                            <div class="dropdown" id="province-suggestions"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="notes">វេជ្ជបញ្ជា/Notes:</label>
+                    <textarea id="notes" name="notes"></textarea>
+                </div>
+
+                <div id="error-message" class="error-message"></div>
+
+                <button type="submit">Save</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Popup Container -->
+    <div id="popup-container">
+        <div class="popup">
+            <h2 id="popup-title"></h2>
+            <p id="popup-message"></p>
+            <button class="close-popup">Close</button>
+        </div>
+    </div>
+
+    <!-- Firebase & JS -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+    <script type="module" src="/js/receptionist.js"></script>
+    <script type="module" src="/js/commune-data.js"></script>
+
+    <!-- Menu Toggle Script -->
+    <script>
+        const menuToggle = document.querySelector('.mobile-menu-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        const menuIcon = document.getElementById('menuIcon');
+
+        if (menuToggle && menuIcon) {
+            menuToggle.addEventListener('click', function () {
+                sidebar.classList.toggle('active');
+                if (sidebar.classList.contains('active')) {
+                    menuIcon.classList.remove('fa-bars');
+                    menuIcon.classList.add('fa-times');
+                } else {
+                    menuIcon.classList.remove('fa-times');
+                    menuIcon.classList.add('fa-bars');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

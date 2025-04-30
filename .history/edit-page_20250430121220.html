@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit-page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/edit-page.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" href="/image/DC1D71C0-68A8-47C5-8634-5585C79D5CF4_1_102_o.jpeg" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@100..900&family=Siemreap&display=swap" rel="stylesheet">
+    <style>
+    body, input, textarea, select, button {
+        font-family: "Noto Sans Khmer", sans-serif;
+    }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <img src="/image/Logo copy - Copy-01.png" alt="Well Clinic Logo" class="logo-image">
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item" onclick="location.href='index.html'">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </li>
+            <li class="nav-item" onclick="location.href='receptionist.html'">
+                <i class="fas fa-user-tie"></i>
+                <span>Receptionist</span>
+            </li>
+            <li class="nav-item active" onclick="location.href='doctor.html'">
+                <i class="fas fa-user-md"></i>
+                <span>Doctor</span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="edit-container">
+            <h1>Edit Information</h1>
+            <form id="editPatientForm">
+                <input type="hidden" id="patientId">
+                
+                <div class="form-group">
+                    <label for="editFullName">ឈ្មោះ:</label>
+                    <input type="text" id="editFullName" name="fullName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editAge">អាយុ:</label>
+                    <input type="number" id="editAge" name="age" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editGender">ភេទ:</label>
+                    <select id="editGender" name="gender" required>
+                        <option value="">ជ្រើសរើសភេទ</option>
+                        <option value="Male">ប្រុស</option>
+                        <option value="Female">ស្រី</option>
+                        <option value="Other">ផ្សេងៗ</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editPhone">លេខទូរស័ព្ទ:</label>
+                    <input type="tel" id="editPhone" name="phone" required>
+                </div>
+                
+                
+                
+                <div class="form-group full-width">
+                    <label for="address">អាស័យដ្ឋាន:</label>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <!-- Village is now an input -->
+                        <input type="text" id="village" name="village" required placeholder="វាយបញ្ចូលភូមិ" style="flex: 1; min-width: 150px;">
+                
+                        <!-- Commune (still select) -->
+                        <select id="commune" name="commune" required style="flex: 1; min-width: 150px;">
+                            <option value="">ជ្រើសរើសឃុំ</option>
+                            <option value="Commune 1">ឃុំ គគីរ</option>
+                            <option value="Commune 2">ឃុំ កាស</option>
+                            <option value="Commune 3">ឃុំ ក្អែក</option>
+                        </select>
+                
+                        <!-- District (still select) -->
+                        <select id="district" name="district" required style="flex: 1; min-width: 150px;">
+                            <option value="">ជ្រើសរើសស្រុក</option>
+                            <option value="District 1">ស្រុក កៀនស្វាយ</option>
+                            <option value="District 2">ស្រុក ក្អែក</option>
+                            <option value="District 3">ស្រុក កាស</option>
+                        </select>
+                
+                        <!-- Province (still select) -->
+                        <select id="province" name="province" required style="flex: 1; min-width: 150px;">
+                            <option value="">ជ្រើសរើសខេត្ត</option>
+                            <option value="Province 1">ខេត្ត ព្រៃវែង</option>
+                            <option value="Province 2">ខេត្ត កណ្តាល</option>
+                            <option value="Province 3">ខេត្ត ភ្នំពេញ</option>
+                            <option value="Province 4">ខេត្ត បន្ទាយមានជ័យ</option>
+                            <option value="Province 5">ខេត្ត បាត់ដំបង</option>
+                            <option value="Province 6">ខេត្ត កំពង់ចាម</option>
+                            <option value="Province 7">ខេត្ត កំពង់ឆ្នាំង</option>
+                            <option value="Province 8">ខេត្ត កំពង់ស្ពឺ</option>
+                            <option value="Province 9">ខេត្ត កំពង់ធំ</option>
+                            <option value="Province 10">ខេត្ត កំពត</option>
+                            <option value="Province 11">ខេត្ត កោះកុង</option>
+                            <option value="Province 12">ខេត្ត ក្រចេះ</option>
+                            <option value="Province 13">ខេត្ត មណ្ឌលគីរី</option>
+                            <option value="Province 14">ខេត្ត ពោធិ៍សាត់</option>
+                            <option value="Province 15">ខេត្ត ព្រះវិហារ</option>
+                            <option value="Province 16">ខេត្ត ព្រះសីហនុ</option>
+                            <option value="Province 17">ខេត្ត រតនគីរី</option>
+                            <option value="Province 18">ខេត្ត សៀមរាប</option>
+                            <option value="Province 19">ខេត្ត ស្ទឹងត្រែង</option>
+                            <option value="Province 20">ខេត្ត តាកែវ</option>
+                            <option value="Province 21">ខេត្ត ស្វាយរៀង</option>
+                            <option value="Province 22">ខេត្ត ឧត្តរមានជ័យ</option>
+                            <option value="Province 23">ខេត្ត កែប</option>
+                            <option value="Province 24">ខេត្ត ប៉ៃលិន</option>
+                            <option value="Province 25">ខេត្ត ត្បូងឃ្មុំ</option>
+                        </select>
+                    </div>
+                </div>
+                
+                
+                <div class="form-group full-width">
+                    <label for="editNotes">វេជ្ជបញ្ជា/Notes:</label>
+                    <textarea id="editNotes" name="notes"></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-cancel" onclick="window.history.back()">Cancel</button>
+                    <button type="submit" class="btn btn-save">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+    <script type="module" src="/js/edit-page.js"></script>
+</body>
+</html>
