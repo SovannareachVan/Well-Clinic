@@ -23,22 +23,44 @@ const village = document.getElementById("village"); // now a text input
 // Address options (commune, district, province only)
 const addressOptions = {
     communes: [
-        { value: "គគីរ", label: "ឃុំ គគីរ" },
-        { value: "កាស", label: "ឃុំ កាស" },
-        { value: "ក្អែក", label: "ឃុំ ក្អែក" }
+        { value: "Commune 1", label: "ឃុំ គគីរ" },
+        { value: "Commune 2", label: "ឃុំ កាស" },
+        { value: "Commune 3", label: "ឃុំ ក្អែក" }
     ],
     districts: [
-        { value: "កៀនស្វាយ", label: "ស្រុក កៀនស្វាយ" },
-        { value: "ក្អែក", label: "ស្រុក ក្អែក" },
-        { value: "កាស", label: "ស្រុក កាស" }
+        { value: "District 1", label: "ស្រុក កៀនស្វាយ" },
+        { value: "District 2", label: "ស្រុក ក្អែក" },
+        { value: "District 3", label: "ស្រុក កាស" }
     ],
     provinces: [
-        { value: "ព្រៃវែង", label: "ខេត្ត ព្រៃវែង" },
-        { value: "កណ្តាល", label: "ខេត្ត កណ្តាល" },
-        { value: "ក្អាត់", label: "ខេត្ត ក្អាត់" }
+        "Phnom Penh": "រាជធានី ភ្នំពេញ",
+        "Banteay Meanchey": "បន្ទាយមានជ័យ",
+        "Battambang": "បាត់ដំបង",
+        "Kampong Cham": "កំពង់ចាម",
+        "Kampong Chhnang": "កំពង់ឆ្នាំង",
+        "Kampong Speu": "កំពង់ស្ពឺ",
+        "Kampong Thom": "កំពង់ធំ",
+        "Kampot": "កំពត",
+        "Kandal": "កណ្តាល",
+        "Kep": "កែប",
+        "Koh Kong": "កោះកុង",
+        "Kratie": "ក្រចេះ",
+        "Mondulkiri": "មណ្ឌលគិរី",
+        "Oddar Meanchey": "អូរដែរមានជ័យ",
+        "Pailin": "ប៉ៃលិន",
+        "Preah Vihear": "ព្រះវិហារ",
+        "Prey Veng": "ព្រៃវែង",
+        "Pursat": "ពោធិ៍សាត់",
+        "Ratanakiri": "រតនគិរី",
+        "Siem Reap": "សៀមរាប",
+        "Preah Sihanouk": "ព្រះសីហនុ",
+        "Stung Treng": "ស្ទឹងត្រែង",
+        "Svay Rieng": "ស្វាយរៀង",
+        "Takeo": "តាកែវ",
+        "Tbong Khmum": "ត្បូងឃ្មុំ"
+    }
     ]
 };
-
 
 // Populate commune, district, and province dropdowns
 function populateAddressDropdowns() {

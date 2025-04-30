@@ -18,29 +18,28 @@ const editNotes = document.getElementById("editNotes");
 const province = document.getElementById("province");
 const district = document.getElementById("district");
 const commune = document.getElementById("commune");
-const village = document.getElementById("village"); // now a text input
+const village = document.getElementById("village");
 
-// Address options (commune, district, province only)
+// Address options (direct Khmer values)
 const addressOptions = {
     communes: [
-        { value: "គគីរ", label: "ឃុំ គគីរ" },
-        { value: "កាស", label: "ឃុំ កាស" },
-        { value: "ក្អែក", label: "ឃុំ ក្អែក" }
+        { value: "ឃុំ គគីរ", label: "ឃុំ គគីរ" },
+        { value: "ឃុំ កាស", label: "ឃុំ កាស" },
+        { value: "ឃុំ ក្អែក", label: "ឃុំ ក្អែក" }
     ],
     districts: [
-        { value: "កៀនស្វាយ", label: "ស្រុក កៀនស្វាយ" },
-        { value: "ក្អែក", label: "ស្រុក ក្អែក" },
-        { value: "កាស", label: "ស្រុក កាស" }
+        { value: "ស្រុក កៀនស្វាយ", label: "ស្រុក កៀនស្វាយ" },
+        { value: "ស្រុក ក្អែក", label: "ស្រុក ក្អែក" },
+        { value: "ស្រុក កាស", label: "ស្រុក កាស" }
     ],
     provinces: [
-        { value: "ព្រៃវែង", label: "ខេត្ត ព្រៃវែង" },
-        { value: "កណ្តាល", label: "ខេត្ត កណ្តាល" },
-        { value: "ក្អាត់", label: "ខេត្ត ក្អាត់" }
+        { value: "ខេត្ត ព្រៃវែង", label: "ខេត្ត ព្រៃវែង" },
+        { value: "ខេត្ត កណ្តាល", label: "ខេត្ត កណ្តាល" },
+        { value: "ខេត្ត ក្អាត់", label: "ខេត្ត ក្អាត់" }
     ]
 };
 
-
-// Populate commune, district, and province dropdowns
+// Populate dropdowns
 function populateAddressDropdowns() {
     const populateDropdown = (dropdown, options) => {
         dropdown.innerHTML = options.map(option => 
@@ -51,6 +50,17 @@ function populateAddressDropdowns() {
     populateDropdown(commune, addressOptions.communes);
     populateDropdown(district, addressOptions.districts);
     populateDropdown(province, addressOptions.provinces);
+}
+
+// Set selected dropdown value
+function setSelectedValue(dropdown, currentValue) {
+    for (let option of dropdown.options) {
+        if (option.value === currentValue) {
+            option.selected = true;
+            return;
+        }
+    }
+    dropdown.selectedIndex = 0; // Fallback
 }
 
 // Load patient data
@@ -75,12 +85,12 @@ async function loadPatientData() {
             editPhone.value = patientData.phone || "";
             editNotes.value = patientData.notes || "";
 
-            // Handle address data if it exists
+            // Address data
             if (patientData.address) {
-                village.value = patientData.address.village || ""; // Text input
-                setSelectedValue(commune, patientData.address.commune, "commune");
-                setSelectedValue(district, patientData.address.district, "district");
-                setSelectedValue(province, patientData.address.province, "province");
+                village.value = patientData.address.village || "";
+                setSelectedValue(commune, patientData.address.commune);
+                setSelectedValue(district, patientData.address.district);
+                setSelectedValue(province, patientData.address.province);
             }
         } else {
             alert("Patient not found!");
@@ -89,19 +99,6 @@ async function loadPatientData() {
     } catch (error) {
         console.error("Error fetching patient data:", error);
         alert("Failed to load patient data.");
-    }
-}
-
-// Helper to set selected value in dropdown
-function setSelectedValue(value, currentValue, dropdownId) {
-    const dropdown = document.getElementById(dropdownId);
-    if (dropdown) {
-        const options = Array.from(dropdown.options);
-        options.forEach(option => {
-            if (option.value === currentValue) {
-                option.selected = true;
-            }
-        });
     }
 }
 
@@ -120,12 +117,11 @@ editPatientForm.addEventListener("submit", async (event) => {
                 province: province.value,
                 district: district.value,
                 commune: commune.value,
-                village: village.value.trim() // free text
+                village: village.value.trim()
             }
         };
 
         await update(ref(db, `patients/${patientId}`), updatedData);
-
         alert("Patient information updated successfully!");
         window.location.href = "doctor.html"; 
     } catch (error) {
@@ -134,6 +130,6 @@ editPatientForm.addEventListener("submit", async (event) => {
     }
 });
 
-// Init
+// Initialize
 populateAddressDropdowns();
 loadPatientData();

@@ -63,7 +63,16 @@
 
     <!-- Custom JavaScript Files -->
     <script type="module" src="/js/add-information.js"></script>
-
-    
+    <script>
+        document.getElementById("saveButton").addEventListener("click", function () {
+            // Example save logic
+            saveDataToFirebase().then(() => {
+                // Go back to the previous page after saving
+                window.history.back();
+            }).catch((error) => {
+                alert("Error saving data: " + error.message);
+            });
+        });
+    </script>
 </body>
 </html>

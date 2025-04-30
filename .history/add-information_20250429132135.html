@@ -52,10 +52,20 @@
         <div class="action-buttons">
             <button class="btn btn-save" id="saveBtn">រក្សាទុក</button>
             <button class="btn btn-back" onclick="window.history.back()">ត្រឡប់ក្រោយ</button>
-            
+
         </div>
     </div>
-
+    <script>
+        document.getElementById("saveButton").addEventListener("click", function () {
+            // Example save logic
+            saveDataToFirebase().then(() => {
+                // Go back to the previous page after saving
+                window.history.back();
+            }).catch((error) => {
+                alert("Error saving data: " + error.message);
+            });
+        });
+    </script>
     <!-- Firebase JS SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
@@ -63,7 +73,5 @@
 
     <!-- Custom JavaScript Files -->
     <script type="module" src="/js/add-information.js"></script>
-
-    
 </body>
 </html>

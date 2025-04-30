@@ -23,22 +23,46 @@ const village = document.getElementById("village"); // now a text input
 // Address options (commune, district, province only)
 const addressOptions = {
     communes: [
-        { value: "គគីរ", label: "ឃុំ គគីរ" },
-        { value: "កាស", label: "ឃុំ កាស" },
-        { value: "ក្អែក", label: "ឃុំ ក្អែក" }
+        { value: "Commune 1", label: "ឃុំ គគីរ" },
+        { value: "Commune 2", label: "ឃុំ កាស" },
+        { value: "Commune 3", label: "ឃុំ ក្អែក" }
     ],
     districts: [
-        { value: "កៀនស្វាយ", label: "ស្រុក កៀនស្វាយ" },
-        { value: "ក្អែក", label: "ស្រុក ក្អែក" },
-        { value: "កាស", label: "ស្រុក កាស" }
+        { value: "District 1", label: "ស្រុក កៀនស្វាយ" },
+        { value: "District 2", label: "ស្រុក ក្អែក" },
+        { value: "District 3", label: "ស្រុក កាស" }
     ],
     provinces: [
-        { value: "ព្រៃវែង", label: "ខេត្ត ព្រៃវែង" },
-        { value: "កណ្តាល", label: "ខេត្ត កណ្តាល" },
-        { value: "ក្អាត់", label: "ខេត្ត ក្អាត់" }
+        { value: "Province 1", label: "ខេត្ត ព្រៃវែង" },
+        { value: "Province 2", label: "ខេត្ត កណ្តាល" },
+        { value: "Province 3", label: "ខេត្ត ក្អាត់" },
+        { value: "Province 4", label: "រាជធានី ភ្នំពេញ" },
+        { value: "Province 5", label: "ខេត្ត បន្ទាយមានជ័យ" },
+        { value: "Province 6", label: "ខេត្ត បាត់ដំបង" },
+        { value: "Province 7", label: "ខេត្ត កំពង់ចាម" },
+        { value: "Province 8", label: "ខេត្ត កំពង់ឆ្នាំង" },
+        { value: "Province 9", label: "ខេត្ត កំពង់ស្ពឺ" },
+        { value: "Province 10", label: "ខេត្ត កំពង់ធំ" },
+        { value: "Province 11", label: "ខេត្ត កំពត" },
+        { value: "Province 12", label: "ខេត្ត កែប" },
+        { value: "Province 13", label: "ខេត្ត កោះកុង" },
+        { value: "Province 14", label: "ខេត្ត ក្រចេះ" },
+        { value: "Province 15", label: "ខេត្ត មណ្ឌលគិរី" },
+        { value: "Province 16", label: "ខេត្ត អូរដែរមានជ័យ" },
+        { value: "Province 17", label: "ខេត្ត ប៉ៃលិន" },
+        { value: "Province 18", label: "ខេត្ត ព្រះវិហារ" },
+        { value: "Province 19", label: "ខេត្ត ពោធិ៍សាត់" },
+        { value: "Province 20", label: "ខេត្ត រតនគិរី" },
+        { value: "Province 21", label: "ខេត្ត សៀមរាប" },
+        { value: "Province 22", label: "ខេត្ត ព្រះសីហនុ" },
+        { value: "Province 23", label: "ខេត្ត ស្ទឹងត្រែង" },
+        { value: "Province 24", label: "ខេត្ត ស្វាយរៀង" },
+        { value: "Province 25", label: "ខេត្ត តាកែវ" },
+        { value: "Province 26", label: "ខេត្ត ត្បូងឃ្មុំ" }
     ]
+    
+    
 };
-
 
 // Populate commune, district, and province dropdowns
 function populateAddressDropdowns() {

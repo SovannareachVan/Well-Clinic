@@ -144,7 +144,7 @@ body {
 }
 .detail-value {
     flex: 1;
-    color: black;
+    color: black
     text-align: left;
     word-break: break-word;
     padding-left: 0; /* Remove any left padding */
@@ -390,9 +390,10 @@ body {
 
 .btn-delete {
     border: none;
-    background-color: rgba(157, 63, 245, 0.731);
+    background-color: var(--primary);
     cursor: pointer;
     font-size: 1.1em;
+    background-color: var(--primary);
     padding: 10px 20px;
     border: none;
     border-radius: 5px;

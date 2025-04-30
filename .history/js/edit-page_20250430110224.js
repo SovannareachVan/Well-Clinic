@@ -23,22 +23,44 @@ const village = document.getElementById("village"); // now a text input
 // Address options (commune, district, province only)
 const addressOptions = {
     communes: [
-        { value: "គគីរ", label: "ឃុំ គគីរ" },
-        { value: "កាស", label: "ឃុំ កាស" },
-        { value: "ក្អែក", label: "ឃុំ ក្អែក" }
+        { value: "Commune 1", label: "ឃុំ គគីរ" },
+        { value: "Commune 2", label: "ឃុំ កាស" },
+        { value: "Commune 3", label: "ឃុំ ក្អែក" }
     ],
     districts: [
-        { value: "កៀនស្វាយ", label: "ស្រុក កៀនស្វាយ" },
-        { value: "ក្អែក", label: "ស្រុក ក្អែក" },
-        { value: "កាស", label: "ស្រុក កាស" }
+        { value: "District 1", label: "ស្រុក កៀនស្វាយ" },
+        { value: "District 2", label: "ស្រុក ក្អែក" },
+        { value: "District 3", label: "ស្រុក កាស" }
     ],
-    provinces: [
-        { value: "ព្រៃវែង", label: "ខេត្ត ព្រៃវែង" },
-        { value: "កណ្តាល", label: "ខេត្ត កណ្តាល" },
-        { value: "ក្អាត់", label: "ខេត្ត ក្អាត់" }
+    const province: [
+        { value: "Phnom Penh", label: "រាជធានី ភ្នំពេញ" },
+        { value: "Banteay Meanchey", label: "ខេត្ត បន្ទាយមានជ័យ" },
+        { value: "Battambang", label: "ខេត្ត បាត់ដំបង" },
+        { value: "Kampong Cham", label: "ខេត្ត កំពង់ចាម" },
+        { value: "Kampong Chhnang", label: "ខេត្ត កំពង់ឆ្នាំង" },
+        { value: "Kampong Speu", label: "ខេត្ត កំពង់ស្ពឺ" },
+        { value: "Kampong Thom", label: "ខេត្ត កំពង់ធំ" },
+        { value: "Kampot", label: "ខេត្ត កំពត" },
+        { value: "Kandal", label: "ខេត្ត កណ្តាល" },
+        { value: "Kep", label: "ខេត្ត កែប" },
+        { value: "Koh Kong", label: "ខេត្ត កោះកុង" },
+        { value: "Kratie", label: "ខេត្ត ក្រចេះ" },
+        { value: "Mondulkiri", label: "ខេត្ត មណ្ឌលគិរី" },
+        { value: "Oddar Meanchey", label: "ខេត្ត អូរដែរមានជ័យ" },
+        { value: "Pailin", label: "ខេត្ត ប៉ៃលិន" },
+        { value: "Preah Vihear", label: "ខេត្ត ព្រះវិហារ" },
+        { value: "Prey Veng", label: "ខេត្ត ព្រៃវែង" },
+        { value: "Pursat", label: "ខេត្ត ពោធិ៍សាត់" },
+        { value: "Ratanakiri", label: "ខេត្ត រតនគិរី" },
+        { value: "Siem Reap", label: "ខេត្ត សៀមរាប" },
+        { value: "Preah Sihanouk", label: "ខេត្ត ព្រះសីហនុ" },
+        { value: "Stung Treng", label: "ខេត្ត ស្ទឹងត្រែង" },
+        { value: "Svay Rieng", label: "ខេត្ត ស្វាយរៀង" },
+        { value: "Takeo", label: "ខេត្ត តាកែវ" },
+        { value: "Tbong Khmum", label: "ខេត្ត ត្បូងឃ្មុំ" }
     ]
+    
 };
-
 
 // Populate commune, district, and province dropdowns
 function populateAddressDropdowns() {
