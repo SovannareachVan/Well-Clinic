@@ -1,0 +1,464 @@
+
+:root {
+    --primary: #4a6fa5;
+    --primary-dark: #166088;
+    --accent: #4fc3f7;
+    --light: #f8f9fa;
+    --dark: #343a40;
+    --gray: #6c757d;
+    --success: #28a745;
+    --danger: #dc3545;
+}
+.logo {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    gap: 10px; /* Adds space between logo and text */
+}
+
+.logo-image {
+    height: 90px; /* Adjust based on your logo's proportions */
+    width: auto; /* Maintains aspect ratio */
+    object-fit: contain;
+}
+
+/* Remove the icon styles since we're not using it anymore */
+.logo i {
+    display: none;
+}
+    /* Unified Sidebar Styles */
+    .sidebar {
+        width: 250px;
+        background: linear-gradient(135deg, #4a6fa5, #166088);
+        color: white;
+        height: 100vh;
+        position: fixed;
+        box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        z-index: 100;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .logo i {
+        font-size: 24px;
+        margin-right: 10px;
+    }
+
+    .logo h2 {
+        font-size: 1.3rem;
+        font-weight: 600;
+    }
+
+    .nav-menu {
+        list-style: none;
+        padding: 0 15px;
+    }
+
+    .nav-item {
+        padding: 12px 15px;
+        margin-bottom: 5px;
+        border-radius: 5px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+
+    .nav-item:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-item.active {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .nav-item i {
+        font-size: 1.1rem;
+        width: 30px;
+        text-align: center;
+    }
+
+    .nav-item span {
+        font-size: 0.95rem;
+        font-weight: 500;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .sidebar {
+            width: 70px;
+        }
+        
+        .logo h2, .nav-item span {
+            display: none;
+        }
+        
+        .logo {
+            justify-content: center;
+            padding: 20px 10px;
+        }
+        
+        .logo i {
+            margin-right: 0;
+            font-size: 28px;
+        }
+        
+        .nav-item {
+            justify-content: center;
+            padding: 15px 0;
+            margin: 5px 0;
+        }
+        
+        .main-content {
+            margin-left: 70px;
+        }
+    }
+
+
+/* Main Content Styles */
+.main-content {
+    flex: 1;
+    margin-left: 250px;
+    padding: 30px;
+}
+
+/* Form Container Styles */
+.form-container {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.form-container h1 {
+    color: var(--dark-color);
+    margin-bottom: 25px;
+    font-weight: 600;
+    text-align: center;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.form-container h1::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background-color: var(--accent-color);
+}
+
+/* Form Styles */
+#patientForm {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+#patientForm label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--dark-color);
+}
+
+#patientForm input,
+#patientForm select,
+#patientForm textarea {
+    width: 100%;
+    padding: 12px 1px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 15px;
+    transition: all 0.3s;
+}
+
+#patientForm input:focus,
+#patientForm select:focus,
+#patientForm textarea:focus {
+    border-color: var(--accent-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.2);
+}
+
+#patientForm textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.full-width {
+    grid-column: span 2;
+}
+
+button[type="submit"] {
+    grid-column: span 2;
+    background-color: var(--primary-color);
+    color: rgb(243, 243, 243);
+    border: none;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: 500;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 10px;
+    background: linear-gradient(135deg, #4a6fa5, #166088);
+}
+
+button[type="submit"]:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px);
+}
+
+/* Popup Styles */
+#popup-container {
+    display: none; /* Hide by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Dim the background */
+    justify-content: center;
+    align-items: center;
+}
+
+.popup {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.close-popup {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+
+@keyframes popupFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Error Message */
+.error-message {
+    color: var(--error-color);
+    font-size: 14px;
+    margin-top: 5px;
+    display: none;
+    grid-column: span 2;
+}
+
+@media (min-width: 1600px) {
+    .main-logo {
+        max-width: 700px; /* Extra large screens */
+    }
+}
+@media (min-width: 1200px) {
+    .main-logo {
+        max-width: 500px;
+    }
+    
+    .logo-image {
+        height: 110px;
+        padding-left: 22%;
+    }
+}
+
+@media (max-width: 992px) {
+    .mobile-menu-toggle {
+        display: block;
+    }
+    .logo-image {
+        height: 110px;
+        padding-left: 50%;
+    }
+    .sidebar {
+        left: -250px;
+    }
+    
+    .sidebar.active {
+        left: 0;
+    }
+    
+    .main-content {
+        margin-left: 0;
+    }
+    
+    .main-logo {
+        max-width: 350px;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Sidebar adjustments - keep visible like doctor page */
+    .sidebar {
+        width: 70px;
+        left: 0 !important; /* Force sidebar to stay visible */
+    }
+    
+    /* Logo adjustments */
+    .logo h2, .nav-item span {
+        display: none;
+    }
+    
+    .logo {
+        justify-content: center;
+        padding: 20px 10px;
+    }
+    
+    .logo-image {
+        height: 40px;
+        padding-left: 0; /* Remove any extra padding */
+    }
+    
+    /* Navigation items */
+    .nav-item {
+        justify-content: center;
+        padding: 15px 0;
+        margin: 5px 0;
+    }
+    
+    /* Main content adjustments */
+    .main-content {
+        margin-left: 70px; /* Match sidebar width */
+        padding: 20px;
+    }
+    
+    /* Form adjustments */
+    #patientForm {
+        grid-template-columns: 1fr;
+    }
+    
+    .full-width {
+        grid-column: span 1;
+    }
+    
+    button[type="submit"] {
+        grid-column: span 1;
+    }
+    
+    /* Hide mobile toggle if not needed */
+    .mobile-menu-toggle {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-logo {
+        max-width: 250px;
+    }
+    
+    .role-card {
+        width: 100%;
+    }
+    
+    .role-container {
+        padding: 30px 15px;
+    }
+}
+
+/* Utility Classes */
+.date-detail-btn {
+    background-color: red;
+}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+@media (max-width: 1024px) {
+    /* Logo adjustments */
+    .main-logo {
+        max-width: 450px; /* Slightly smaller than desktop */
+
+    }
+    .logo-image {
+        height: 100px;
+        padding-left: 22%;
+    }
+
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .sidebar {
+        left: 0 !important;
+        width: 250px;
+    }
+    
+    .main-content {
+        margin-left: 250px;
+    }
+    
+    .mobile-menu-toggle {
+        display: none;
+    }
+}
+.logo-image {
+    height: 100px;
+    padding-left: 22%;
+}
+
+/* Add these styles to your receptionist.css */
+.address-group {
+    position: relative;
+    flex: 1;
+    min-width: 150px;
+  }
+  
+  .dropdown {
+    position: absolute;
+    width: 100%;
+    max-height: 500px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid #ddd;
+    border-top: none;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    z-index: 1000;
+    display: none;
+  }
+  
+  .dropdown li {
+    padding: 8px 12px;
+    cursor: pointer;
+  }
+  
+  .dropdown li:hover {
+    background-color: #f0f0f0;
+  }
+  
+  /* Show dropdown when input is focused */
+  .address-group input:focus + .dropdown {
+    display: block;
+  }
