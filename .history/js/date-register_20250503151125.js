@@ -81,7 +81,7 @@ async function getPatientDetails(id) {
                 village ? `ភូមិ ${addressMapping.village[village] || village}` : '',
                 commune ? `ឃុំ/សង្កាត់ ${addressMapping.commune[commune] || commune}` : '',
                 district ? `ស្រុក/ខណ្ឌ ${addressMapping.district[district] || district}` : '',
-                province ? `ខេត្ត/ក្រុង ${addressMapping.province[province] || province}` : ''
+                province ? `ខេត្ត ${addressMapping.province[province] || province}` : ''
             ].filter(Boolean); // remove empty
 
             const addressString = addressParts.join(', ');
