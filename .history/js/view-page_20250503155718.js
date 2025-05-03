@@ -37,38 +37,58 @@ async function getPatientDetails(recordId, visitId = null) {
             }
         });
 
-        // Address mapping
-        const addressMapping = {
-            village: {},
-            commune: {},
-            district: {},
-            province: {}
-        };
+    // Address mapping (same as above)
+const addressMapping = {
+    village: {
+        "Village 1": "ទួលក្របៅ",
+        "Village 2": "សាមកុក",
+        "Village 3": "ហាបី"
+    },
+    commune: {
+        "Commune 1": "គគីរ",
+        "Commune 2": "កាស",
+        "Commune 3": "ក្អែក"
+    },
+    district: {
+        "District 1": "កៀនស្វាយ",
+        "District 2": "ក្អែក",
+        "District 3": "កាស"
+    },
+    province: {
+        "Province 1": "ព្រៃវែង",
+        "Province 2": "កណ្តាល",
+        "Province 3": "ក្អាត់"
+    }
+};
 
-        // Handle Address mapping
-        if (patientData.address) {
-            let addressString = '';
-            const { village, commune, district, province } = patientData.address;
+// Handle Address mapping (same logic to display address)
+if (patientData.address) {
+    let addressString = '';
 
-            const addressParts = [
-                village ? `ភូមិ ${addressMapping.village[village] || village}` : '',
-                commune ? `ឃុំ/សង្កាត់ ${addressMapping.commune[commune] || commune}` : '',
-                district ? `ស្រុក/ខណ្ឌ ${addressMapping.district[district] || district}` : '',
-                province ? `ខេត្ត/ក្រុង ${addressMapping.province[province] || province}` : ''
-            ].filter(Boolean);
+    const { village, commune, district, province } = patientData.address;
 
-            addressString = addressParts.join(', ');
-            const patientAddressElement = document.getElementById('patientAddress');
-            if (patientAddressElement) {
-                patientAddressElement.textContent = addressString || 'N/A';
-            }
-        } else {
-            console.error('Address data not found or empty');
-            const patientAddressElement = document.getElementById('patientAddress');
-            if (patientAddressElement) {
-                patientAddressElement.textContent = 'N/A';
-            }
-        }
+    const addressParts = [
+        village ? `ភូមិ ${addressMapping.village[village] || village}` : '', // Village label with value
+        commune ? `ឃុំ/សង្កាត់ ${addressMapping.commune[commune] || commune}` : '', // Commune label with value
+        district ? `ស្រុក/ខណ្ឌ ${addressMapping.district[district] || district}` : '', // District label with value
+        province ? `ខេត្ត/ក្រុង ${addressMapping.province[province] || province}` : '' // Province label with value
+    ].filter(Boolean); // Remove empty strings
+
+    addressString = addressParts.join(', '); // Add commas between parts
+
+    // Display the formatted address
+    const patientAddressElement = document.getElementById('patientAddress');
+    if (patientAddressElement) {
+        patientAddressElement.textContent = addressString || 'N/A';
+    }
+} else {
+    console.error('Address data not found or empty');
+    const patientAddressElement = document.getElementById('patientAddress');
+    if (patientAddressElement) {
+        patientAddressElement.textContent = 'N/A';
+    }
+}
+
 
         // Notes and visit information
         const visits = patientData.visits ? Object.entries(patientData.visits) : [];
@@ -86,35 +106,39 @@ async function getPatientDetails(recordId, visitId = null) {
         }
 
         // Sort visits by checkIn date (newest first)
-        visits.sort((a, b) => new Date(b[1].checkIn) - new Date(a[1].checkIn));
+// Sort visits by checkIn date (newest first)
+visits.sort((a, b) => {
+    const dateA = new Date(a[1].checkIn || 0);
+    const dateB = new Date(b[1].checkIn || 0);
+    return dateB - dateA;
+});
 
-        if (visitId && patientData.visits?.[visitId]) {
-            const visit = patientData.visits[visitId];
-            const isFirstVisit = visits.findIndex(v => v[0] === visitId) === visits.length - 1;
-            outputHtml += generateVisitHtml(
-                'ព័ត៌មានពិនិត្យ',
-                visit.checkIn,
-                visit.checkOut,
-                visit.clinic,
-                visit.doctor,
-                visit.information || visit || {},
-                isFirstVisit
-            );
-        } else {
-            visits.forEach(([currentVisitId, visit], index) => {
-                // The oldest visit (last in array) is the first visit
-                const isFirstVisit = index === visits.length - 1;
-                outputHtml += generateVisitHtml(
-                    `ព័ត៌មានពិនិត្យលើកទី ${visits.length - index}`,
-                    visit.checkIn,
-                    visit.checkOut,
-                    visit.clinic,
-                    visit.doctor,
-                    visit.information || visit || {},
-                    isFirstVisit
-                );
-            });
-        }
+if (visitId && patientData.visits?.[visitId]) {
+    const visit = patientData.visits[visitId];
+    const isFirstVisit = visits.findIndex(v => v[0] === visitId) === 0;
+    outputHtml += generateVisitHtml(
+        'ព័ត៌មានពិនិត្យ',
+        visit.checkIn,
+        visit.checkOut,
+        visit.clinic,
+        visit.doctor,
+        visit.information || visit || {},
+        isFirstVisit
+    );
+} else {
+    visits.forEach(([visitId, visit], index) => {
+        const isFirstVisit = index === 0;
+        outputHtml += generateVisitHtml(
+            `ព័ត៌មានពិនិត្យលើកទី ${index + 1}`,
+            visit.checkIn,
+            visit.checkOut,
+            visit.clinic,
+            visit.doctor,
+            visit.information || visit || {},
+            isFirstVisit
+        );
+    });
+}
 
         patientNotesContainer.innerHTML = outputHtml;
 
@@ -124,9 +148,9 @@ async function getPatientDetails(recordId, visitId = null) {
     }
 }
 
+
+
 function generateVisitHtml(title, checkIn, checkOut, clinic, doctor, info, isFirstVisit = false) {
-    // Normalize the data structure
-    const data = info.information || info;
     return `
         <div class="visit-note">
             <div class="visit-note-header">
@@ -139,12 +163,14 @@ function generateVisitHtml(title, checkIn, checkOut, clinic, doctor, info, isFir
                 </div>
             </div>
             <div class="visit-note-content">
-                ${isFirstVisit ? generateFirstVisitContent(data) : generateSecondVisitContent(data)}
+                ${isFirstVisit ? generateFirstVisitContent(info) : generateSecondVisitContent(info)}
             </div>
         </div>
     `;
 }
 
+
+// For the first visit, display the fields exactly as needed
 function generateFirstVisitContent(info) {
     return `
         <div class="note-item"><strong>សញ្ញាណតម្អូញ:</strong> ${info.note1 || 'មិនទាន់បំពេញ'}</div>
@@ -156,15 +182,24 @@ function generateFirstVisitContent(info) {
     `;
 }
 
+// For the second visit, display a simpler set of fields
+// Update generateSecondVisitContent to handle both formats:
 function generateSecondVisitContent(info) {
+    // Try to get fields from info directly, or from info.information
+    const treatmentHistory = info.treatmentHistory || (info.information && info.information.treatmentHistory);
+    const labTest = info.labTest || (info.information && info.information.labTest);
+    const diagnosis = info.diagnosis || (info.information && info.information.diagnosis);
+    const medicines = info.medicines || (info.information && info.information.medicines);
+
     return `
-        <div class="note-item"><strong>ប្រវត្តិព្យាបាល:</strong> ${info.treatmentHistory || 'មិនទាន់បំពេញ'}</div>
-        <div class="note-item"><strong>តេស្តមន្ទីពិសោធន៍:</strong> ${info.labTest || 'មិនទាន់បំពេញ'}</div>
-        <div class="note-item"><strong>រោគវិនិច្ឆ័យ:</strong> ${info.diagnosis || 'មិនទាន់បំពេញ'}</div>
-        <div class="note-item"><strong>របៀបប្រើប្រាស់ថ្នាំ:</strong> ${info.medicines ? generateMedicineTable(info.medicines) : 'មិនទាន់បំពេញ'}</div>
+        <div class="note-item"><strong>ប្រវត្តិព្យាបាល:</strong> ${treatmentHistory || 'មិនទាន់បំពេញ'}</div>
+        <div class="note-item"><strong>តេស្តមន្ទីពិសោធន៍:</strong> ${labTest || 'មិនទាន់បំពេញ'}</div>
+        <div class="note-item"><strong>រោគវិនិច្ឆ័យ:</strong> ${diagnosis || 'មិនទាន់បំពេញ'}</div>
+        <div class="note-item"><strong>របៀបប្រើប្រាស់ថ្នាំ:</strong> ${medicines ? generateMedicineTable(medicines) : 'មិនទាន់បំពេញ'}</div>
     `;
 }
 
+// Generate the medicine table if applicable
 function generateMedicineTable(medicines) {
     return `
     <div class="medicine-container">
@@ -192,6 +227,7 @@ function generateMedicineTable(medicines) {
     `;
 }
 
+// Format the date correctly
 function formatDate(dateString) {
     const date = new Date(dateString);
     if (isNaN(date.getTime())) {
@@ -200,6 +236,7 @@ function formatDate(dateString) {
     return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
 }
 
+// =============== Load when page ready ================
 window.onload = function () {
     const urlParams = new URLSearchParams(window.location.search);
     const recordId = urlParams.get('recordId');

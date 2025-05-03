@@ -37,38 +37,54 @@ async function getPatientDetails(recordId, visitId = null) {
             }
         });
 
-        // Address mapping
-        const addressMapping = {
-            village: {},
-            commune: {},
-            district: {},
-            province: {}
-        };
+    // Address mapping (same as above)
+const addressMapping = {
+    village: {
+        "Village 1": "ទួលក្របៅ",
+        "Village 2": "សាមកុក",
+        "Village 3": "ហាបី"
+    },
+    commune: {
+        "Commune 1": "គគីរ",
+        "Commune 2": "កាស",
+        "Commune 3": "ក្អែក"
+    },
+    district: {
 
-        // Handle Address mapping
-        if (patientData.address) {
-            let addressString = '';
-            const { village, commune, district, province } = patientData.address;
+    },
+    province: {
 
-            const addressParts = [
-                village ? `ភូមិ ${addressMapping.village[village] || village}` : '',
-                commune ? `ឃុំ/សង្កាត់ ${addressMapping.commune[commune] || commune}` : '',
-                district ? `ស្រុក/ខណ្ឌ ${addressMapping.district[district] || district}` : '',
-                province ? `ខេត្ត/ក្រុង ${addressMapping.province[province] || province}` : ''
-            ].filter(Boolean);
+    }
+};
 
-            addressString = addressParts.join(', ');
-            const patientAddressElement = document.getElementById('patientAddress');
-            if (patientAddressElement) {
-                patientAddressElement.textContent = addressString || 'N/A';
-            }
-        } else {
-            console.error('Address data not found or empty');
-            const patientAddressElement = document.getElementById('patientAddress');
-            if (patientAddressElement) {
-                patientAddressElement.textContent = 'N/A';
-            }
-        }
+// Handle Address mapping (same logic to display address)
+if (patientData.address) {
+    let addressString = '';
+
+    const { village, commune, district, province } = patientData.address;
+
+    const addressParts = [
+        village ? `ភូមិ ${addressMapping.village[village] || village}` : '', // Village label with value
+        commune ? `ឃុំ/សង្កាត់ ${addressMapping.commune[commune] || commune}` : '', // Commune label with value
+        district ? `ស្រុក/ខណ្ឌ ${addressMapping.district[district] || district}` : '', // District label with value
+        province ? `ខេត្ត/ក្រុង ${addressMapping.province[province] || province}` : '' // Province label with value
+    ].filter(Boolean); // Remove empty strings
+
+    addressString = addressParts.join(', '); // Add commas between parts
+
+    // Display the formatted address
+    const patientAddressElement = document.getElementById('patientAddress');
+    if (patientAddressElement) {
+        patientAddressElement.textContent = addressString || 'N/A';
+    }
+} else {
+    console.error('Address data not found or empty');
+    const patientAddressElement = document.getElementById('patientAddress');
+    if (patientAddressElement) {
+        patientAddressElement.textContent = 'N/A';
+    }
+}
+
 
         // Notes and visit information
         const visits = patientData.visits ? Object.entries(patientData.visits) : [];
@@ -90,27 +106,25 @@ async function getPatientDetails(recordId, visitId = null) {
 
         if (visitId && patientData.visits?.[visitId]) {
             const visit = patientData.visits[visitId];
-            const isFirstVisit = visits.findIndex(v => v[0] === visitId) === visits.length - 1;
             outputHtml += generateVisitHtml(
                 'ព័ត៌មានពិនិត្យ',
                 visit.checkIn,
                 visit.checkOut,
                 visit.clinic,
                 visit.doctor,
-                visit.information || visit || {},
-                isFirstVisit
+                visit.information || {},
+                visitId === '2'
             );
         } else {
-            visits.forEach(([currentVisitId, visit], index) => {
-                // The oldest visit (last in array) is the first visit
-                const isFirstVisit = index === visits.length - 1;
+            visits.forEach(([visitId, visit], index) => {
+                const isFirstVisit = index === 0;
                 outputHtml += generateVisitHtml(
-                    `ព័ត៌មានពិនិត្យលើកទី ${visits.length - index}`,
+                    `ព័ត៌មានពិនិត្យលើកទី ${index + 1}`,
                     visit.checkIn,
                     visit.checkOut,
                     visit.clinic,
                     visit.doctor,
-                    visit.information || visit || {},
+                    visit.information || {},
                     isFirstVisit
                 );
             });
@@ -124,9 +138,9 @@ async function getPatientDetails(recordId, visitId = null) {
     }
 }
 
+
+
 function generateVisitHtml(title, checkIn, checkOut, clinic, doctor, info, isFirstVisit = false) {
-    // Normalize the data structure
-    const data = info.information || info;
     return `
         <div class="visit-note">
             <div class="visit-note-header">
@@ -139,12 +153,14 @@ function generateVisitHtml(title, checkIn, checkOut, clinic, doctor, info, isFir
                 </div>
             </div>
             <div class="visit-note-content">
-                ${isFirstVisit ? generateFirstVisitContent(data) : generateSecondVisitContent(data)}
+                ${isFirstVisit ? generateFirstVisitContent(info) : generateSecondVisitContent(info)}
             </div>
         </div>
     `;
 }
 
+
+// For the first visit, display the fields exactly as needed
 function generateFirstVisitContent(info) {
     return `
         <div class="note-item"><strong>សញ្ញាណតម្អូញ:</strong> ${info.note1 || 'មិនទាន់បំពេញ'}</div>
@@ -156,6 +172,7 @@ function generateFirstVisitContent(info) {
     `;
 }
 
+// For the second visit, display a simpler set of fields
 function generateSecondVisitContent(info) {
     return `
         <div class="note-item"><strong>ប្រវត្តិព្យាបាល:</strong> ${info.treatmentHistory || 'មិនទាន់បំពេញ'}</div>
@@ -165,6 +182,7 @@ function generateSecondVisitContent(info) {
     `;
 }
 
+// Generate the medicine table if applicable
 function generateMedicineTable(medicines) {
     return `
     <div class="medicine-container">
@@ -192,6 +210,7 @@ function generateMedicineTable(medicines) {
     `;
 }
 
+// Format the date correctly
 function formatDate(dateString) {
     const date = new Date(dateString);
     if (isNaN(date.getTime())) {
@@ -200,6 +219,7 @@ function formatDate(dateString) {
     return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
 }
 
+// =============== Load when page ready ================
 window.onload = function () {
     const urlParams = new URLSearchParams(window.location.search);
     const recordId = urlParams.get('recordId');
