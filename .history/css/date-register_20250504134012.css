@@ -364,11 +364,12 @@ select:focus {
 
     #checkInTable td button,
     #checkInTable td .btn {
-        padding: 6px 8px;
-        font-size: 0.75rem;
+        padding: 8px 10px;       /* Increased padding */
+        font-size: 1rem;          /* Larger font size */
         width: auto;
         display: inline-block;
-        margin: 2px auto;
+        margin: 2px auto;         /* Slightly larger margin */
+        min-width: 90px;  
     }
 
     /* Optional: Make header text wrap if needed */

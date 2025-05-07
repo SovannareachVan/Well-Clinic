@@ -52,10 +52,14 @@ async function getPatientDetails(id) {
         // Address Mapping (same as view-page)
         const addressMapping = {
             village: {
-
+                "Village 1": "ទួលក្របៅ",
+                "Village 2": "សាមកុក",
+                "Village 3": "ហាបី"
             },
             commune: {
-
+                "Commune 1": "គគីរ",
+                "Commune 2": "កាស",
+                "Commune 3": "ក្អែក"
             },
             district: {
 

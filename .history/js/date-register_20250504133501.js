@@ -52,16 +52,24 @@ async function getPatientDetails(id) {
         // Address Mapping (same as view-page)
         const addressMapping = {
             village: {
-
+                "Village 1": "ទួលក្របៅ",
+                "Village 2": "សាមកុក",
+                "Village 3": "ហាបី"
             },
             commune: {
-
+                "Commune 1": "គគីរ",
+                "Commune 2": "កាស",
+                "Commune 3": "ក្អែក"
             },
             district: {
-
+                "District 1": "កៀនស្វាយ",
+                "District 2": "ក្អែក",
+                "District 3": "កាស"
             },
             province: {
-
+                "Province 1": "ព្រៃវែង",
+                "Province 2": "កណ្តាល",
+                "Province 3": "ក្អាត់"
             }
         };
 
@@ -71,7 +79,7 @@ async function getPatientDetails(id) {
 
             const addressParts = [
                 village ? `ភូមិ ${addressMapping.village[village] || village}` : '',
-                commune ? `ឃុំ ${addressMapping.commune[commune] || commune}` : '',
+                commune ? `ឃុំ/សង្កាត់ ${addressMapping.commune[commune] || commune}` : '',
                 district ? `ស្រុក ${addressMapping.district[district] || district}` : '',
                 province ? `ខេត្ត ${addressMapping.province[province] || province}` : ''
             ].filter(Boolean); // remove empty
