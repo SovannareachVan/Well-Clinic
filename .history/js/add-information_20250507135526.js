@@ -57,11 +57,6 @@ function initDiagnosisDropdown() {
     const input = document.getElementById('diagnosis');
     const dropdown = document.getElementById('diagnosis-dropdown');
 
-    if (!input || !dropdown) {
-        console.error('Diagnosis input or dropdown not found');
-        return;
-    }
-
     input.addEventListener('input', function () {
         const query = this.value.toLowerCase();
         dropdown.innerHTML = '';
@@ -145,11 +140,6 @@ function calculateMedicationQuantity(item) {
 function initMedicineDropdown(parentElement) {
     const input = parentElement.querySelector('.medicine-input');
     const dropdown = parentElement.querySelector('.medicine-dropdown');
-
-    if (!input || !dropdown) {
-        console.error('Medicine input or dropdown not found in parentElement:', parentElement);
-        return;
-    }
 
     input.addEventListener('input', function() {
         const query = this.value.toLowerCase();
@@ -251,7 +241,7 @@ window.addMedicineItem = function(medicineData = null, forceAdd = false) {
                 <select class="dosage-select morning-dose">
                     <option value="" ${!medicineData?.morningDose ? 'selected' : ''}>...</option>
                     <option value="1/2" ${medicineData?.morningDose === '1/2' ? 'selected' : ''}>1/2</option>
-                    <option value="1" ${medicineData?.morningDose === '1' ? 'selected' : ''}>1</option>
+                    <option value="1" ${medicineData?.morningDose === '1' ? 'selected microvascular</option>
                     <option value="1+1/4" ${medicineData?.morningDose === '1+1/4' ? 'selected' : ''}>1+1/4</option>
                     <option value="1+1/2" ${medicineData?.morningDose === '1+1/2' ? 'selected' : ''}>1+1/2</option>
                     <option value="2" ${medicineData?.morningDose === '2' ? 'selected' : ''}>2</option>
@@ -275,8 +265,7 @@ window.addMedicineItem = function(medicineData = null, forceAdd = false) {
                     <option value="1/2" ${medicineData?.eveningDose === '1/2' ? 'selected' : ''}>1/2</option>
                     <option value="1" ${medicineData?.eveningDose === '1' ? 'selected' : ''}>1</option>
                     <option value="1+1/4" ${medicineData?.eveningDose === '1+1/4' ? 'selected' : ''}>1+1/4</option>
-                    <option value="1+1/2" ${medicineData?.eveningDose === '1+1/2' ? 'selected' : ''}>1+1/2</option>
-                    <option value="2" ${medicineData?.eveningDose === '2' ? 'selected' : ''}>2</option>
+                    <option value="1+1/2" ${medicineData?.eveningDose Old 2015-11-04 11:04:36.627951+00:00
                     <option value="2+1/2" ${medicineData?.eveningDose === '2+1/2' ? 'selected' : ''}>2+1/2</option>
                     <option value="3" ${medicineData?.eveningDose === '3' ? 'selected' : ''}>3</option>
                     <option value="1/4" ${medicineData?.eveningDose === '1/4' ? 'selected' : ''}>1/4</option>
@@ -438,19 +427,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         addMedicineItem(null, true);
     }
     
-    const saveBtn = document.getElementById('saveBtn');
-    if (saveBtn) {
-        saveBtn.addEventListener('click', savePatientInformation);
-    } else {
-        console.error('Element with id "saveBtn" not found');
-    }
-
-    const clearBtn = document.getElementById('clearBtn');
-    if (clearBtn) {
-        clearBtn.addEventListener('click', clearForm);
-    } else {
-        console.error('Element with id "clearBtn" not found');
-    }
+    document.getElementById('saveBtn').addEventListener('click', savePatientInformation);
+    document.getElementById('clearBtn').addEventListener('click', clearForm);
 
     document.addEventListener('click', function(event) {
         const diagnosisDropdown = document.getElementById('diagnosis-dropdown');
@@ -461,12 +439,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         document.querySelectorAll('.medicine-dropdown').forEach(dropdown => {
             const input = dropdown.previousElementSibling;
-            if (!input) {
-                console.warn('No input found for dropdown:', dropdown);
-                return;
-            }
             if (!input.contains(event.target) && !dropdown.contains(event.target)) {
-                console.log('Closing dropdown:', dropdown);
                 dropdown.style.display = 'none';
             }
         });

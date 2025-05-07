@@ -438,19 +438,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         addMedicineItem(null, true);
     }
     
-    const saveBtn = document.getElementById('saveBtn');
-    if (saveBtn) {
-        saveBtn.addEventListener('click', savePatientInformation);
-    } else {
-        console.error('Element with id "saveBtn" not found');
-    }
-
-    const clearBtn = document.getElementById('clearBtn');
-    if (clearBtn) {
-        clearBtn.addEventListener('click', clearForm);
-    } else {
-        console.error('Element with id "clearBtn" not found');
-    }
+    document.getElementById('saveBtn').addEventListener('click', savePatientInformation);
+    document.getElementById('clearBtn').addEventListener('click', clearForm);
 
     document.addEventListener('click', function(event) {
         const diagnosisDropdown = document.getElementById('diagnosis-dropdown');
