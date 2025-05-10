@@ -21,7 +21,7 @@ function formatDateTime(date) {
 
 // Utility function to combine manual date and auto-generated time for Firebase
 function combineDateTime(day, month, year, time) {
-    if (!day || !month || !year) return 'N/A'; // If any date part is missing, return 'N/A'
+    if (!day || !month || !year) return 'N/A'; // If date parts are missing, return 'N/A'
     const dateStr = `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year.padStart(4, '0')}`;
     return `${dateStr} ${time}`;
 }
@@ -74,12 +74,14 @@ async function getPatientDetails(id) {
         // Update Address
         if (patientData.address) {
             const { village, commune, district, province } = patientData.address;
+
             const addressParts = [
                 village ? `ភូមិ ${addressMapping.village[village] || village}` : '',
                 commune ? `ឃុំ ${addressMapping.commune[commune] || commune}` : '',
                 district ? `ស្រុក ${addressMapping.district[district] || district}` : '',
                 province ? `ខេត្ត ${addressMapping.province[province] || province}` : ''
             ].filter(Boolean);
+
             const addressString = addressParts.join(', ');
             updateField('patientAddress', addressString);
         } else {
@@ -160,6 +162,7 @@ async function loadSavedVisits(patientId) {
 
                 // Action buttons
                 const actionCell = newRow.insertCell(5);
+                
                 const deleteBtn = document.createElement('button');
                 deleteBtn.classList.add('btn', 'btn-delete');
                 deleteBtn.textContent = 'Delete';
@@ -344,7 +347,7 @@ function checkIn() {
     };
 
     set(ref(db, `patients/${recordId}/visits/${visitId}`), visitData)
-        .then(() => console.log('New visit saved:', visitId, visitData))
+        .then(() => console.log('New visit saved:', visitId))
         .catch(error => console.error('Error saving visit:', error));
 }
 
@@ -407,16 +410,16 @@ async function saveAllRows() {
 
                 // Extract check-in date and time
                 const checkInInputs = row.cells[1].querySelector('.date-inputs');
-                const checkInDay = checkInInputs.querySelector('.day-input').value.trim();
-                const checkInMonth = checkInInputs.querySelector('.month-input').value.trim();
-                const checkInYear = checkInInputs.querySelector('.year-input').value.trim();
+                const checkInDay = checkInInputs.querySelector('.day-input').value;
+                const checkInMonth = checkInInputs.querySelector('.month-input').value;
+                const checkInYear = checkInInputs.querySelector('.year-input').value;
                 const checkInTime = checkInInputs.querySelector('.time-display').textContent;
 
                 // Extract check-out date and time
                 const checkOutInputs = row.cells[2].querySelector('.date-inputs');
-                const checkOutDay = checkOutInputs.querySelector('.day-input').value.trim();
-                const checkOutMonth = checkOutInputs.querySelector('.month-input').value.trim();
-                const checkOutYear = checkOutInputs.querySelector('.year-input').value.trim();
+                const checkOutDay = checkOutInputs.querySelector('.day-input').value;
+                const checkOutMonth = checkOutInputs.querySelector('.month-input').value;
+                const checkOutYear = checkOutInputs.querySelector('.year-input').value;
                 const checkOutTime = checkOutInputs.querySelector('.time-display').textContent;
 
                 // Combine date and time
@@ -430,8 +433,6 @@ async function saveAllRows() {
                     clinic: row.cells[3].querySelector('select').value,
                     doctor: row.cells[4].textContent
                 };
-
-                console.log(`Saving visit ${visitId}:`, updatedData); // Debug log
 
                 await update(visitRef, updatedData);
             }
