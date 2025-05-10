@@ -709,15 +709,15 @@ html, body {
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     overflow: hidden;
-    max-height: 300px; /* 5 rows at ~60px each */
-    overflow-y: auto;
-    position: relative;
-    display: block;
+    max-height: 300px; /* Exact height for 5 rows at ~60px each */
+    overflow-y: auto; /* Ensure vertical scrolling */
+    position: relative; /* Context for sticky header */
+    display: block; /* Force block behavior to respect height */
 }
 
 .medication-header {
     display: grid;
-    grid-template-columns: repeat(8, 1fr); /* Adjusted for 8 columns */
+    grid-template-columns: repeat(7, 1fr);
     background-color: var(--primary);
     color: white;
     font-weight: 500;
@@ -729,23 +729,33 @@ html, body {
     border-bottom: 1px solid #e0e0e0;
 }
 
-.medicine-row {
-    grid-template-columns: repeat(8, 1fr); /* Adjusted for 8 columns */
+.medication-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
     padding: 12px 15px;
     border-bottom: 1px solid #e0e0e0;
     background-color: white;
     text-align: center;
     align-items: center;
-    min-height: 60px;
-    box-sizing: border-box;
+    min-height: 60px; /* Consistent row height */
+    box-sizing: border-box; /* Include padding in height calculation */
 }
 
-.medicine-row:last-child {
+.medication-row:last-child {
     border-bottom: none;
 }
 
-.medicine-row:hover {
+.medication-row:hover {
     background-color: #f5f7fa;
+}
+
+.no-medicines {
+    padding: 15px;
+    text-align: center;
+    color: var(--gray);
+    font-style: italic;
+    background-color: #f8f9fa;
+    border-radius: 4px;
 }
 
 /* Scrollbar styling */
@@ -762,10 +772,11 @@ html, body {
     background: #f1f1f1;
 }
 
-/* Medicine Container */
+/* Ensure medicine-container doesn't interfere */
 .medicine-container {
     margin-top: 10px;
     width: 100%;
+    max-height: 100%; /* Allow it to respect child height */
 }
 
 /* Responsive Styles */
@@ -775,24 +786,24 @@ html, body {
     }
 
     .medication-table {
-        max-height: 400px; /* Adjusted for mobile */
+        max-height: 400px; /* Taller on mobile for stacked layout */
     }
 
-    .medicine-row {
+    .medication-row {
         grid-template-columns: 1fr;
         padding: 15px;
         border-bottom: 1px solid #e0e0e0;
         position: relative;
         padding-left: 120px;
-        min-height: auto;
+        min-height: auto; /* Adjust for mobile */
     }
 
-    .medicine-row > div {
+    .medication-row > div {
         text-align: left;
         padding: 5px 0;
     }
 
-    .medicine-row > div::before {
+    .medication-row > div::before {
         content: attr(data-label);
         position: absolute;
         left: 15px;
@@ -802,12 +813,16 @@ html, body {
     }
 
     /* Add data labels */
-    .medicine-row > div:nth-child(1)::before { content: "ល.រ:"; }
-    .medicine-row > div:nth-child(2)::before { content: "ឈ្មោះថ្នាំ:"; }
-    .medicine-row > div:nth-child(3)::before { content: "ប្រភេទថ្នាំ:"; }
-    .medicine-row > div:nth-child(4)::before { content: "រយៈពេល:"; }
-    .medicine-row > div:nth-child(5)::before { content: "ព្រឹក:"; }
-    .medicine-row > div:nth-child(6)::before { content: "ថ្ងៃ:"; }
-    .medicine-row > div:nth-child(7)::before { content: "ល្ងាច:"; }
-    .medicine-row > div:nth-child(8)::before { content: "ចំនួន:"; }
+    .medication-row > div:nth-child(1)::before { content: "ឈ្មោះថ្នាំ:"; }
+    .medication-row > div:nth-child(2)::before { content: "ប្រភេទថ្នាំ:"; }
+    .medication-row > div:nth-child(3)::before { content: "រយះពេល:"; }
+    .medication-row > div:nth-child(4)::before { content: "ព្រឹក:"; }
+    .medication-row > div:nth-child(5)::before { content: "ថ្ងៃ:"; }
+    .medication-row > div:nth-child(6)::before { content: "ល្ងាច:"; }
+    .medication-row > div:nth-child(7)::before { content: "ចំនួន:"; }
+}
+
+.medication-table {
+    max-height: 300px !important;
+    overflow-y: auto !important;
 }

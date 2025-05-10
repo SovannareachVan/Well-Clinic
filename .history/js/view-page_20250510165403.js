@@ -2,6 +2,26 @@
 import { db } from './firebase-config.js';
 import { ref, get } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js';
 
+// Utility function for consistent date/time formatting
+function formatDateTime(date) {
+    const pad = num => num.toString().padStart(2, '0');
+    const dateStr = `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()}`;
+    const timeStr = `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+    return {
+        dateStr,
+        timeStr,
+        combined: `${dateStr} ${timeStr}`, // Space between date and time
+        display: `${dateStr}<br>${timeStr}`
+    };
+}
+
+// Utility function to split combined date-time for display
+function splitDateTime(dateTimeStr) {
+    if (!dateTimeStr || dateTimeStr.trim() === '') return { date: '', time: '' };
+    const [date, time] = dateTimeStr.split(' ');
+    return { date: date || '', time: time || '' };
+}
+
 async function getPatientDetails(recordId, visitId = null) {
     console.log("Fetching patient data for ID:", recordId);
     try {
@@ -127,13 +147,18 @@ async function getPatientDetails(recordId, visitId = null) {
 function generateVisitHtml(title, checkIn, checkOut, clinic, doctor, info, isFirstVisit = false) {
     // Normalize the data structure
     const data = info.information || info;
+
+    // Format check-in and check-out for display
+    const checkInDisplay = checkIn ? splitDateTime(checkIn).display : 'N/A';
+    const checkOutDisplay = checkOut ? splitDateTime(checkOut).display : 'N/A';
+
     return `
         <div class="visit-note">
             <div class="visit-note-header">
                 <h3>${title}</h3>
                 <div class="visit-meta">
-                    <div><strong>ថ្ងៃចូល:</strong> ${checkIn || 'N/A'}</div>
-                    <div><strong>ថ្ងៃចេញ:</strong> ${checkOut || 'N/A'}</div>
+                    <div><strong>ថ្ងៃចូល:</strong> ${checkInDisplay}</div>
+                    <div><strong>ថ្ងៃចេញ:</strong> ${checkOutDisplay}</div>
                     <div><strong>មន្ទីរពេទ្យ:</strong> ${clinic || 'N/A'}</div>
                     <div><strong>វេជ្ជបណ្ឌិត:</strong> ${doctor || 'N/A'}</div>
                 </div>
@@ -150,7 +175,7 @@ function generateFirstVisitContent(info) {
         <div class="note-item"><strong>សញ្ញាណតម្អូញ:</strong> ${info.note1 || 'មិនទាន់បំពេញ'}</div>
         <div class="note-item"><strong>ប្រវត្តិព្យាបាល:</strong> ${info.note2 || 'មិនទាន់បំពេញ'}</div>
         <div class="note-item"><strong>តេស្តមន្ទីពិសោធន៍:</strong> ${info.note3 || 'មិនទាន់បំពេញ'}</div>
-        <div class="note-item"><strong>រោគវិនិច្ឆ័យ:</strong> ${info.diagnosis|| 'មិនទាន់បំពេញ'}</div>
+        <div class="note-item"><strong>រោគវិនិច្ឆ័យ:</strong> ${info.diagnosis || 'មិនទាន់បំពេញ'}</div>
         <div class="note-item"><strong>រោគវិនិច្ឆ័យញែក:</strong> ${info.note5 || 'មិនទាន់បំពេញ'}</div>
         <div class="note-item"><strong>របៀបប្រើប្រាស់ថ្នាំ:</strong> ${info.medicines ? generateMedicineTable(info.medicines) : 'មិនទាន់បំពេញ'}</div>
     `;

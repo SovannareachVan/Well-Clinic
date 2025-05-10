@@ -168,30 +168,28 @@ function generateSecondVisitContent(info) {
 function generateMedicineTable(medicines) {
     return `
     <div class="medicine-container">
-        <div class="medication-table">
-            <div class="medicine-header">
-                <div class="medicine-col">ល.រ</div>
-                <div class="medicine-col">ឈ្មោះថ្នាំ</div>
-                <div class="medicine-col">ប្រភេទថ្នាំ</div>
-                <div class="medicine-col">រយៈពេល</div>
-                <div class="medicine-col">ព្រឹក</div>
-                <div class="medicine-col">ថ្ងៃ</div>
-                <div class="medicine-col">ល្ងាច</div>
-                <div class="medicine-col">ចំនួន</div>
-            </div>
-            ${medicines.map((med, index) => `
-                <div class="medicine-row">
-                    <div class="medicine-col">${index + 1}.</div>
-                    <div class="medicine-col">${med.name || ''}</div>
-                    <div class="medicine-col">${med.dosage || ''}</div>
-                    <div class="medicine-col">${med.days || ''} ថ្ងៃ</div>
-                    <div class="medicine-col">${med.morningDose || ''}</div>
-                    <div class="medicine-col">${med.afternoonDose || ''}</div>
-                    <div class="medicine-col">${med.eveningDose || ''}</div>
-                    <div class="medicine-col">${med.quantity || ''}</div>
-                </div>
-            `).join('')}
+        <div class="medicine-header">
+            <div class="medicine-col">ល.រ</div>
+            <div class="medicine-col">ឈ្មោះថ្នាំ</div>
+            <div class="medicine-col">ប្រភេទថ្នាំ</div>
+            <div class="medicine-col">រយៈពេល</div>
+            <div class="medicine-col">ព្រឹក</div>
+            <div class="medicine-col">ថ្ងៃ</div>
+            <div class="medicine-col">ល្ងាច</div>
+            <div class="medicine-col">ចំនួន</div>
         </div>
+        ${medicines.map((med, index) => `
+            <div class="medicine-row">
+                <div class="medicine-col">${index + 1}.</div>
+                <div class="medicine-col">${med.name || ''}</div>
+                <div class="medicine-col">${med.dosage || ''}</div>
+                <div class="medicine-col">${med.days || ''} ថ្ងៃ</div>
+                <div class="medicine-col">${med.morningDose || ''}</div>
+                <div class="medicine-col">${med.afternoonDose || ''}</div>
+                <div class="medicine-col">${med.eveningDose || ''}</div>
+                <div class="medicine-col">${med.quantity || ''}</div>
+            </div>
+        `).join('')}
     </div>
     `;
 }
