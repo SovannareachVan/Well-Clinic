@@ -412,3 +412,87 @@ button.saveBtn {
 
 
 
+
+/* Date input container */
+.date-inputs {
+    display: flex;
+    align-items: center;
+    gap: 6px; /* Space between inputs and separator */
+    background-color: #f9f9f9; /* Light background for contrast */
+    padding: 6px 10px; /* Padding for a clean look */
+    border: 1px solid #d1d5db; /* Subtle border */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* Soft shadow for depth */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern font */
+}
+
+/* Individual date input fields */
+.day-input,
+.month-input,
+.year-input {
+    border: none; /* Remove default border */
+    background: transparent; /* Transparent background */
+    text-align: center; /* Center the text */
+    font-size: 15px; /* Slightly larger font */
+    color: #1f2937; /* Dark gray text */
+    width: 40px; /* Fixed width for consistency */
+    padding: 4px 0; /* Vertical padding */
+    border-bottom: 2px solid #e5e7eb; /* Light underline */
+    transition: border-bottom-color 0.3s ease; /* Smooth transition for focus */
+}
+
+.day-input:focus,
+.month-input:focus,
+.year-input:focus {
+    outline: none; /* Remove default outline */
+    border-bottom: 2px solid #3b82f6; /* Blue underline on focus */
+}
+
+/* Adjust widths for specific fields */
+.day-input,
+.month-input {
+    width: 30px; /* Slightly smaller for day and month */
+}
+
+.year-input {
+    width: 50px; /* Wider for year */
+}
+
+/* Placeholder styling */
+.day-input::placeholder,
+.month-input::placeholder,
+.year-input::placeholder {
+    color: #9ca3af; /* Light gray placeholder */
+    font-style: italic; /* Italic for emphasis */
+}
+
+/* Time display styling */
+.time-display {
+    margin-left: 8px; /* Space between date and time */
+    font-size: 14px; /* Slightly smaller font */
+    font-weight: 600; /* Bold for emphasis */
+    color: #374151; /* Darker gray for contrast */
+    background-color: #e5e7eb; /* Light gray background */
+    padding: 2px 6px; /* Small padding */
+    border-radius: 4px; /* Rounded corners */
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 600px) {
+    .date-inputs {
+        flex-wrap: wrap; /* Allow wrapping on small screens */
+        padding: 8px; /* Adjust padding */
+    }
+
+    .day-input,
+    .month-input,
+    .year-input {
+        width: 50px; /* Wider inputs for easier tapping */
+        margin-bottom: 4px; /* Space between stacked inputs */
+    }
+
+    .time-display {
+        margin-left: 0; /* Remove left margin on stack */
+        margin-top: 4px; /* Add top margin when wrapped */
+    }
+}

@@ -412,3 +412,14 @@ button.saveBtn {
 
 
 
+
+/* Date input container */
+/* Individual date input fields */
+.day-input,
+.month-input,
+.year-input {
+    border: none;
+    font-size: font-size: 15px ;
+   
+}
+

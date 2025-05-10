@@ -412,3 +412,37 @@ button.saveBtn {
 
 
 
+
+/* Date input container */
+.date-inputs {
+    display: flex;
+    align-items: center;
+    gap: 6px; /* Space between inputs and separator */
+    background-color: #f9f9f9; /* Light background for contrast */
+    padding: 6px 10px; /* Padding for a clean look */
+    border: 1px solid #d1d5db; /* Subtle border */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* Soft shadow for depth */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern font */
+}
+
+/* Individual date input fields */
+.day-input,
+.month-input,
+.year-input {
+    border: none; /* Remove default border */
+    background: transparent; /* Transparent background */
+    text-align: center; /* Center the text */
+    font-size: 15px; /* Slightly larger font */
+    color: #1f2937; /* Dark gray text */
+    padding: 4px 0; /* Vertical padding */
+    border-bottom: 2px solid #e5e7eb; /* Light underline */
+    transition: border-bottom-color 0.3s ease; /* Smooth transition for focus */
+}
+
+.day-input:focus,
+.month-input:focus,
+.year-input:focus {
+    outline: none; /* Remove default outline */
+    border-bottom: 2px solid #3b82f6; /* Blue underline on focus */
+}

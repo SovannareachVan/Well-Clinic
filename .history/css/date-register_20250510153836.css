@@ -412,3 +412,151 @@ button.saveBtn {
 
 
 
+
+/* General table styling */
+#checkInTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-family: Arial, sans-serif;
+}
+
+#checkInTable th,
+#checkInTable td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+#checkInTable th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+/* Date input container */
+.date-inputs {
+    display: flex;
+    align-items: center;
+    gap: 4px; /* Reduced gap for tighter spacing */
+    background-color: #fff;
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Individual date input fields */
+.day-input,
+.month-input,
+.year-input {
+    border: none;
+    background: none;
+    text-align: center;
+    width: 40px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.day-input:focus,
+.month-input:focus,
+.year-input:focus {
+    border-bottom: 2px solid #007bff; /* Blue underline on focus */
+}
+
+/* Placeholder styling */
+.day-input::placeholder,
+.month-input::placeholder,
+.year-input::placeholder {
+    color: #999;
+    font-style: italic;
+}
+
+/* Separator styling */
+.date-inputs::before,
+.date-inputs::after {
+    content: '';
+}
+
+.date-inputs span {
+    margin-left: 8px;
+    color: #555;
+    font-weight: 600;
+}
+
+/* Time display styling */
+.time-display {
+    margin-left: 10px;
+    color: #2c3e50;
+    font-weight: bold;
+    background-color: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* Button styling */
+.btn {
+    padding: 6px 12px;
+    margin-right: 5px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.btn-delete {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-delete:hover {
+    background-color: #c82333;
+}
+
+.btn-checkout {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-checkout:hover {
+    background-color: #218838;
+}
+
+.btn-disabled {
+    background-color: #6c757d;
+    color: white;
+    cursor: not-allowed;
+}
+
+.btn-edit {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-edit:hover {
+    background-color: #0056b3;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+    .date-inputs {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 8px;
+    }
+
+    .day-input,
+    .month-input,
+    .year-input {
+        width: 50px;
+        margin-bottom: 4px;
+    }
+
+    .time-display {
+        margin-left: 0;
+        margin-top: 4px;
+    }
+}
