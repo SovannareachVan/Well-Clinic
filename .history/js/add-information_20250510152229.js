@@ -33,7 +33,7 @@ const medicineOptions = [
     "Lanzap 10mg",
     "Lumark 500mg",
     "Merlopam 0.5mg",
-    "Merlopam 2mg",
+    "Merlopap 2mg",
     "Morcet 10mg",
     "MultiV",
     "Nortriptyline 25mg",
@@ -294,12 +294,10 @@ window.addMedicineItem = function (medicineData = null, forceAdd = true) {
 
     medicinesInitialized = true;
 
-    // Limit display to the last 6 rows (hide oldest rows)
+    // Limit display to 6 rows
     const medicineItems = ul.querySelectorAll('.medicine-item');
     if (medicineItems.length > 6) {
-        for (let i = 0; i < medicineItems.length - 6; i++) {
-            medicineItems[i].style.display = 'none'; // Hide the oldest rows
-        }
+        medicineItems[0].style.display = 'none'; // Hide the first row
     }
 
     return li;
@@ -420,11 +418,11 @@ async function displayVisitInfo(patientId, info, isNewVisit) {
         addMedicineItem(null, true);
     }
 
-    // Limit display to the last 6 rows (hide oldest rows)
+    // Ensure only the last 6 rows are displayed
     const medicineItems = medicineList.querySelectorAll('.medicine-item');
     if (medicineItems.length > 6) {
         for (let i = 0; i < medicineItems.length - 6; i++) {
-            medicineItems[i].style.display = 'none'; // Hide the oldest rows
+            medicineItems[i].style.display = 'none';
         }
     }
 }

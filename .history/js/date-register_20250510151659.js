@@ -6,7 +6,7 @@ let rowCount = 1;
 let recordId = null;
 let isFirstVisit = false;
 
-// Utility function for consistent time formatting
+// Utility function for consistent time formatting (time only, since date will be manual)
 function formatTime(date) {
     const pad = num => num.toString().padStart(2, '0');
     return `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
@@ -14,14 +14,13 @@ function formatTime(date) {
 
 // Utility function to combine manual date and auto-generated time
 function combineDateTime(day, month, year, time) {
-    if (!day || !month || !year) return '';
-    const dateStr = `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year.padStart(4, '0')}`;
+    const dateStr = `${day}/${month}/${year}`;
     return `${dateStr} ${time}`;
 }
 
 // Utility function to split combined date-time for display
 function splitDateTime(dateTimeStr) {
-    if (!dateTimeStr || dateTimeStr === '') return { date: '', time: '' };
+    if (!dateTimeStr || dateTimeStr === 'N/A') return { date: 'N/A', time: 'N/A' };
     const [date, time] = dateTimeStr.split(' ');
     return { date, time };
 }
@@ -56,7 +55,7 @@ async function getPatientDetails(id) {
         updateField('patientEmail', patientData.email);
         updateField('patientNotes', patientData.notes);
 
-        // Address Mapping
+        // Address Mapping (same as view-page)
         const addressMapping = {
             village: {},
             commune: {},
@@ -67,12 +66,14 @@ async function getPatientDetails(id) {
         // Update Address
         if (patientData.address) {
             const { village, commune, district, province } = patientData.address;
+
             const addressParts = [
                 village ? `ភូមិ ${addressMapping.village[village] || village}` : '',
                 commune ? `ឃុំ ${addressMapping.commune[commune] || commune}` : '',
                 district ? `ស្រុក ${addressMapping.district[district] || district}` : '',
                 province ? `ខេត្ត ${addressMapping.province[province] || province}` : ''
-            ].filter(Boolean);
+            ].filter(Boolean); // remove empty
+
             const addressString = addressParts.join(', ');
             updateField('patientAddress', addressString);
         } else {
@@ -114,7 +115,7 @@ async function loadSavedVisits(patientId) {
                         <input type="text" class="day-input" value="${checkInData.date.split('/')[0] || ''}" placeholder="DD" maxlength="2" size="2">/
                         <input type="text" class="month-input" value="${checkInData.date.split('/')[1] || ''}" placeholder="MM" maxlength="2" size="2">/
                         <input type="text" class="year-input" value="${checkInData.date.split('/')[2] || ''}" placeholder="YYYY" maxlength="4" size="4">
-                        <span class="time-display">${checkInData.time || ''}</span>
+                        <span class="time-display">${checkInData.time}</span>
                     </div>
                 `;
 
@@ -126,7 +127,7 @@ async function loadSavedVisits(patientId) {
                         <input type="text" class="day-input" value="${checkOutData.date.split('/')[0] || ''}" placeholder="DD" maxlength="2" size="2">/
                         <input type="text" class="month-input" value="${checkOutData.date.split('/')[1] || ''}" placeholder="MM" maxlength="2" size="2">/
                         <input type="text" class="year-input" value="${checkOutData.date.split('/')[2] || ''}" placeholder="YYYY" maxlength="4" size="4">
-                        <span class="time-display">${checkOutData.time || ''}</span>
+                        <span class="time-display">${checkOutData.time}</span>
                     </div>
                 `;
 
@@ -137,13 +138,17 @@ async function loadSavedVisits(patientId) {
                 // Clinic selection
                 const clinicCell = newRow.insertCell(3);
                 const clinicSelect = document.createElement('select');
+                
+                // Configure clinic options
                 const clinics = ['វែលគ្លីនិក I', 'វែលគ្លីនិក II'];
                 clinics.forEach(clinic => {
                     const option = new Option(clinic, clinic);
                     clinicSelect.add(option);
                 });
+                
+                // Set current value and handle changes
                 clinicSelect.value = visit.clinic || clinics[0];
-                clinicSelect.addEventListener('change', saveAllRows);
+                clinicSelect.addEventListener('change', () => saveAllRows());
                 clinicCell.appendChild(clinicSelect);
 
                 // Doctor information
@@ -151,8 +156,10 @@ async function loadSavedVisits(patientId) {
 
                 // Action buttons
                 const actionCell = newRow.insertCell(5);
+                
+                // Delete button
                 const deleteBtn = document.createElement('button');
-                deleteBtn.classList.add('btn', 'btn-delete');
+                deleteBtn.classList.add('btn', 'btn-delete');                
                 deleteBtn.textContent = 'Delete';
                 deleteBtn.onclick = () => {
                     const password = prompt('បញ្ចូល 12345 ដើម្បីលុប:');
@@ -165,12 +172,14 @@ async function loadSavedVisits(patientId) {
                     }
                 };
 
+                // Check-out button
                 const checkOutBtn = document.createElement('button');
-                checkOutBtn.className = 'btn ' + (visit.checkOut === '' ? 'btn-checkout' : 'btn-disabled');
-                checkOutBtn.textContent = visit.checkOut === '' ? 'Check-out' : 'Checked-out';
-                checkOutBtn.disabled = visit.checkOut !== '';
+                checkOutBtn.className = 'btn ' + (visit.checkOut === 'N/A' ? 'btn-checkout' : 'btn-disabled');
+                checkOutBtn.textContent = visit.checkOut === 'N/A' ? 'Check-out' : 'Checked-out';
+                checkOutBtn.disabled = visit.checkOut !== 'N/A';
                 checkOutBtn.onclick = () => checkOutAction(newRow);
 
+                // View button
                 const viewBtn = document.createElement('button');
                 viewBtn.className = 'btn btn-edit';
                 viewBtn.textContent = 'Edit';
@@ -263,7 +272,7 @@ function checkIn() {
         </div>
     `;
 
-    // Check-out date and time (initially empty)
+    // Check-out date and time (initially N/A)
     const checkOutCell = newRow.insertCell(2);
     checkOutCell.innerHTML = `
         <div class="date-inputs">
@@ -328,18 +337,6 @@ function checkIn() {
     actionCell.appendChild(deleteBtn);
     actionCell.appendChild(checkOutBtn);
     actionCell.appendChild(viewBtn);
-
-    // Save the new visit to Firebase with empty date
-    const visitData = {
-        checkIn: combineDateTime('', '', '', timeStr),
-        checkOut: '',
-        clinic: clinicSelect.value,
-        doctor: 'Dr. Minh Hong'
-    };
-
-    set(ref(db, `patients/${recordId}/visits/${visitId}`), visitData)
-        .then(() => console.log('New visit saved:', visitId))
-        .catch(error => console.error('Error saving visit:', error));
 }
 
 // Handle check-out action
@@ -414,8 +411,8 @@ async function saveAllRows() {
                 const checkOutTime = checkOutInputs.querySelector('.time-display').textContent;
 
                 // Combine date and time
-                const checkInDateTime = checkInDay && checkInMonth && checkInYear ? combineDateTime(checkInDay, checkInMonth, checkInYear, checkInTime) : '';
-                const checkOutDateTime = checkOutDay && checkOutMonth && checkOutYear ? combineDateTime(checkOutDay, checkOutMonth, checkOutYear, checkOutTime) : '';
+                const checkInDateTime = checkInDay && checkInMonth && checkInYear ? combineDateTime(checkInDay, checkInMonth, checkInYear, checkInTime) : 'N/A';
+                const checkOutDateTime = checkOutDay && checkOutMonth && checkOutYear ? combineDateTime(checkOutDay, checkOutMonth, checkOutYear, checkOutTime) : 'N/A';
 
                 const updatedData = {
                     ...existingData,

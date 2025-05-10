@@ -188,6 +188,7 @@ window.addMedicineItem = function (medicineData = null, forceAdd = true) {
         return null;
     }
 
+    // Remove the restriction to allow unlimited rows
     const li = document.createElement('li');
     li.classList.add('medicine-item');
 
@@ -293,15 +294,6 @@ window.addMedicineItem = function (medicineData = null, forceAdd = true) {
     });
 
     medicinesInitialized = true;
-
-    // Limit display to the last 6 rows (hide oldest rows)
-    const medicineItems = ul.querySelectorAll('.medicine-item');
-    if (medicineItems.length > 6) {
-        for (let i = 0; i < medicineItems.length - 6; i++) {
-            medicineItems[i].style.display = 'none'; // Hide the oldest rows
-        }
-    }
-
     return li;
 };
 
@@ -418,14 +410,6 @@ async function displayVisitInfo(patientId, info, isNewVisit) {
         info.medicines.forEach(med => addMedicineItem(med, true));
     } else {
         addMedicineItem(null, true);
-    }
-
-    // Limit display to the last 6 rows (hide oldest rows)
-    const medicineItems = medicineList.querySelectorAll('.medicine-item');
-    if (medicineItems.length > 6) {
-        for (let i = 0; i < medicineItems.length - 6; i++) {
-            medicineItems[i].style.display = 'none'; // Hide the oldest rows
-        }
     }
 }
 

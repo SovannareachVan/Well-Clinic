@@ -14,14 +14,14 @@ function formatTime(date) {
 
 // Utility function to combine manual date and auto-generated time
 function combineDateTime(day, month, year, time) {
-    if (!day || !month || !year) return '';
+    if (!day || !month || !year) return 'N/A';
     const dateStr = `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year.padStart(4, '0')}`;
     return `${dateStr} ${time}`;
 }
 
 // Utility function to split combined date-time for display
 function splitDateTime(dateTimeStr) {
-    if (!dateTimeStr || dateTimeStr === '') return { date: '', time: '' };
+    if (!dateTimeStr || dateTimeStr === 'N/A') return { date: 'N/A', time: 'N/A' };
     const [date, time] = dateTimeStr.split(' ');
     return { date, time };
 }
@@ -109,28 +109,32 @@ async function loadSavedVisits(patientId) {
                 // Check-in date and time
                 const checkInCell = newRow.insertCell(1);
                 const checkInData = splitDateTime(visit.checkIn);
+                const [checkInDay, checkInMonth, checkInYear] = checkInData.date.split('/').map(part => part || '');
                 checkInCell.innerHTML = `
                     <div class="date-inputs">
-                        <input type="text" class="day-input" value="${checkInData.date.split('/')[0] || ''}" placeholder="DD" maxlength="2" size="2">/
-                        <input type="text" class="month-input" value="${checkInData.date.split('/')[1] || ''}" placeholder="MM" maxlength="2" size="2">/
-                        <input type="text" class="year-input" value="${checkInData.date.split('/')[2] || ''}" placeholder="YYYY" maxlength="4" size="4">
-                        <span class="time-display">${checkInData.time || ''}</span>
+                        <input type="text" class="day-input" value="${checkInDay}" placeholder="DD" maxlength="2" size="2">/
+                        <input type="text" class="month-input" value="${checkInMonth}" placeholder="MM" maxlength="2" size="2">/
+                        <input type="text" class="year-input" value="${checkInYear}" placeholder="YYYY" maxlength="4" size="4">
+                        <span class="time-display">${checkInData.time || 'N/A'}</span>
+                        <span class="date-time-display" style="margin-left: 10px;"></span>
                     </div>
                 `;
 
                 // Check-out date and time
                 const checkOutCell = newRow.insertCell(2);
                 const checkOutData = splitDateTime(visit.checkOut);
+                const [checkOutDay, checkOutMonth, checkOutYear] = checkOutData.date.split('/').map(part => part || '');
                 checkOutCell.innerHTML = `
                     <div class="date-inputs">
-                        <input type="text" class="day-input" value="${checkOutData.date.split('/')[0] || ''}" placeholder="DD" maxlength="2" size="2">/
-                        <input type="text" class="month-input" value="${checkOutData.date.split('/')[1] || ''}" placeholder="MM" maxlength="2" size="2">/
-                        <input type="text" class="year-input" value="${checkOutData.date.split('/')[2] || ''}" placeholder="YYYY" maxlength="4" size="4">
-                        <span class="time-display">${checkOutData.time || ''}</span>
+                        <input type="text" class="day-input" value="${checkOutDay}" placeholder="DD" maxlength="2" size="2">/
+                        <input type="text" class="month-input" value="${checkOutMonth}" placeholder="MM" maxlength="2" size="2">/
+                        <input type="text" class="year-input" value="${checkOutYear}" placeholder="YYYY" maxlength="4" size="4">
+                        <span class="time-display">${checkOutData.time || 'N/A'}</span>
+                        <span class="date-time-display" style="margin-left: 10px;"></span>
                     </div>
                 `;
 
-                // Add event listeners for auto-jumping between date fields
+                // Add event listeners for auto-jumping and real-time updates
                 setupDateInputs(checkInCell);
                 setupDateInputs(checkOutCell);
 
@@ -166,9 +170,9 @@ async function loadSavedVisits(patientId) {
                 };
 
                 const checkOutBtn = document.createElement('button');
-                checkOutBtn.className = 'btn ' + (visit.checkOut === '' ? 'btn-checkout' : 'btn-disabled');
-                checkOutBtn.textContent = visit.checkOut === '' ? 'Check-out' : 'Checked-out';
-                checkOutBtn.disabled = visit.checkOut !== '';
+                checkOutBtn.className = 'btn ' + (visit.checkOut === 'N/A' ? 'btn-checkout' : 'btn-disabled');
+                checkOutBtn.textContent = visit.checkOut === 'N/A' ? 'Check-out' : 'Checked-out';
+                checkOutBtn.disabled = visit.checkOut !== 'N/A';
                 checkOutBtn.onclick = () => checkOutAction(newRow);
 
                 const viewBtn = document.createElement('button');
@@ -190,30 +194,40 @@ async function loadSavedVisits(patientId) {
     }
 }
 
-// Function to set up auto-jumping for date inputs
+// Function to set up auto-jumping and real-time date-time updates
 function setupDateInputs(cell) {
     const dayInput = cell.querySelector('.day-input');
     const monthInput = cell.querySelector('.month-input');
     const yearInput = cell.querySelector('.year-input');
+    const timeDisplay = cell.querySelector('.time-display');
+    const dateTimeDisplay = cell.querySelector('.date-time-display');
 
+    // Auto-jump logic
     dayInput.addEventListener('input', () => {
         if (dayInput.value.length === 2) {
             monthInput.focus();
         }
+        updateDateTimeDisplay();
     });
 
     monthInput.addEventListener('input', () => {
         if (monthInput.value.length === 2) {
             yearInput.focus();
         }
+        updateDateTimeDisplay();
     });
 
-    // Optional: Add validation for day and month
+    yearInput.addEventListener('input', () => {
+        updateDateTimeDisplay();
+    });
+
+    // Validation
     dayInput.addEventListener('change', () => {
         const day = parseInt(dayInput.value);
         if (day < 1 || day > 31) {
             alert('Day must be between 01 and 31');
             dayInput.value = '';
+            updateDateTimeDisplay();
         }
     });
 
@@ -222,16 +236,22 @@ function setupDateInputs(cell) {
         if (month < 1 || month > 12) {
             alert('Month must be between 01 and 12');
             monthInput.value = '';
+            updateDateTimeDisplay();
         }
     });
 
-    // Save on change
-    [dayInput, monthInput, yearInput].forEach(input => {
-        input.addEventListener('change', () => {
-            const row = cell.closest('tr');
-            saveAllRows();
-        });
-    });
+    // Real-time update of date-time display
+    function updateDateTimeDisplay() {
+        const day = dayInput.value;
+        const month = monthInput.value;
+        const year = yearInput.value;
+        const time = timeDisplay.textContent;
+        const dateTime = combineDateTime(day, month, year, time);
+        dateTimeDisplay.textContent = dateTime === 'N/A' ? '' : dateTime;
+    }
+
+    // Initial update
+    updateDateTimeDisplay();
 }
 
 // Handle check-in action
@@ -252,7 +272,7 @@ function checkIn() {
     const serialCell = newRow.insertCell(0);
     serialCell.textContent = rowCount++;
 
-    // Check-in date and time (date manual, time auto-generated)
+    // Check-in date and time
     const checkInCell = newRow.insertCell(1);
     checkInCell.innerHTML = `
         <div class="date-inputs">
@@ -260,10 +280,11 @@ function checkIn() {
             <input type="text" class="month-input" placeholder="MM" maxlength="2" size="2">/
             <input type="text" class="year-input" placeholder="YYYY" maxlength="4" size="4">
             <span class="time-display">${timeStr}</span>
+            <span class="date-time-display" style="margin-left: 10px;"></span>
         </div>
     `;
 
-    // Check-out date and time (initially empty)
+    // Check-out date and time
     const checkOutCell = newRow.insertCell(2);
     checkOutCell.innerHTML = `
         <div class="date-inputs">
@@ -271,10 +292,11 @@ function checkIn() {
             <input type="text" class="month-input" placeholder="MM" maxlength="2" size="2">/
             <input type="text" class="year-input" placeholder="YYYY" maxlength="4" size="4">
             <span class="time-display">N/A</span>
+            <span class="date-time-display" style="margin-left: 10px;"></span>
         </div>
     `;
 
-    // Add event listeners for auto-jumping between date fields
+    // Add event listeners
     setupDateInputs(checkInCell);
     setupDateInputs(checkOutCell);
 
@@ -296,8 +318,6 @@ function checkIn() {
 
     // Action buttons
     const actionCell = newRow.insertCell(5);
-    
-    // Delete button
     const deleteBtn = document.createElement('button');
     deleteBtn.textContent = 'Delete';
     deleteBtn.addEventListener('click', () => {
@@ -311,12 +331,10 @@ function checkIn() {
         }
     });
 
-    // Check-out button
     const checkOutBtn = document.createElement('button');
     checkOutBtn.textContent = 'Check-out';
     checkOutBtn.addEventListener('click', () => checkOutAction(newRow));
 
-    // View button
     const viewBtn = document.createElement('button');
     viewBtn.textContent = 'Edit';
     viewBtn.addEventListener('click', () => {
@@ -329,14 +347,13 @@ function checkIn() {
     actionCell.appendChild(checkOutBtn);
     actionCell.appendChild(viewBtn);
 
-    // Save the new visit to Firebase with empty date
+    // Save initial visit data
     const visitData = {
         checkIn: combineDateTime('', '', '', timeStr),
-        checkOut: '',
+        checkOut: 'N/A',
         clinic: clinicSelect.value,
         doctor: 'Dr. Minh Hong'
     };
-
     set(ref(db, `patients/${recordId}/visits/${visitId}`), visitData)
         .then(() => console.log('New visit saved:', visitId))
         .catch(error => console.error('Error saving visit:', error));
@@ -414,8 +431,8 @@ async function saveAllRows() {
                 const checkOutTime = checkOutInputs.querySelector('.time-display').textContent;
 
                 // Combine date and time
-                const checkInDateTime = checkInDay && checkInMonth && checkInYear ? combineDateTime(checkInDay, checkInMonth, checkInYear, checkInTime) : '';
-                const checkOutDateTime = checkOutDay && checkOutMonth && checkOutYear ? combineDateTime(checkOutDay, checkOutMonth, checkOutYear, checkOutTime) : '';
+                const checkInDateTime = combineDateTime(checkInDay, checkInMonth, checkInYear, checkInTime);
+                const checkOutDateTime = combineDateTime(checkOutDay, checkOutMonth, checkOutYear, checkOutTime);
 
                 const updatedData = {
                     ...existingData,

@@ -181,11 +181,25 @@ function initMedicineDropdown(parentElement) {
 }
 
 // Function to add a medicine item
-window.addMedicineItem = function (medicineData = null, forceAdd = true) {
+window.addMedicineItem = function (medicineData = null, forceAdd = false) {
     const ul = document.getElementById('medicineList');
     if (!ul) {
         console.error("Error: 'medicineList' element not found!");
         return null;
+    }
+
+    if (!forceAdd && !medicineData && medicinesInitialized && ul.querySelectorAll('li').length > 0) {
+        const lastLi = ul.lastElementChild;
+        const inputs = lastLi.querySelectorAll('input');
+        const selects = lastLi.querySelectorAll('select');
+        let isEmpty = true;
+        inputs.forEach(input => {
+            if (input.value) isEmpty = false;
+        });
+        selects.forEach(select => {
+            if (select.value) isEmpty = false;
+        });
+        if (isEmpty) return null;
     }
 
     const li = document.createElement('li');
@@ -293,15 +307,6 @@ window.addMedicineItem = function (medicineData = null, forceAdd = true) {
     });
 
     medicinesInitialized = true;
-
-    // Limit display to the last 6 rows (hide oldest rows)
-    const medicineItems = ul.querySelectorAll('.medicine-item');
-    if (medicineItems.length > 6) {
-        for (let i = 0; i < medicineItems.length - 6; i++) {
-            medicineItems[i].style.display = 'none'; // Hide the oldest rows
-        }
-    }
-
     return li;
 };
 
@@ -403,13 +408,12 @@ async function savePatientInformation() {
 }
 
 // Function to display visit info
-async function displayVisitInfo(patientId, info, isNewVisit) {
+async function displayVisitInfo(patientId, info) {
     const visitCount = await getVisitCount(patientId);
-
-    // If this is a new visit, treatmentHistory and labTest should be empty
-    // If editing an existing visit, load the saved data
-    document.getElementById('treatmentHistory').value = isNewVisit ? '' : (info?.treatmentHistory && info.treatmentHistory !== 'N/A' ? info.treatmentHistory : '');
-    document.getElementById('labTest').value = isNewVisit ? '' : (info?.labTest && info.labTest !== 'N/A' ? info.labTest : '');
+    
+    // For second visit, clear treatmentHistory and labTest
+    document.getElementById('treatmentHistory').value = (visitCount === 1 && !info?.treatmentHistory) ? '' : (info?.treatmentHistory !== 'N/A' ? info.treatmentHistory : '');
+    document.getElementById('labTest').value = (visitCount === 1 && !info?.labTest) ? '' : (info?.labTest !== 'N/A' ? info.labTest : '');
     document.getElementById('diagnosis').value = info?.diagnosis || '';
 
     const medicineList = document.getElementById('medicineList');
@@ -418,14 +422,6 @@ async function displayVisitInfo(patientId, info, isNewVisit) {
         info.medicines.forEach(med => addMedicineItem(med, true));
     } else {
         addMedicineItem(null, true);
-    }
-
-    // Limit display to the last 6 rows (hide oldest rows)
-    const medicineItems = medicineList.querySelectorAll('.medicine-item');
-    if (medicineItems.length > 6) {
-        for (let i = 0; i < medicineItems.length - 6; i++) {
-            medicineItems[i].style.display = 'none'; // Hide the oldest rows
-        }
     }
 }
 
@@ -448,16 +444,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     const visitId = urlParams.get('visitId');
 
     if (patientId && visitId) {
-        // Load current visit data
+        // Try loading current visit data
         const infoRef = ref(db, `patients/${patientId}/visits/${visitId}/information`);
         const snapshot = await get(infoRef);
         if (snapshot.exists()) {
-            // Existing visit: load the saved data
-            await displayVisitInfo(patientId, snapshot.val(), false);
+            await displayVisitInfo(patientId, snapshot.val());
         } else {
-            // New visit: load diagnosis and medicines from latest visit, but keep treatmentHistory and labTest empty
+            // Load latest visit data (e.g., from initial registration)
             const latestVisitData = await getLatestVisitData(patientId);
-            await displayVisitInfo(patientId, latestVisitData || {}, true);
+            await displayVisitInfo(patientId, latestVisitData);
         }
     } else {
         addMedicineItem(null, true);

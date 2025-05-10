@@ -6,26 +6,19 @@ let rowCount = 1;
 let recordId = null;
 let isFirstVisit = false;
 
-// Utility function for consistent time formatting
-function formatTime(date) {
+// Utility function for consistent date/time formatting
+// Update your formatDateTime function to include a space between date and time
+function formatDateTime(date) {
     const pad = num => num.toString().padStart(2, '0');
-    return `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+    const dateStr = `${pad(date.getDate())}/${pad(date.getMonth()+1)}/${date.getFullYear()}`;
+    const timeStr = `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+    return {
+        dateStr,
+        timeStr,
+        combined: `${dateStr} ${timeStr}`,  // Added space here
+        display: `${dateStr}<br>${timeStr}`
+    };
 }
-
-// Utility function to combine manual date and auto-generated time
-function combineDateTime(day, month, year, time) {
-    if (!day || !month || !year) return '';
-    const dateStr = `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year.padStart(4, '0')}`;
-    return `${dateStr} ${time}`;
-}
-
-// Utility function to split combined date-time for display
-function splitDateTime(dateTimeStr) {
-    if (!dateTimeStr || dateTimeStr === '') return { date: '', time: '' };
-    const [date, time] = dateTimeStr.split(' ');
-    return { date, time };
-}
-
 async function getPatientDetails(id) {
     try {
         const [patientSnapshot, visitsSnapshot] = await Promise.all([
@@ -56,23 +49,33 @@ async function getPatientDetails(id) {
         updateField('patientEmail', patientData.email);
         updateField('patientNotes', patientData.notes);
 
-        // Address Mapping
+        // Address Mapping (same as view-page)
         const addressMapping = {
-            village: {},
-            commune: {},
-            district: {},
-            province: {}
+            village: {
+
+            },
+            commune: {
+
+            },
+            district: {
+
+            },
+            province: {
+
+            }
         };
 
         // Update Address
         if (patientData.address) {
             const { village, commune, district, province } = patientData.address;
+
             const addressParts = [
                 village ? `ភូមិ ${addressMapping.village[village] || village}` : '',
                 commune ? `ឃុំ ${addressMapping.commune[commune] || commune}` : '',
                 district ? `ស្រុក ${addressMapping.district[district] || district}` : '',
                 province ? `ខេត្ត ${addressMapping.province[province] || province}` : ''
-            ].filter(Boolean);
+            ].filter(Boolean); // remove empty
+
             const addressString = addressParts.join(', ');
             updateField('patientAddress', addressString);
         } else {
@@ -89,6 +92,9 @@ async function getPatientDetails(id) {
     }
 }
 
+
+
+
 // Load existing visits from Firebase
 async function loadSavedVisits(patientId) {
     try {
@@ -103,47 +109,47 @@ async function loadSavedVisits(patientId) {
                 const newRow = tableBody.insertRow();
                 newRow.dataset.visitId = visitId;
 
+                // Helper function to safely format date/time
+                const formatDateTimeDisplay = (datetimeStr) => {
+                    if (!datetimeStr || datetimeStr === 'N/A') return 'N/A';
+                    
+                    // Handle both space-separated and concatenated formats
+                    if (datetimeStr.includes(' ')) {
+                        const [date, time] = datetimeStr.split(' ');
+                        return `${date}<br>${time}`;
+                    } else if (datetimeStr.length >= 16) { // DD/MM/YYYYHH:MM:SS
+                        const date = datetimeStr.slice(0, 10);
+                        const time = datetimeStr.slice(10);
+                        return `${date}<br>${time}`;
+                    }
+                    return datetimeStr; // Fallback
+                };
+
                 // Serial number
                 newRow.insertCell(0).textContent = index + 1;
 
-                // Check-in date and time
+                // Check-in time
                 const checkInCell = newRow.insertCell(1);
-                const checkInData = splitDateTime(visit.checkIn);
-                checkInCell.innerHTML = `
-                    <div class="date-inputs">
-                        <input type="text" class="day-input" value="${checkInData.date.split('/')[0] || ''}" placeholder="DD" maxlength="2" size="2">/
-                        <input type="text" class="month-input" value="${checkInData.date.split('/')[1] || ''}" placeholder="MM" maxlength="2" size="2">/
-                        <input type="text" class="year-input" value="${checkInData.date.split('/')[2] || ''}" placeholder="YYYY" maxlength="4" size="4">
-                        <span class="time-display">${checkInData.time || ''}</span>
-                    </div>
-                `;
+                checkInCell.innerHTML = formatDateTimeDisplay(visit.checkIn);
 
-                // Check-out date and time
+                // Check-out time
                 const checkOutCell = newRow.insertCell(2);
-                const checkOutData = splitDateTime(visit.checkOut);
-                checkOutCell.innerHTML = `
-                    <div class="date-inputs">
-                        <input type="text" class="day-input" value="${checkOutData.date.split('/')[0] || ''}" placeholder="DD" maxlength="2" size="2">/
-                        <input type="text" class="month-input" value="${checkOutData.date.split('/')[1] || ''}" placeholder="MM" maxlength="2" size="2">/
-                        <input type="text" class="year-input" value="${checkOutData.date.split('/')[2] || ''}" placeholder="YYYY" maxlength="4" size="4">
-                        <span class="time-display">${checkOutData.time || ''}</span>
-                    </div>
-                `;
-
-                // Add event listeners for auto-jumping between date fields
-                setupDateInputs(checkInCell);
-                setupDateInputs(checkOutCell);
+                checkOutCell.innerHTML = formatDateTimeDisplay(visit.checkOut);
 
                 // Clinic selection
                 const clinicCell = newRow.insertCell(3);
                 const clinicSelect = document.createElement('select');
+                
+                // Configure clinic options
                 const clinics = ['វែលគ្លីនិក I', 'វែលគ្លីនិក II'];
                 clinics.forEach(clinic => {
                     const option = new Option(clinic, clinic);
                     clinicSelect.add(option);
                 });
+                
+                // Set current value and handle changes
                 clinicSelect.value = visit.clinic || clinics[0];
-                clinicSelect.addEventListener('change', saveAllRows);
+                clinicSelect.addEventListener('change', () => saveAllRows());
                 clinicCell.appendChild(clinicSelect);
 
                 // Doctor information
@@ -151,8 +157,10 @@ async function loadSavedVisits(patientId) {
 
                 // Action buttons
                 const actionCell = newRow.insertCell(5);
+                
+                // Delete button
                 const deleteBtn = document.createElement('button');
-                deleteBtn.classList.add('btn', 'btn-delete');
+                deleteBtn.classList.add('btn', 'btn-delete');                
                 deleteBtn.textContent = 'Delete';
                 deleteBtn.onclick = () => {
                     const password = prompt('បញ្ចូល 12345 ដើម្បីលុប:');
@@ -164,13 +172,16 @@ async function loadSavedVisits(patientId) {
                         alert('Incorrect password. Deletion cancelled.');
                     }
                 };
+                
 
+                // Check-out button
                 const checkOutBtn = document.createElement('button');
-                checkOutBtn.className = 'btn ' + (visit.checkOut === '' ? 'btn-checkout' : 'btn-disabled');
-                checkOutBtn.textContent = visit.checkOut === '' ? 'Check-out' : 'Checked-out';
-                checkOutBtn.disabled = visit.checkOut !== '';
+                checkOutBtn.className = 'btn ' + (visit.checkOut === 'N/A' ? 'btn-checkout' : 'btn-disabled');
+                checkOutBtn.textContent = visit.checkOut === 'N/A' ? 'Check-out' : 'Checked-out';
+                checkOutBtn.disabled = visit.checkOut !== 'N/A';
                 checkOutBtn.onclick = () => checkOutAction(newRow);
 
+                // View button
                 const viewBtn = document.createElement('button');
                 viewBtn.className = 'btn btn-edit';
                 viewBtn.textContent = 'Edit';
@@ -190,50 +201,6 @@ async function loadSavedVisits(patientId) {
     }
 }
 
-// Function to set up auto-jumping for date inputs
-function setupDateInputs(cell) {
-    const dayInput = cell.querySelector('.day-input');
-    const monthInput = cell.querySelector('.month-input');
-    const yearInput = cell.querySelector('.year-input');
-
-    dayInput.addEventListener('input', () => {
-        if (dayInput.value.length === 2) {
-            monthInput.focus();
-        }
-    });
-
-    monthInput.addEventListener('input', () => {
-        if (monthInput.value.length === 2) {
-            yearInput.focus();
-        }
-    });
-
-    // Optional: Add validation for day and month
-    dayInput.addEventListener('change', () => {
-        const day = parseInt(dayInput.value);
-        if (day < 1 || day > 31) {
-            alert('Day must be between 01 and 31');
-            dayInput.value = '';
-        }
-    });
-
-    monthInput.addEventListener('change', () => {
-        const month = parseInt(monthInput.value);
-        if (month < 1 || month > 12) {
-            alert('Month must be between 01 and 12');
-            monthInput.value = '';
-        }
-    });
-
-    // Save on change
-    [dayInput, monthInput, yearInput].forEach(input => {
-        input.addEventListener('change', () => {
-            const row = cell.closest('tr');
-            saveAllRows();
-        });
-    });
-}
-
 // Handle check-in action
 function checkIn() {
     if (!recordId) {
@@ -246,37 +213,19 @@ function checkIn() {
     const visitId = push(ref(db, `patients/${recordId}/visits`)).key;
     newRow.dataset.visitId = visitId;
 
-    const timeStr = formatTime(new Date());
+    const { dateStr, timeStr, combined, display } = formatDateTime(new Date());
 
     // Serial number
     const serialCell = newRow.insertCell(0);
     serialCell.textContent = rowCount++;
 
-    // Check-in date and time (date manual, time auto-generated)
+    // Check-in time
     const checkInCell = newRow.insertCell(1);
-    checkInCell.innerHTML = `
-        <div class="date-inputs">
-            <input type="text" class="day-input" placeholder="DD" maxlength="2" size="2">/
-            <input type="text" class="month-input" placeholder="MM" maxlength="2" size="2">/
-            <input type="text" class="year-input" placeholder="YYYY" maxlength="4" size="4">
-            <span class="time-display">${timeStr}</span>
-        </div>
-    `;
+    checkInCell.innerHTML = display;
 
-    // Check-out date and time (initially empty)
+    // Check-out time (initially N/A)
     const checkOutCell = newRow.insertCell(2);
-    checkOutCell.innerHTML = `
-        <div class="date-inputs">
-            <input type="text" class="day-input" placeholder="DD" maxlength="2" size="2">/
-            <input type="text" class="month-input" placeholder="MM" maxlength="2" size="2">/
-            <input type="text" class="year-input" placeholder="YYYY" maxlength="4" size="4">
-            <span class="time-display">N/A</span>
-        </div>
-    `;
-
-    // Add event listeners for auto-jumping between date fields
-    setupDateInputs(checkInCell);
-    setupDateInputs(checkOutCell);
+    checkOutCell.textContent = 'N/A';
 
     // Clinic selection
     const clinicCell = newRow.insertCell(3);
@@ -310,6 +259,7 @@ function checkIn() {
             alert('Incorrect password. Deletion cancelled.');
         }
     });
+    
 
     // Check-out button
     const checkOutBtn = document.createElement('button');
@@ -318,7 +268,7 @@ function checkIn() {
 
     // View button
     const viewBtn = document.createElement('button');
-    viewBtn.textContent = 'Edit';
+    viewBtn.textContent = 'View';
     viewBtn.addEventListener('click', () => {
         const targetPage = isFirstVisit ? 'add-detail-page.html' : 'add-information.html';
         window.location.href = `${targetPage}?patientId=${recordId}&visitId=${visitId}`;
@@ -329,10 +279,10 @@ function checkIn() {
     actionCell.appendChild(checkOutBtn);
     actionCell.appendChild(viewBtn);
 
-    // Save the new visit to Firebase with empty date
+    // Save the new visit to Firebase
     const visitData = {
-        checkIn: combineDateTime('', '', '', timeStr),
-        checkOut: '',
+        checkIn: combined,
+        checkOut: 'N/A',
         clinic: clinicSelect.value,
         doctor: 'Dr. Minh Hong'
     };
@@ -347,20 +297,18 @@ function checkOutAction(row) {
     const visitId = row.dataset.visitId;
     if (!visitId || !recordId) return;
 
-    const timeStr = formatTime(new Date());
+    const { dateStr, timeStr, combined, display } = formatDateTime(new Date());
     
     // Update UI
-    const checkOutCell = row.cells[2];
-    const checkOutInputs = checkOutCell.querySelector('.date-inputs');
-    const timeDisplay = checkOutInputs.querySelector('.time-display');
-    timeDisplay.textContent = timeStr;
-
+    row.cells[2].innerHTML = display;
     const checkOutBtn = row.querySelector('button:nth-child(2)');
     checkOutBtn.disabled = true;
     checkOutBtn.textContent = 'Checked-out';
 
-    // Save to Firebase
-    saveAllRows();
+    // Update Firebase
+    update(ref(db, `patients/${recordId}/visits/${visitId}`), {
+        checkOut: combined
+    }).catch(error => console.error('Error updating check-out time:', error));
 }
 
 // Delete a visit row
@@ -382,6 +330,7 @@ function deleteRow(row) {
 }
 
 // Save all rows to Firebase
+// Update the saveAllRows function to properly handle the time formatting
 async function saveAllRows() {
     if (!recordId) return;
 
@@ -399,28 +348,14 @@ async function saveAllRows() {
             if (snapshot.exists()) {
                 const existingData = snapshot.val();
 
-                // Extract check-in date and time
-                const checkInInputs = row.cells[1].querySelector('.date-inputs');
-                const checkInDay = checkInInputs.querySelector('.day-input').value.padStart(2, '0');
-                const checkInMonth = checkInInputs.querySelector('.month-input').value.padStart(2, '0');
-                const checkInYear = checkInInputs.querySelector('.year-input').value.padStart(4, '0');
-                const checkInTime = checkInInputs.querySelector('.time-display').textContent;
-
-                // Extract check-out date and time
-                const checkOutInputs = row.cells[2].querySelector('.date-inputs');
-                const checkOutDay = checkOutInputs.querySelector('.day-input').value.padStart(2, '0');
-                const checkOutMonth = checkOutInputs.querySelector('.month-input').value.padStart(2, '0');
-                const checkOutYear = checkOutInputs.querySelector('.year-input').value.padStart(4, '0');
-                const checkOutTime = checkOutInputs.querySelector('.time-display').textContent;
-
-                // Combine date and time
-                const checkInDateTime = checkInDay && checkInMonth && checkInYear ? combineDateTime(checkInDay, checkInMonth, checkInYear, checkInTime) : '';
-                const checkOutDateTime = checkOutDay && checkOutMonth && checkOutYear ? combineDateTime(checkOutDay, checkOutMonth, checkOutYear, checkOutTime) : '';
-
+                // Properly extract date and time from cells
+                const checkInText = row.cells[1].textContent.replace(/\n/g, ' ').trim();
+                const checkOutText = row.cells[2].textContent.replace(/\n/g, ' ').trim();
+                
                 const updatedData = {
                     ...existingData,
-                    checkIn: checkInDateTime,
-                    checkOut: checkOutDateTime,
+                    checkIn: checkInText === 'undefined' ? existingData.checkIn : checkInText,
+                    checkOut: checkOutText === 'N/A' ? 'N/A' : (checkOutText === 'undefined' ? existingData.checkOut : checkOutText),
                     clinic: row.cells[3].querySelector('select').value,
                     doctor: row.cells[4].textContent
                 };
@@ -432,6 +367,7 @@ async function saveAllRows() {
         }
     }
 }
+
 
 // Initialize the page
 document.addEventListener('DOMContentLoaded', async function() {

@@ -1,5 +1,5 @@
 import { db } from './firebase-config.js';
-import { ref, set, get, update, push } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js';
+import { ref, set, get, update } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js';
 import { note4Options } from './dropdown.js';
 import { medicineOptions } from './medicine-dropdown.js';
 
@@ -86,6 +86,7 @@ async function getPatientDetails(recordId, visitId = null) {
         let structuredNotes = {};
         let basicInfo = {};
 
+        // First get the basic patient info
         const patientRef = ref(db, 'patients/' + recordId);
         const patientSnapshot = await get(patientRef);
 
@@ -96,6 +97,7 @@ async function getPatientDetails(recordId, visitId = null) {
 
         basicInfo = patientSnapshot.val();
 
+        // Update patient info in DOM safely
         const updateField = (id, value) => {
             const element = document.getElementById(id);
             if (element) {
@@ -110,6 +112,7 @@ async function getPatientDetails(recordId, visitId = null) {
         updateField('patientPhone', basicInfo.phone);
         updateField('patientEmail', basicInfo.email);
 
+        // Handle notes display
         if (typeof basicInfo.notes === 'string') {
             updateField('patientNotes', basicInfo.notes);
         } else if (basicInfo.notes?.original) {
@@ -118,6 +121,7 @@ async function getPatientDetails(recordId, visitId = null) {
             updateField('patientNotes', '');
         }
 
+        // Address Mapping
         const addressMapping = {
             village: {
                 "Village 1": "ទួលក្របៅ",
@@ -143,33 +147,42 @@ async function getPatientDetails(recordId, visitId = null) {
 
         if (basicInfo.address) {
             const { village, commune, district, province } = basicInfo.address;
+
             const addressParts = [
                 village ? `ភូមិ ${addressMapping.village[village] || village}` : '',
                 commune ? `ឃុំ/សង្កាត់ ${addressMapping.commune[commune] || commune}` : '',
                 district ? `ស្រុក/ខណ្ឌ ${addressMapping.district[district] || district}` : '',
                 province ? `ខេត្ត ${addressMapping.province[province] || province}` : ''
             ].filter(Boolean);
-            updateField('patientAddress', addressParts.join(', '));
+
+            const addressString = addressParts.join(', ');
+            updateField('patientAddress', addressString);
         } else {
             updateField('patientAddress', 'N/A');
         }
 
+        // Fetch structured notes
         if (visitId) {
             const visitRef = ref(db, `patients/${recordId}/visits/${visitId}/information`);
             const visitSnapshot = await get(visitRef);
+
             if (visitSnapshot.exists()) {
                 structuredNotes = visitSnapshot.val();
+            } else if (basicInfo.structuredNotes) {
+                structuredNotes = basicInfo.structuredNotes;
             }
         } else {
             structuredNotes = basicInfo.structuredNotes || {};
         }
 
+        // Populate structured notes fields
         document.getElementById('patientNote1').value = structuredNotes.note1 || '';
         document.getElementById('patientNote2').value = structuredNotes.note2 || '';
         document.getElementById('patientNote3').value = structuredNotes.note3 || '';
-        document.getElementById('patientNote4').value = structuredNotes.diagnosis || ''; // Use diagnosis field
+        document.getElementById('patientNote4').value = structuredNotes.note4 || '';
         document.getElementById('patientNote5').value = structuredNotes.note5 || '';
 
+        // Load medicines
         const ul = document.getElementById('medicineList');
         ul.innerHTML = '';
         if (structuredNotes.medicines) {
@@ -178,6 +191,7 @@ async function getPatientDetails(recordId, visitId = null) {
                 calculateMedicationQuantity(li);
             });
         }
+
     } catch (error) {
         console.error('Error fetching patient details:', error);
     }
@@ -199,25 +213,28 @@ async function savePatientNotes(recordId, visitId = null) {
         note1: document.getElementById('patientNote1').value.trim(),
         note2: document.getElementById('patientNote2').value.trim(),
         note3: document.getElementById('patientNote3').value.trim(),
-        diagnosis: document.getElementById('patientNote4').value.trim(), // Save as diagnosis
+        note4: document.getElementById('patientNote4').value.trim(),
         note5: document.getElementById('patientNote5').value.trim(),
-        medicines,
-        createdAt: new Date().toISOString()
+        medicines
     };
 
     try {
-        if (!visitId) {
-            // Create a new visit for initial registration
-            const visitsRef = ref(db, `patients/${recordId}/visits`);
-            const newVisitRef = push(visitsRef);
-            visitId = newVisitRef.key;
+        if (visitId) {
+            await set(ref(db, `patients/${recordId}/visits/${visitId}/information`), structuredNotes);
+        } else {
+            const snapshot = await get(ref(db, 'patients/' + recordId));
+            const currentData = snapshot.val() || {};
+            await update(ref(db, 'patients/' + recordId), {
+                ...currentData,
+                structuredNotes,
+                notes: document.getElementById('patientNotes').value.trim()
+            }); 
         }
-        await set(ref(db, `patients/${recordId}/visits/${visitId}/information`), structuredNotes);
         alert('Notes saved successfully!');
         window.history.back();
     } catch (err) {
         console.error('Error saving patient notes:', err);
-        alert('Failed to save notes: ' + err.message);
+        alert('Failed to save notes.');
     }
 }
 
@@ -225,11 +242,11 @@ async function savePatientNotes(recordId, visitId = null) {
 function initMedicineDropdown(parentElement) {
     const input = parentElement.querySelector('.medicine-input');
     const dropdown = parentElement.querySelector('.medicine-dropdown');
-    if (!input || !dropdown) return;
 
     input.addEventListener('input', function () {
         const query = this.value.toLowerCase();
         dropdown.innerHTML = '';
+
         const filteredOptions = query
             ? medicineOptions.filter(option => option.toLowerCase().includes(query))
             : medicineOptions;
@@ -267,7 +284,6 @@ function initMedicineDropdown(parentElement) {
     });
 }
 
-// Function to add a medicine item
 window.addMedicineItem = function (medicineData = null) {
     const ul = document.getElementById('medicineList');
     if (!ul) {
@@ -374,9 +390,10 @@ window.addMedicineItem = function (medicineData = null) {
     const afternoonSelect = li.querySelector('.afternoon-dose');
     const eveningSelect = li.querySelector('.evening-dose');
 
-    [daysInput, morningSelect, afternoonSelect, eveningSelect].forEach(elem => {
-        if (elem) elem.addEventListener('change', () => calculateMedicationQuantity(li));
-    });
+    daysInput.addEventListener('input', () => calculateMedicationQuantity(li));
+    morningSelect.addEventListener('change', () => calculateMedicationQuantity(li));
+    afternoonSelect.addEventListener('change', () => calculateMedicationQuantity(li));
+    eveningSelect.addEventListener('change', () => calculateMedicationQuantity(li));
 
     return li;
 };

@@ -150,7 +150,7 @@ function generateFirstVisitContent(info) {
         <div class="note-item"><strong>សញ្ញាណតម្អូញ:</strong> ${info.note1 || 'មិនទាន់បំពេញ'}</div>
         <div class="note-item"><strong>ប្រវត្តិព្យាបាល:</strong> ${info.note2 || 'មិនទាន់បំពេញ'}</div>
         <div class="note-item"><strong>តេស្តមន្ទីពិសោធន៍:</strong> ${info.note3 || 'មិនទាន់បំពេញ'}</div>
-        <div class="note-item"><strong>រោគវិនិច្ឆ័យ:</strong> ${info.diagnosis || 'មិនទាន់បំពេញ'}</div>
+        <div class="note-item"><strong>រោគវិនិច្ឆ័យ:</strong> ${info.note4 || 'មិនទាន់បំពេញ'}</div>
         <div class="note-item"><strong>រោគវិនិច្ឆ័យញែក:</strong> ${info.note5 || 'មិនទាន់បំពេញ'}</div>
         <div class="note-item"><strong>របៀបប្រើប្រាស់ថ្នាំ:</strong> ${info.medicines ? generateMedicineTable(info.medicines) : 'មិនទាន់បំពេញ'}</div>
     `;
@@ -166,13 +166,9 @@ function generateSecondVisitContent(info) {
 }
 
 function generateMedicineTable(medicines) {
-    // Display only the last 6 rows of medicines
-    const displayedMedicines = medicines.length > 6 ? medicines.slice(-6) : medicines;
-    
     return `
     <div class="medicine-container">
         <div class="medicine-header">
-            <div class="medicine-col">ល.រ</div>
             <div class="medicine-col">ឈ្មោះថ្នាំ</div>
             <div class="medicine-col">ប្រភេទថ្នាំ</div>
             <div class="medicine-col">រយៈពេល</div>
@@ -181,9 +177,8 @@ function generateMedicineTable(medicines) {
             <div class="medicine-col">ល្ងាច</div>
             <div class="medicine-col">ចំនួន</div>
         </div>
-        ${displayedMedicines.map((med, index) => `
+        ${medicines.map(med => `
             <div class="medicine-row">
-                <div class="medicine-col">${index + 1}.</div>
                 <div class="medicine-col">${med.name || ''}</div>
                 <div class="medicine-col">${med.dosage || ''}</div>
                 <div class="medicine-col">${med.days || ''} ថ្ងៃ</div>

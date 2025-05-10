@@ -1,5 +1,5 @@
 import { db } from './firebase-config.js';
-import { ref, set, get, update, push } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js';
+import { ref, set, get, update } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js ';
 import { note4Options } from './dropdown.js';
 import { medicineOptions } from './medicine-dropdown.js';
 
@@ -15,7 +15,6 @@ function initDiagnosisDropdown() {
         const filteredOptions = query
             ? note4Options.filter(option => option.toLowerCase().includes(query))
             : note4Options;
-
         filteredOptions.forEach(option => {
             const div = document.createElement("div");
             div.classList.add("dropdown-item");
@@ -27,7 +26,6 @@ function initDiagnosisDropdown() {
             };
             dropdown.appendChild(div);
         });
-
         dropdown.style.display = filteredOptions.length ? 'block' : 'none';
     });
 
@@ -86,9 +84,9 @@ async function getPatientDetails(recordId, visitId = null) {
         let structuredNotes = {};
         let basicInfo = {};
 
+        // Get basic patient info
         const patientRef = ref(db, 'patients/' + recordId);
         const patientSnapshot = await get(patientRef);
-
         if (!patientSnapshot.exists()) {
             console.error('Patient not found.');
             return;
@@ -96,11 +94,10 @@ async function getPatientDetails(recordId, visitId = null) {
 
         basicInfo = patientSnapshot.val();
 
+        // Update DOM fields
         const updateField = (id, value) => {
             const element = document.getElementById(id);
-            if (element) {
-                element.textContent = value || 'N/A';
-            }
+            if (element) element.textContent = value || 'N/A';
         };
 
         updateField('patientName', basicInfo.fullName);
@@ -110,6 +107,7 @@ async function getPatientDetails(recordId, visitId = null) {
         updateField('patientPhone', basicInfo.phone);
         updateField('patientEmail', basicInfo.email);
 
+        // Notes display logic
         if (typeof basicInfo.notes === 'string') {
             updateField('patientNotes', basicInfo.notes);
         } else if (basicInfo.notes?.original) {
@@ -118,27 +116,12 @@ async function getPatientDetails(recordId, visitId = null) {
             updateField('patientNotes', '');
         }
 
+        // Address mapping
         const addressMapping = {
-            village: {
-                "Village 1": "ទួលក្របៅ",
-                "Village 2": "សាមកុក",
-                "Village 3": "ហាបី"
-            },
-            commune: {
-                "Commune 1": "គគីរ",
-                "Commune 2": "កាស",
-                "Commune 3": "ក្អែក"
-            },
-            district: {
-                "District 1": "កៀនស្វាយ",
-                "District 2": "ក្អែក",
-                "District 3": "កាស"
-            },
-            province: {
-                "Province 1": "ព្រៃវែង",
-                "Province 2": "កណ្តាល",
-                "Province 3": "ក្អាត់"
-            }
+            village: { "Village 1": "ទួលក្របៅ", "Village 2": "សាមកុក", "Village 3": "ហាបី" },
+            commune: { "Commune 1": "គគីរ", "Commune 2": "កាស", "Commune 3": "ក្អែក" },
+            district: { "District 1": "កៀនស្វាយ", "District 2": "ក្អែក", "District 3": "កាស" },
+            province: { "Province 1": "ព្រៃវែង", "Province 2": "កណ្តាល", "Province 3": "ក្អាត់" }
         };
 
         if (basicInfo.address) {
@@ -154,22 +137,27 @@ async function getPatientDetails(recordId, visitId = null) {
             updateField('patientAddress', 'N/A');
         }
 
+        // Load structured notes or visit-specific info
         if (visitId) {
             const visitRef = ref(db, `patients/${recordId}/visits/${visitId}/information`);
             const visitSnapshot = await get(visitRef);
             if (visitSnapshot.exists()) {
                 structuredNotes = visitSnapshot.val();
+            } else if (basicInfo.structuredNotes) {
+                structuredNotes = basicInfo.structuredNotes;
             }
         } else {
             structuredNotes = basicInfo.structuredNotes || {};
         }
 
+        // Populate form fields
         document.getElementById('patientNote1').value = structuredNotes.note1 || '';
         document.getElementById('patientNote2').value = structuredNotes.note2 || '';
         document.getElementById('patientNote3').value = structuredNotes.note3 || '';
-        document.getElementById('patientNote4').value = structuredNotes.diagnosis || ''; // Use diagnosis field
+        document.getElementById('patientNote4').value = structuredNotes.note4 || '';
         document.getElementById('patientNote5').value = structuredNotes.note5 || '';
 
+        // Load medicine items
         const ul = document.getElementById('medicineList');
         ul.innerHTML = '';
         if (structuredNotes.medicines) {
@@ -178,6 +166,7 @@ async function getPatientDetails(recordId, visitId = null) {
                 calculateMedicationQuantity(li);
             });
         }
+
     } catch (error) {
         console.error('Error fetching patient details:', error);
     }
@@ -199,33 +188,35 @@ async function savePatientNotes(recordId, visitId = null) {
         note1: document.getElementById('patientNote1').value.trim(),
         note2: document.getElementById('patientNote2').value.trim(),
         note3: document.getElementById('patientNote3').value.trim(),
-        diagnosis: document.getElementById('patientNote4').value.trim(), // Save as diagnosis
+        note4: document.getElementById('patientNote4').value.trim(),
         note5: document.getElementById('patientNote5').value.trim(),
-        medicines,
-        createdAt: new Date().toISOString()
+        medicines
     };
 
     try {
-        if (!visitId) {
-            // Create a new visit for initial registration
-            const visitsRef = ref(db, `patients/${recordId}/visits`);
-            const newVisitRef = push(visitsRef);
-            visitId = newVisitRef.key;
+        if (visitId) {
+            await set(ref(db, `patients/${recordId}/visits/${visitId}/information`), structuredNotes);
+        } else {
+            const snapshot = await get(ref(db, 'patients/' + recordId));
+            const currentData = snapshot.val() || {};
+            await update(ref(db, 'patients/' + recordId), {
+                ...currentData,
+                structuredNotes,
+                notes: document.getElementById('patientNotes').value.trim()
+            });
         }
-        await set(ref(db, `patients/${recordId}/visits/${visitId}/information`), structuredNotes);
-        alert('Notes saved successfully!');
+        alert('ចំណាំត្រូវបានរក្សាទុកដោយជោគជ័យ!');
         window.history.back();
     } catch (err) {
         console.error('Error saving patient notes:', err);
-        alert('Failed to save notes: ' + err.message);
+        alert('កំហុសក្នុងការរក្សាទុកចំណាំ។');
     }
 }
 
-// Function to initialize medicine dropdown
+// Initialize medicine dropdown for a given parent element
 function initMedicineDropdown(parentElement) {
     const input = parentElement.querySelector('.medicine-input');
     const dropdown = parentElement.querySelector('.medicine-dropdown');
-    if (!input || !dropdown) return;
 
     input.addEventListener('input', function () {
         const query = this.value.toLowerCase();
@@ -233,19 +224,17 @@ function initMedicineDropdown(parentElement) {
         const filteredOptions = query
             ? medicineOptions.filter(option => option.toLowerCase().includes(query))
             : medicineOptions;
-
         filteredOptions.forEach(option => {
             const div = document.createElement("div");
             div.classList.add("dropdown-item");
             div.textContent = option;
-            div.onclick = function () {
+            div.onclick = () => {
                 input.value = option;
                 dropdown.innerHTML = '';
                 dropdown.style.display = 'none';
             };
             dropdown.appendChild(div);
         });
-
         dropdown.style.display = filteredOptions.length ? 'block' : 'none';
     });
 
@@ -256,7 +245,7 @@ function initMedicineDropdown(parentElement) {
                 const div = document.createElement("div");
                 div.classList.add("dropdown-item");
                 div.textContent = option;
-                div.onclick = function () {
+                div.onclick = () => {
                     input.value = option;
                     dropdown.innerHTML = '';
                     dropdown.style.display = 'none';
@@ -267,7 +256,7 @@ function initMedicineDropdown(parentElement) {
     });
 }
 
-// Function to add a medicine item
+// Add a new medicine item dynamically
 window.addMedicineItem = function (medicineData = null) {
     const ul = document.getElementById('medicineList');
     if (!ul) {
@@ -277,7 +266,6 @@ window.addMedicineItem = function (medicineData = null) {
 
     const li = document.createElement('li');
     li.classList.add('medicine-item');
-
     li.innerHTML = `
         <table class="medicine-table">
             <thead>
@@ -355,41 +343,55 @@ window.addMedicineItem = function (medicineData = null) {
             </tbody>
         </table>
     `;
-
     ul.appendChild(li);
-    initMedicineDropdown(li);
+    initMedicineDropdown(li); // Initialize dropdown for auto-complete
 
+    // Fill in values if provided
     if (medicineData) {
         li.querySelector('.medicine-input').value = medicineData.name || '';
         li.querySelector('.dosage-select').value = medicineData.dosage || '';
         li.querySelector('.time-input').value = medicineData.days || '';
-        li.querySelector('.morning-dose').value = medicineData.morningDose || '';
-        li.querySelector('.afternoon-dose').value = medicineData.afternoonDose || '';
-        li.querySelector('.evening-dose').value = medicineData.eveningDose || '';
+        li.querySelectorAll('.dosage-select')[1].value = medicineData.morningDose || '';
+        li.querySelectorAll('.dosage-select')[2].value = medicineData.afternoonDose || '';
+        li.querySelectorAll('.dosage-select')[3].value = medicineData.eveningDose || '';
         li.querySelector('.quantity-input').value = medicineData.quantity || '';
     }
 
+    // Setup quantity calculator
     const daysInput = li.querySelector('.time-input');
     const morningSelect = li.querySelector('.morning-dose');
     const afternoonSelect = li.querySelector('.afternoon-dose');
     const eveningSelect = li.querySelector('.evening-dose');
+    const quantityInput = li.querySelector('.quantity-input');
 
-    [daysInput, morningSelect, afternoonSelect, eveningSelect].forEach(elem => {
-        if (elem) elem.addEventListener('change', () => calculateMedicationQuantity(li));
-    });
+    function calculateQuantity() {
+        const days = parseFloat(daysInput.value) || 0;
+        const morning = parseDoseValue(morningSelect.value);
+        const afternoon = parseDoseValue(afternoonSelect.value);
+        const evening = parseDoseValue(eveningSelect.value);
+        const totalPerDay = morning + afternoon + evening;
+        const total = days * totalPerDay;
+        quantityInput.value = total % 1 === 0 ? total : total.toFixed(1);
+    }
+
+    daysInput.addEventListener('input', calculateQuantity);
+    morningSelect.addEventListener('change', calculateQuantity);
+    afternoonSelect.addEventListener('change', calculateQuantity);
+    eveningSelect.addEventListener('change', calculateQuantity);
 
     return li;
 };
 
+// DOMContentLoaded Event Listener
 document.addEventListener('DOMContentLoaded', () => {
+    initDiagnosisDropdown();
+
     const urlParams = new URLSearchParams(window.location.search);
     const recordId = urlParams.get('patientId');
     const visitId = urlParams.get('visitId');
 
     if (recordId) {
         getPatientDetails(recordId, visitId);
-        initDiagnosisDropdown();
-
         const saveBtn = document.getElementById('saveBtn');
         if (saveBtn) {
             saveBtn.addEventListener('click', () => savePatientNotes(recordId, visitId));
@@ -401,8 +403,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Always add one medicine row
     addMedicineItem();
 
+    // Close dropdowns when clicking outside
     document.addEventListener('click', event => {
         const note4Input = document.getElementById('patientNote4');
         const note4Dropdown = document.getElementById('note4-dropdown');
