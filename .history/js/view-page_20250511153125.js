@@ -131,7 +131,7 @@ function generateVisitHtml(title, checkIn, checkOut, clinic, doctor, info, isFir
     // Normalize the data structure
     const data = info.information || info;
     
-    // Ensure checkIn and checkOut are strings, display on the same line
+    // Ensure checkIn and checkOut are strings
     const checkInDisplay = checkIn && checkIn !== 'N/A' ? checkIn : 'N/A';
     const checkOutDisplay = checkOut && checkOut !== 'N/A' ? checkOut : 'N/A';
 
