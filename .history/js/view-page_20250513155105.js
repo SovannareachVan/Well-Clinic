@@ -28,7 +28,7 @@ async function getPatientDetails(recordId, visitId = null) {
             { id: 'patientAge', key: 'age' },
             { id: 'patientGender', key: 'gender' },
             { id: 'patientPhone', key: 'phone' },
-            { id: 'patientTelegram', key: 'telegram' }
+            { id: 'patientTelegram', key: 'telegram' } // Add Telegram field
         ];
 
         fields.forEach(field => {
@@ -86,21 +86,11 @@ async function getPatientDetails(recordId, visitId = null) {
             return;
         }
 
-        // Sort visits by checkIn date (newest first), with 'N/A' treated as newest and invalid dates handled
+        // Sort visits by checkIn date (newest first), with error handling
         visits.sort((a, b) => {
-            const checkInA = a[1].checkIn;
-            const checkInB = b[1].checkIn;
-
-            // Parse dates, fallback to 'N/A' as newest
-            const dateA = checkInA === 'N/A' ? new Date() : new Date(checkInA);
-            const dateB = checkInB === 'N/A' ? new Date() : new Date(checkInB);
-
-            // If either date is invalid, treat 'N/A' or invalid as newest
-            if (isNaN(dateA.getTime()) && isNaN(dateB.getTime())) return 0; // Both invalid, maintain order
-            if (isNaN(dateA.getTime())) return -1; // A invalid, place A first
-            if (isNaN(dateB.getTime())) return 1; // B invalid, place B first
-
-            return dateB - dateA; // Sort valid dates newest first
+            const dateA = a[1].checkIn && a[1].checkIn !== 'N/A' ? new Date(a[1].checkIn) : new Date(0);
+            const dateB = b[1].checkIn && b[1].checkIn !== 'N/A' ? new Date(b[1].checkIn) : new Date(0);
+            return isNaN(dateB) || isNaN(dateA) ? 0 : dateB - dateA;
         });
 
         if (visitId && patientData.visits?.[visitId]) {
@@ -137,14 +127,13 @@ async function getPatientDetails(recordId, visitId = null) {
         document.getElementById('patientNotes').textContent = 'Failed to load patient details.';
     }
 }
-
 function generateVisitHtml(title, checkIn, checkOut, clinic, doctor, info, isFirstVisit = false) {
     // Normalize the data structure
     const data = info.information || info;
     
-    // Ensure checkIn and checkOut are strings, handle invalid dates
-    const checkInDisplay = checkIn && checkIn !== 'N/A' ? (isValidDate(checkIn) ? checkIn : 'N/A') : 'N/A';
-    const checkOutDisplay = checkOut && checkOut !== 'N/A' ? (isValidDate(checkOut) ? checkOut : 'N/A') : 'N/A';
+    // Ensure checkIn and checkOut are strings, display on the same line
+    const checkInDisplay = checkIn && checkIn !== 'N/A' ? checkIn : 'N/A';
+    const checkOutDisplay = checkOut && checkOut !== 'N/A' ? checkOut : 'N/A';
 
     return `
         <div class="visit-note">
@@ -163,14 +152,6 @@ function generateVisitHtml(title, checkIn, checkOut, clinic, doctor, info, isFir
         </div>
     `;
 }
-
-// Helper function to validate date
-function isValidDate(dateStr) {
-    const date = new Date(dateStr);
-    return !isNaN(date.getTime()) && dateStr.match(/^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$/);
-}
-
-// Rest of the functions (generateFirstVisitContent, generateSecondVisitContent, generateMedicineTable, formatDate) remain unchanged
 
 function generateFirstVisitContent(info) {
     return `
