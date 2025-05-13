@@ -14,25 +14,16 @@ function formatDateTime(date) {
     return {
         dateStr,
         timeStr,
-        combined: `${dateStr} ${timeStr}`,
+        combined: `${dateStr} ${timeStr}`, // Space between date and time
         display: `${dateStr}<br>${timeStr}`
     };
 }
 
-// Utility function to validate a date string
-function isValidDateString(dateStr) {
-    if (!dateStr || dateStr === 'N/A') return false;
-    const [day, month, year] = dateStr.split('/').map(num => parseInt(num, 10));
-    if (isNaN(day) || isNaN(month) || isNaN(year)) return false;
-    if (day < 1 || day > 31 || month < 1 || month > 12 || year < 1900 || year > new Date().getFullYear()) return false;
-    const date = new Date(year, month - 1, day);
-    return !isNaN(date.getTime());
-}
-
 // Utility function to combine manual date and auto-generated time for Firebase
 function combineDateTime(day, month, year, time) {
-    if (!day || !month || !year) return 'N/A';
+    if (!day || !month || !year) return 'N/A'; // If any date part is missing, return 'N/A'
 
+    // Validate and parse inputs
     const dayNum = parseInt(day, 10);
     const monthNum = parseInt(month, 10) - 1; // Months are 0-based in JavaScript Date
     const yearNum = parseInt(year, 10);
@@ -40,8 +31,9 @@ function combineDateTime(day, month, year, time) {
     if (isNaN(dayNum) || isNaN(monthNum) || isNaN(yearNum)) return 'N/A';
     if (dayNum < 1 || dayNum > 31 || monthNum < 0 || monthNum > 11 || yearNum < 1900 || yearNum > new Date().getFullYear()) return 'N/A';
 
+    // Create a Date object to validate
     const date = new Date(yearNum, monthNum, dayNum);
-    if (isNaN(date.getTime())) return 'N/A';
+    if (isNaN(date.getTime())) return 'N/A'; // Invalid date
 
     const dateStr = `${day.padStart(2, '0')}/${(monthNum + 1).toString().padStart(2, '0')}/${year.padStart(4, '0')}`;
     return `${dateStr} ${time}`;
@@ -50,13 +42,7 @@ function combineDateTime(day, month, year, time) {
 // Utility function to split combined date-time for display
 function splitDateTime(dateTimeStr) {
     if (!dateTimeStr || dateTimeStr === 'N/A') return { date: '', time: '' };
-
     const [date, time] = dateTimeStr.split(' ');
-    if (!date || !time) return { date: '', time: '' };
-
-    // Validate the date part
-    if (!isValidDateString(date)) return { date: '', time: '' };
-
     return { date: date || '', time: time || '' };
 }
 
@@ -74,6 +60,7 @@ async function getPatientDetails(id) {
 
         const patientData = patientSnapshot.val();
 
+        // Update patient info in DOM safely
         const updateField = (id, value) => {
             const element = document.getElementById(id);
             if (element) {
@@ -90,6 +77,7 @@ async function getPatientDetails(id) {
         updateField('patientEmail', patientData.email);
         updateField('patientNotes', patientData.notes);
 
+        // Address Mapping
         const addressMapping = {
             village: {},
             commune: {},
@@ -97,6 +85,7 @@ async function getPatientDetails(id) {
             province: {}
         };
 
+        // Update Address
         if (patientData.address) {
             const { village, commune, district, province } = patientData.address;
             const addressParts = [
@@ -111,6 +100,7 @@ async function getPatientDetails(id) {
             updateField('patientAddress', 'N/A');
         }
 
+        // Set first visit flag
         isFirstVisit = !visitsSnapshot.exists();
         return true;
 
@@ -120,6 +110,7 @@ async function getPatientDetails(id) {
     }
 }
 
+// Load existing visits from Firebase
 async function loadSavedVisits(patientId) {
     try {
         const snapshot = await get(ref(db, `patients/${patientId}/visits`));
@@ -133,24 +124,9 @@ async function loadSavedVisits(patientId) {
                 const newRow = tableBody.insertRow();
                 newRow.dataset.visitId = visitId;
 
-                // Clean up invalid dates in Firebase data
-                const cleanedVisit = { ...visit };
-                if (visit.checkIn && !isValidDateString(visit.checkIn.split(' ')[0])) {
-                    cleanedVisit.checkIn = 'N/A';
-                }
-                if (visit.checkOut && visit.checkOut !== 'N/A' && !isValidDateString(visit.checkOut.split(' ')[0])) {
-                    cleanedVisit.checkOut = 'N/A';
-                }
-
-                // Update Firebase if data was cleaned
-                if (cleanedVisit.checkIn !== visit.checkIn || cleanedVisit.checkOut !== visit.checkOut) {
-                    set(ref(db, `patients/${patientId}/visits/${visitId}`), cleanedVisit)
-                        .catch(error => console.error('Error cleaning visit data:', error));
-                }
-
                 // Split check-in and check-out date-time
-                const checkInData = splitDateTime(cleanedVisit.checkIn);
-                const checkOutData = splitDateTime(cleanedVisit.checkOut);
+                const checkInData = splitDateTime(visit.checkIn);
+                const checkOutData = splitDateTime(visit.checkOut);
 
                 // Serial number
                 newRow.insertCell(0).textContent = index + 1;
@@ -213,9 +189,9 @@ async function loadSavedVisits(patientId) {
                 };
 
                 const checkOutBtn = document.createElement('button');
-                checkOutBtn.className = 'btn ' + (cleanedVisit.checkOut === 'N/A' ? 'btn-checkout' : 'btn-disabled');
-                checkOutBtn.textContent = cleanedVisit.checkOut === 'N/A' ? 'Check-out' : 'Checked-out';
-                checkOutBtn.disabled = cleanedVisit.checkOut !== 'N/A';
+                checkOutBtn.className = 'btn ' + (visit.checkOut === 'N/A' ? 'btn-checkout' : 'btn-disabled');
+                checkOutBtn.textContent = visit.checkOut === 'N/A' ? 'Check-out' : 'Checked-out';
+                checkOutBtn.disabled = visit.checkOut !== 'N/A';
                 checkOutBtn.onclick = () => checkOutAction(newRow);
 
                 const viewBtn = document.createElement('button');
@@ -457,7 +433,7 @@ async function saveAllRows() {
                 const checkOutYear = checkOutInputs.querySelector('.year-input').value.trim();
                 const checkOutTime = checkOutInputs.querySelector('.time-display').textContent;
 
-                // Combine date and time with validation
+                // Combine date and time
                 const checkInDateTime = combineDateTime(checkInDay, checkInMonth, checkInYear, checkInTime);
                 const checkOutDateTime = checkOutTime === 'N/A' ? 'N/A' : combineDateTime(checkOutDay, checkOutMonth, checkOutYear, checkOutTime);
 
@@ -469,7 +445,7 @@ async function saveAllRows() {
                     doctor: row.cells[4].textContent
                 };
 
-                console.log(`Saving visit ${visitId}:`, updatedData);
+                console.log(`Saving visit ${visitId}:`, updatedData); // Debug log
 
                 await update(visitRef, updatedData);
             }

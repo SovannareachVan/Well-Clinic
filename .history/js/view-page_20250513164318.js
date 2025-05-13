@@ -1,3 +1,4 @@
+// Import Firebase modules
 import { db } from './firebase-config.js';
 import { ref, get } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js';
 
@@ -15,11 +16,13 @@ async function getPatientDetails(recordId, visitId = null) {
         const patientData = snapshot.val();
         const patientNotesContainer = document.getElementById('patientNotes');
 
+        // Fill patient name in big header
         const patientNameHeader = document.getElementById('patientName');
         if (patientNameHeader) {
             patientNameHeader.textContent = patientData.fullName || 'N/A';
         }
 
+        // Show basic info
         const fields = [
             { id: 'patientFullName', key: 'fullName' },
             { id: 'patientAge', key: 'age' },
@@ -35,6 +38,7 @@ async function getPatientDetails(recordId, visitId = null) {
             }
         });
 
+        // Address mapping
         const addressMapping = {
             village: {},
             commune: {},
@@ -42,6 +46,7 @@ async function getPatientDetails(recordId, visitId = null) {
             province: {}
         };
 
+        // Handle Address mapping
         if (patientData.address) {
             let addressString = '';
             const { village, commune, district, province } = patientData.address;
@@ -66,9 +71,11 @@ async function getPatientDetails(recordId, visitId = null) {
             }
         }
 
+        // Notes and visit information
         const visits = patientData.visits ? Object.entries(patientData.visits) : [];
         let outputHtml = '';
 
+        // Show general notes if any
         if (patientData.notes) {
             outputHtml += `<div class="patient-general-notes">${patientData.notes}</div>`;
         }
@@ -79,18 +86,21 @@ async function getPatientDetails(recordId, visitId = null) {
             return;
         }
 
+        // Sort visits by checkIn date (newest first), with 'N/A' treated as newest and invalid dates handled
         visits.sort((a, b) => {
             const checkInA = a[1].checkIn;
             const checkInB = b[1].checkIn;
 
+            // Parse dates, fallback to 'N/A' as newest
             const dateA = checkInA === 'N/A' ? new Date() : new Date(checkInA);
             const dateB = checkInB === 'N/A' ? new Date() : new Date(checkInB);
 
-            if (isNaN(dateA.getTime()) && isNaN(dateB.getTime())) return 0;
-            if (isNaN(dateA.getTime())) return -1;
-            if (isNaN(dateB.getTime())) return 1;
+            // If either date is invalid, treat 'N/A' or invalid as newest
+            if (isNaN(dateA.getTime()) && isNaN(dateB.getTime())) return 0; // Both invalid, maintain order
+            if (isNaN(dateA.getTime())) return -1; // A invalid, place A first
+            if (isNaN(dateB.getTime())) return 1; // B invalid, place B first
 
-            return dateB - dateA;
+            return dateB - dateA; // Sort valid dates newest first
         });
 
         if (visitId && patientData.visits?.[visitId]) {
@@ -129,10 +139,12 @@ async function getPatientDetails(recordId, visitId = null) {
 }
 
 function generateVisitHtml(title, checkIn, checkOut, clinic, doctor, info, isFirstVisit = false) {
+    // Normalize the data structure
     const data = info.information || info;
     
-    const checkInDisplay = checkIn && checkIn !== 'N/A' && isValidDate(checkIn) ? checkIn : 'N/A';
-    const checkOutDisplay = checkOut && checkOut !== 'N/A' && isValidDate(checkOut) ? checkOut : 'N/A';
+    // Ensure checkIn and checkOut are strings, handle invalid dates
+    const checkInDisplay = checkIn && checkIn !== 'N/A' ? (isValidDate(checkIn) ? checkIn : 'N/A') : 'N/A';
+    const checkOutDisplay = checkOut && checkOut !== 'N/A' ? (isValidDate(checkOut) ? checkOut : 'N/A') : 'N/A';
 
     return `
         <div class="visit-note">
@@ -152,17 +164,15 @@ function generateVisitHtml(title, checkIn, checkOut, clinic, doctor, info, isFir
     `;
 }
 
+// Helper function to validate date
 function isValidDate(dateStr) {
-    if (!dateStr || dateStr === 'N/A') return false;
     const date = new Date(dateStr);
-    const [datePart] = dateStr.split(' ');
-    const [day, month, year] = datePart.split('/').map(num => parseInt(num, 10));
-    return !isNaN(date.getTime()) && 
-           dateStr.match(/^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$/) && 
-           day >= 1 && day <= 31 && 
-           month >= 1 && month <= 12 && 
-           year >= 1900 && year <= new Date().getFullYear();
+    return !isNaN(date.getTime()) && dateStr.match(/^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$/);
 }
+
+// Rest of the functions (generateFirstVisitContent, generateSecondVisitContent, generateMedicineTable, formatDate) remain unchanged
+
+// Rest of the functions (generateFirstVisitContent, generateSecondVisitContent, generateMedicineTable, formatDate) remain unchanged
 
 function generateFirstVisitContent(info) {
     return `
