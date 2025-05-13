@@ -60,7 +60,7 @@ async function getPatientDetails(id) {
         updateField('patientAge', patientData.age);
         updateField('patientGender', patientData.gender);
         updateField('patientPhone', patientData.phone);
-        updateField('patientTelegram', patientData.telegram);
+        updateField('patientPhone', patientData.phone);
         updateField('patientEmail', patientData.email);
         updateField('patientNotes', patientData.notes);
 

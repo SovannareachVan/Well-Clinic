@@ -104,58 +104,58 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-patientForm.addEventListener('submit', async (event) => {
-    event.preventDefault();
+    patientForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
 
-    const fullName = document.getElementById('fullName').value.trim();
-    const age = document.getElementById('age').value.trim();
-    const gender = document.getElementById('gender').value;
-    const phone = document.getElementById('phone').value.trim();
-    const telegram = document.getElementById('telegram').value.trim() || ''; // Telegram is optional
-    const email = document.getElementById('email')?.value.trim() || '';
-    const notes = document.getElementById('notes').value.trim();
-    const village = document.getElementById('village').value.trim();
-    const communeValue = document.getElementById('commune').value.trim();
-    let districtValue = document.getElementById('district').value.trim();
-    let provinceValue = document.getElementById('province').value.trim();
-    
-    const related = addressRelationships.communes[communeValue];
-    if (related) {
-        districtValue = related.district;
-        provinceValue = related.province;
-        document.getElementById('district').value = related.district;
-        document.getElementById('province').value = related.province;
-    }
+        const fullName = document.getElementById('fullName').value.trim();
+        const age = document.getElementById('age').value.trim();
+        const gender = document.getElementById('gender').value;
+        const phone = document.getElementById('phone').value.trim();
+        const telegram = document.getElementById('telegram').value.trim() || ''; // Add Telegram field
+        const email = document.getElementById('email')?.value.trim() || '';
+        const notes = document.getElementById('notes').value.trim();
+        const village = document.getElementById('village').value.trim();
+        const communeValue = document.getElementById('commune').value.trim();
+        let districtValue = document.getElementById('district').value.trim();
+        let provinceValue = document.getElementById('province').value.trim();
+        
+        const related = addressRelationships.communes[communeValue];
+        if (related) {
+            districtValue = related.district;
+            provinceValue = related.province;
+            document.getElementById('district').value = related.district; // Optional visual update
+            document.getElementById('province').value = related.province;
+        }
 
-    if (!fullName || !age || !gender || !phone || !village || !communeValue || !districtValue || !provinceValue) {
-        showPopup("កំហុស", "សូមបំពេញព័ត៌មានទាំងអស់។");
-        return;
-    }
+        if (!fullName || !age || !gender || !phone || !village || !communeValue || !districtValue || !provinceValue) {
+            showPopup("កំហុស", "សូមបំពេញព័ត៌មានទាំងអស់។");
+            return;
+        }
 
-    try {
-        const patientRef = push(ref(db, 'patients'));
-        await set(patientRef, {
-            fullName,
-            age,
-            gender,
-            phone,
-            telegram,
-            email,
-            address: {
-                village,
-                commune: communeValue,
-                district: districtValue,
-                province: provinceValue
-            },
-            notes,
-            timestamp: new Date().toISOString()
-        });
+        try {
+            const patientRef = push(ref(db, 'patients'));
+            await set(patientRef, {
+                fullName,
+                age,
+                gender,
+                phone,
+                telegram, // Save Telegram field to Firebase
+                email,
+                address: {
+                    village,
+                    commune: communeValue,
+                    district: districtValue,
+                    province: provinceValue
+                },
+                notes,
+                timestamp: new Date().toISOString()
+            });
 
-        showPopup("ជោគជ័យ", "ការចុះឈ្មោះបានជោគជ័យ!");
-        patientForm.reset();
-    } catch (error) {
-        console.error("Error saving patient:", error);
-        showPopup("កំហុស", "ការចុះឈ្មោះមានបញ្ហា សូមព្យាយាមម្ដងទៀត។");
-    }
-});
+            showPopup("ជោគជ័យ", "ការចុះឈ្មោះបានជោគជ័យ!");
+            patientForm.reset();
+        } catch (error) {
+            console.error("Error saving patient:", error);
+            showPopup("កំហុស", "ការចុះឈ្មោះមានបញ្ហា សូមព្យាយាមម្ដងទៀត។");
+        }
+    });
 });

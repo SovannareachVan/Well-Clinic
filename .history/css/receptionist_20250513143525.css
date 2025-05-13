@@ -179,7 +179,7 @@
 #patientForm select,
 #patientForm textarea {
     width: 100%;
-    padding: 13.7px 15px;
+    padding: 12px 1px;
     border: 1px solid #ddd;
     border-radius: 5px;
     font-size: 15px;
@@ -482,7 +482,7 @@ button[type="submit"]:hover {
 }
 
 .contact-group input {
-    padding:  15px 15px;  /* Smaller padding to fit the space */
+    padding:  1px 15px;  /* Smaller padding to fit the space */
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 0.9rem; /* Smaller font size */

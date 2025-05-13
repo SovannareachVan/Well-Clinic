@@ -409,7 +409,36 @@ button.saveBtn {
 
 
 
+/* Table Styles */
+#checkInTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 1rem;
+}
 
+#checkInTable th,
+#checkInTable td {
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+#checkInTable th {
+    background-color: var(--primary);
+    color: white;
+    font-weight: bold;
+}
+
+#checkInTable td {
+    background-color: white;
+}
+
+#checkInTable tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* New Rule to Remove Border from Date Inputs */
 #checkInTable input[type="text"] {
     border: none;
     background: transparent;
@@ -419,9 +448,8 @@ button.saveBtn {
     text-align: center;
 }
 
-/* Ensure the input still looks clickable or editable */
+/* Optional Focus Style */
 #checkInTable input[type="text"]:focus {
-    outline: none; /* Remove the default focus outline if desired */
-    border-bottom: 1px solid var(--accent); /* Optional: Add a subtle underline on focus */
+    outline: none;
+    border-bottom: 1px solid var(--accent);
 }
-

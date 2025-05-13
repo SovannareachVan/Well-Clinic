@@ -108,7 +108,7 @@ async function getPatientDetails(recordId, visitId = null) {
         updateField('patientAge', basicInfo.age);
         updateField('patientGender', basicInfo.gender);
         updateField('patientPhone', basicInfo.phone);
-        updateField('patientTelegram', basicInfo.telegram);
+        updateField('patientTelegram', basicInfo.);
         updateField('patientEmail', basicInfo.email);
 
         if (typeof basicInfo.notes === 'string') {

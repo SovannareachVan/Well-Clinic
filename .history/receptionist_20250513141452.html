@@ -62,14 +62,16 @@
                 </select>
             </div>
 
-            <div class="form-group">
+            <div class="form-group full-width">
                 <label>ទំនាក់ទំនង:</label>
-                <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                     <div class="contact-group">
-                        <input type="tel" id="phone" name="phone" required placeholder="លេខទូរស័ព្ទ:" style="flex: 1; min-width: 0;">
+                        <label for="phone">លេខទូរស័ព្ទ:</label>
+                        <input type="tel" id="phone" name="phone" required placeholder="វាយបញ្ចូលលេខទូរស័ព្ទ">
                     </div>
                     <div class="contact-group">
-                        <input type="text" id="telegram" name="telegram" placeholder="Telegram Contact:" style="flex: 1; min-width: 0;">
+                        <label for="telegram">Telegram Contact:</label>
+                        <input type="text" id="telegram" name="telegram" placeholder="វាយបញ្ចូល Telegram Contact">
                     </div>
                 </div>
             </div>
@@ -106,7 +108,6 @@
             <button type="submit">Save</button>
         </form>
     </div>
-</div>
 </div>
 
     <!-- Popup Container -->

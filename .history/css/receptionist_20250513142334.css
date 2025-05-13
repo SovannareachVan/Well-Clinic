@@ -179,7 +179,7 @@
 #patientForm select,
 #patientForm textarea {
     width: 100%;
-    padding: 13.7px 15px;
+    padding: 12px 1px;
     border: 1px solid #ddd;
     border-radius: 5px;
     font-size: 15px;
@@ -472,17 +472,14 @@ button[type="submit"]:hover {
 /* Add or update this in your existing CSS */
 
 /* Contact Group Styling */
-/* Add or update this in your existing CSS */
-
-/* Contact Group Styling */
 .contact-group {
-    flex: 1; /* Equal distribution of space */
+    flex: 1;
     min-width: 0; /* Allow shrinking */
-    max-width: 50%; /* Ensure two boxes fit side by side */
+    max-width: 50%; /* Ensure two boxes fit side by side within the form-group */
 }
 
 .contact-group input {
-    padding:  15px 15px;  /* Smaller padding to fit the space */
+    padding: 6px 8px; /* Smaller padding to fit the space */
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 0.9rem; /* Smaller font size */
@@ -498,10 +495,4 @@ button[type="submit"]:hover {
 /* Ensure the form-group containing the contact fields matches other form-group widths */
 .form-group > div {
     width: 100%; /* Match the width of other form-group inputs */
-}
-
-/* Ensure equal height and alignment */
-.contact-group {
-    display: flex;
-    align-items: center;
 }

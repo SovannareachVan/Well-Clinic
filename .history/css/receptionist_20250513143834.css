@@ -179,7 +179,7 @@
 #patientForm select,
 #patientForm textarea {
     width: 100%;
-    padding: 13.7px 15px;
+    padding: 5px 1px;
     border: 1px solid #ddd;
     border-radius: 5px;
     font-size: 15px;

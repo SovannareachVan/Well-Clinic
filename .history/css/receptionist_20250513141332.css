@@ -179,7 +179,7 @@
 #patientForm select,
 #patientForm textarea {
     width: 100%;
-    padding: 13.7px 15px;
+    padding: 12px 1px;
     border: 1px solid #ddd;
     border-radius: 5px;
     font-size: 15px;
@@ -466,42 +466,28 @@ button[type="submit"]:hover {
   /* Add this to your existing CSS */
 
 /* Contact Group Styling */
-/* Add or update this in your existing CSS */
-
-/* Contact Group Styling */
-/* Add or update this in your existing CSS */
-
-/* Contact Group Styling */
-/* Add or update this in your existing CSS */
-
-/* Contact Group Styling */
 .contact-group {
-    flex: 1; /* Equal distribution of space */
-    min-width: 0; /* Allow shrinking */
-    max-width: 50%; /* Ensure two boxes fit side by side */
+    flex: 1;
+    min-width: 150px;
+    display: flex;
+    flex-direction: column;
+}
+
+.contact-group label {
+    font-weight: bold;
+    color: var(--primary-dark);
+    margin-bottom: 5px;
 }
 
 .contact-group input {
-    padding:  15px 15px;  /* Smaller padding to fit the space */
+    padding: 8px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    font-size: 0.9rem; /* Smaller font size */
-    width: 100%; /* Full width within the group */
-    box-sizing: border-box; /* Include padding in width calculation */
+    font-size: 1rem;
+    width: 100%;
 }
 
 .contact-group input:focus {
     outline: none;
     border-color: var(--accent);
-}
-
-/* Ensure the form-group containing the contact fields matches other form-group widths */
-.form-group > div {
-    width: 100%; /* Match the width of other form-group inputs */
-}
-
-/* Ensure equal height and alignment */
-.contact-group {
-    display: flex;
-    align-items: center;
 }

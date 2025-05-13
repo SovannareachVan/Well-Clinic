@@ -62,14 +62,41 @@
                 </select>
             </div>
 
+            <div class="form-group full-width">
+                <label><div class="main-content">
+    <div class="form-container">
+        <h1>ចុះឈ្មោះអ្នកជំងឺ</h1>
+        <form id="patientForm">
             <div class="form-group">
+                <label for="fullName">ឈ្មោះ:</label>
+                <input type="text" id="fullName" name="fullName" required>
+            </div>
+
+            <div class="form-group">
+                <label for="age">អាយុ:</label>
+                <input type="number" id="age" name="age" required>
+            </div>
+
+            <div class="form-group">
+                <label for="gender">ភេទ:</label>
+                <select id="gender" name="gender" required>
+                    <option value="">ជ្រើសរើសភេទ</option>
+                    <option value="Male">ប្រុស</option>
+                    <option value="Female">ស្រី</option>
+                    <option value="Other">ផ្សេងៗ</option>
+                </select>
+            </div>
+
+            <div class="form-group full-width">
                 <label>ទំនាក់ទំនង:</label>
-                <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                     <div class="contact-group">
-                        <input type="tel" id="phone" name="phone" required placeholder="លេខទូរស័ព្ទ:" style="flex: 1; min-width: 0;">
+                        <label for="phone">លេខទូរស័ព្ទ:</label>
+                        <input type="tel" id="phone" name="phone" required placeholder="វាយបញ្ចូលលេខទូរស័ព្ទ">
                     </div>
                     <div class="contact-group">
-                        <input type="text" id="telegram" name="telegram" placeholder="Telegram Contact:" style="flex: 1; min-width: 0;">
+                        <label for="telegram">Telegram Contact:</label>
+                        <input type="text" id="telegram" name="telegram" placeholder="វាយបញ្ចូល Telegram Contact">
                     </div>
                 </div>
             </div>
@@ -106,7 +133,51 @@
             <button type="submit">Save</button>
         </form>
     </div>
-</div>
+</div></label>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <div class="contact-group">
+                        <label for="phone">លេខទូរស័ព្ទ:</label>
+                        <input type="tel" id="phone" name="phone" required placeholder="វាយបញ្ចូលលេខទូរស័ព្ទ">
+                    </div>
+                    <div class="contact-group">
+                        <label for="telegram">Telegram Contact:</label>
+                        <input type="text" id="telegram" name="telegram" placeholder="វាយបញ្ចូល Telegram Contact">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group full-width">
+                <label for="address">អាស័យដ្ឋាន:</label>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <input type="text" id="village" name="village" required placeholder="វាយបញ្ចូលភូមិ" style="flex: 1; min-width: 150px;">
+
+                    <div class="address-group">
+                        <input type="text" id="commune" placeholder="ឃុំ" autocomplete="off" />
+                        <ul id="commune-suggestions" class="dropdown"></ul>
+                    </div>
+                    
+                    <div class="address-group">
+                        <input type="text" id="district" placeholder="ស្រុក" autocomplete="off" />
+                        <ul id="district-suggestions" class="dropdown"></ul>
+                    </div>
+                    
+                    <div class="address-group">
+                        <input type="text" id="province" placeholder="ខេត្ត" autocomplete="off" />
+                        <ul id="province-suggestions" class="dropdown"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group full-width">
+                <label for="notes">វេជ្ជបញ្ជា/Notes:</label>
+                <textarea id="notes" name="notes"></textarea>
+            </div>
+
+            <div id="error-message" class="error-message"></div>
+
+            <button type="submit">Save</button>
+        </form>
+    </div>
 </div>
 
     <!-- Popup Container -->
