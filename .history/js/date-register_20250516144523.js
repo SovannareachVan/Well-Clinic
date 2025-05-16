@@ -3,7 +3,7 @@ import { ref, get, push, update, remove, set } from 'https://www.gstatic.com/fir
 
 // Global variables
 let rowCount = 1;
-let patientId = null; // Changed from recordId to patientId
+let recordId = null;
 let isFirstVisit = false;
 
 // Utility function for consistent date/time formatting
@@ -35,17 +35,17 @@ function combineDateTime(day, month, year, time) {
     month = String(month || '').trim();
     year = String(year || '').trim();
 
-    if (!day || !month || !year || day === 'DD' || month === 'MM' || year === 'YYYY') return null;
+    if (!day || !month || !year || day === 'DD' || month === 'MM' || year === 'YYYY') return 'N/A';
 
     const dayNum = parseInt(day, 10);
     const monthNum = parseInt(month, 10) - 1;
     const yearNum = parseInt(year, 10);
 
-    if (isNaN(dayNum) || isNaN(monthNum) || isNaN(yearNum)) return null;
-    if (dayNum < 1 || dayNum > 31 || monthNum < 0 || monthNum > 11 || yearNum < 1900 || yearNum > new Date().getFullYear()) return null;
+    if (isNaN(dayNum) || isNaN(monthNum) || isNaN(yearNum)) return 'N/A';
+    if (dayNum < 1 || dayNum > 31 || monthNum < 0 || monthNum > 11 || yearNum < 1900 || yearNum > new Date().getFullYear()) return 'N/A';
 
     const date = new Date(yearNum, monthNum, dayNum);
-    if (isNaN(date.getTime())) return null;
+    if (isNaN(date.getTime())) return 'N/A';
 
     const dateStr = `${day.padStart(2, '0')}/${(monthNum + 1).toString().padStart(2, '0')}/${year.padStart(4, '0')}`;
     return `${dateStr} ${time}`;
@@ -276,6 +276,7 @@ function setupDateInputs(cell) {
         } else {
             dayInput.value = day.toString().padStart(2, '0');
         }
+        debouncedSaveAllRows();
     });
 
     monthInput.addEventListener('change', () => {
@@ -286,6 +287,7 @@ function setupDateInputs(cell) {
         } else {
             monthInput.value = month.toString().padStart(2, '0');
         }
+        debouncedSaveAllRows();
     });
 
     yearInput.addEventListener('change', () => {
@@ -296,37 +298,22 @@ function setupDateInputs(cell) {
         } else {
             yearInput.value = year.toString().padStart(4, '0');
         }
-    });
-
-    [dayInput, monthInput, yearInput].forEach(input => {
-        input.addEventListener('change', () => {
-            if (dayInput.value && monthInput.value && yearInput.value) {
-                const combined = combineDateTime(dayInput.value, monthInput.value, yearInput.value, cell.querySelector('.time-display').textContent);
-                if (!combined) {
-                    alert('Please enter a valid date (DD/MM/YYYY).');
-                    dayInput.value = '';
-                    monthInput.value = '';
-                    yearInput.value = '';
-                } else {
-                    debouncedSaveAllRows();
-                }
-            }
-        });
+        debouncedSaveAllRows();
     });
 }
 
 function checkIn() {
-    if (!patientId) { // Changed from recordId to patientId
+    if (!recordId) {
         console.error('No patient ID available');
         return;
     }
 
     const tableBody = document.getElementById('checkInTable').getElementsByTagName('tbody')[0];
     const newRow = tableBody.insertRow();
-    const visitId = push(ref(db, `patients/${patientId}/visits`)).key; // Changed from recordId to patientId
+    const visitId = push(ref(db, `patients/${recordId}/visits`)).key;
     newRow.dataset.visitId = visitId;
 
-    const { timeStr } = formatDateTime(new Date());
+    const { timeStr } = formatDateTime(new Date()); // Only use time, not date
 
     const serialCell = newRow.insertCell(0);
     serialCell.textContent = rowCount++;
@@ -391,7 +378,7 @@ function checkIn() {
     viewBtn.textContent = 'View';
     viewBtn.addEventListener('click', () => {
         const targetPage = isFirstVisit ? 'add-detail-page.html' : 'add-information.html';
-        window.location.href = `${targetPage}?patientId=${patientId}&visitId=${visitId}`; // Changed from recordId to patientId
+        window.location.href = `${targetPage}?patientId=${recordId}&visitId=${visitId}`;
         isFirstVisit = false;
     });
 
@@ -400,22 +387,22 @@ function checkIn() {
     actionCell.appendChild(viewBtn);
 
     const visitData = {
-        checkIn: 'N/A',
+        checkIn: 'N/A', // Initially set to 'N/A' until the user inputs the date
         checkOut: 'N/A',
         clinic: clinicSelect.value,
         doctor: 'Dr. Minh Hong'
     };
 
-    set(ref(db, `patients/${patientId}/visits/${visitId}`), visitData) // Changed from recordId to patientId
+    set(ref(db, `patients/${recordId}/visits/${visitId}`), visitData)
         .then(() => console.log('New visit saved:', visitId, visitData))
         .catch(error => console.error('Error saving visit:', error));
 }
 
 function checkOutAction(row) {
     const visitId = row.dataset.visitId;
-    if (!visitId || !patientId) return; // Changed from recordId to patientId
+    if (!visitId || !recordId) return;
 
-    const { timeStr } = formatDateTime(new Date());
+    const { timeStr } = formatDateTime(new Date()); // Only update time, not date
     
     const checkOutCell = row.cells[2];
     const checkOutInputs = checkOutCell.querySelector('.date-inputs');
@@ -426,16 +413,10 @@ function checkOutAction(row) {
     const checkOutMonthInput = checkOutInputs.querySelector('.month-input').value.trim();
     const checkOutYearInput = checkOutInputs.querySelector('.year-input').value.trim();
 
+    // Validate that the date is provided before proceeding
     if (!checkOutDayInput || !checkOutMonthInput || !checkOutYearInput) {
         alert('Please enter a valid check-out date (DD/MM/YYYY).');
-        timeDisplay.textContent = 'N/A';
-        return;
-    }
-
-    const combined = combineDateTime(checkOutDayInput, checkOutMonthInput, checkOutYearInput, timeStr);
-    if (!combined) {
-        alert('Please enter a valid check-out date (DD/MM/YYYY).');
-        timeDisplay.textContent = 'N/A';
+        timeDisplay.textContent = 'N/A'; // Reset time if date is invalid
         return;
     }
 
@@ -448,9 +429,9 @@ function checkOutAction(row) {
 
 function deleteRow(row) {
     const visitId = row.dataset.visitId;
-    if (!visitId || !patientId) return; // Changed from recordId to patientId
+    if (!visitId || !recordId) return;
 
-    remove(ref(db, `patients/${patientId}/visits/${visitId}`)) // Changed from recordId to patientId
+    remove(ref(db, `patients/${recordId}/visits/${visitId}`))
         .then(() => {
             row.remove();
             const tableBody = document.getElementById('checkInTable').getElementsByTagName('tbody')[0];
@@ -472,7 +453,7 @@ function debounce(func, wait) {
 }
 
 async function saveAllRows() {
-    if (!patientId) return; // Changed from recordId to patientId
+    if (!recordId) return;
 
     const tableBody = document.getElementById('checkInTable').getElementsByTagName('tbody')[0];
     const rows = tableBody.getElementsByTagName('tr');
@@ -481,7 +462,7 @@ async function saveAllRows() {
         const visitId = row.dataset.visitId;
         if (!visitId) continue;
 
-        const visitRef = ref(db, `patients/${patientId}/visits/${visitId}`); // Changed from recordId to patientId
+        const visitRef = ref(db, `patients/${recordId}/visits/${visitId}`);
 
         try {
             const snapshot = await get(visitRef);
@@ -500,13 +481,25 @@ async function saveAllRows() {
                 const checkOutYear = checkOutInputs.querySelector('.year-input').value.trim();
                 const checkOutTime = checkOutInputs.querySelector('.time-display').textContent;
 
+                // Validate check-in date before saving
+                if (checkInTime !== 'N/A' && (!checkInDay || !checkInMonth || !checkInYear)) {
+                    alert('Please enter a valid check-in date (DD/MM/YYYY) for visit #' + row.cells[0].textContent);
+                    return;
+                }
+
+                // Validate check-out date if it's not 'N/A'
+                if (checkOutTime !== 'N/A' && (!checkOutDay || !checkOutMonth || !checkOutYear)) {
+                    alert('Please enter a valid check-out date (DD/MM/YYYY) for visit #' + row.cells[0].textContent);
+                    return;
+                }
+
                 const checkInDateTime = combineDateTime(checkInDay, checkInMonth, checkInYear, checkInTime);
                 const checkOutDateTime = checkOutTime === 'N/A' ? 'N/A' : combineDateTime(checkOutDay, checkOutMonth, checkOutYear, checkOutTime);
 
                 const updatedData = {
                     ...existingData,
-                    checkIn: checkInDateTime ? checkInDateTime : existingData.checkIn,
-                    checkOut: checkOutDateTime && checkOutDateTime !== 'N/A' ? checkOutDateTime : existingData.checkOut,
+                    checkIn: checkInDateTime !== 'N/A' ? checkInDateTime : existingData.checkIn,
+                    checkOut: checkOutDateTime !== 'N/A' ? checkOutDateTime : existingData.checkOut,
                     clinic: row.cells[3].querySelector('select').value,
                     doctor: row.cells[4].textContent
                 };
@@ -533,13 +526,13 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     console.log(`Patient ID from URL: ${id}`);
-    patientId = id; // Changed from recordId to patientId
+    recordId = id;
     
     document.getElementById('checkInBtn').addEventListener('click', checkIn);
     document.getElementById('backBtn').addEventListener('click', () => window.history.back());
 
     const patientLoaded = await getPatientDetails(id);
     if (patientLoaded) {
-        await loadSavedVisits(patientId); // Changed from id to patientId
+        await loadSavedVisits(id);
     }
 });

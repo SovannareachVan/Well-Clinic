@@ -61,39 +61,32 @@ function parseDoseValue(dose) {
     return parseFloat(dose) || 0;
 }
 
-// Function to calculate medication quantity and total price
-function calculateTotals(item) {
-    const daysInput = item.querySelector('.time-input');
-    const morningDose = item.querySelector('.morning-dose');
-    const afternoonDose = item.querySelector('.afternoon-dose');
-    const eveningDose = item.querySelector('.evening-dose');
+// Function to calculate medication quantity
+function calculateMedicationQuantity(item) {
+    const daysInput = item.querySelector('.time-input:first-of-type');
+    const morningDose = item.querySelectorAll('.dosage-select')[1].value;
+    const afternoonDose = item.querySelectorAll('.dosage-select')[2].value;
+    const eveningDose = item.querySelectorAll('.dosage-select')[3].value;
     const quantityInput = item.querySelector('.quantity-input');
-    const retailPriceInput = item.querySelector('.retail-price-input');
-    const totalPriceInput = item.querySelector('.total-price-input');
 
     const days = parseFloat(daysInput.value) || 0;
-    const morningValue = parseDoseValue(morningDose.value);
-    const afternoonValue = parseDoseValue(afternoonDose.value);
-    const eveningValue = parseDoseValue(eveningDose.value);
-    const retailPrice = parseFloat(retailPriceInput.value) || 0;
+    const morningValue = parseDoseValue(morningDose);
+    const afternoonValue = parseDoseValue(afternoonDose);
+    const eveningValue = parseDoseValue(eveningDose);
 
     const totalPerDay = morningValue + afternoonValue + eveningValue;
     const totalQuantity = days * totalPerDay;
-    quantityInput.value = totalQuantity % 1 === 0 ? totalQuantity : totalQuantity.toFixed(1);
 
-    const totalPrice = totalQuantity * retailPrice;
-    if (totalPriceInput) {
-        totalPriceInput.value = totalPrice % 1 === 0 ? totalPrice : totalPrice.toFixed(2);
-    }
+    quantityInput.value = totalQuantity % 1 === 0 ? totalQuantity : totalQuantity.toFixed(1);
 }
 
 // Function to fetch patient data
-async function getPatientDetails(patientId, visitId = null) { // Changed from recordId to patientId
+async function getPatientDetails(recordId, visitId = null) {
     try {
         let structuredNotes = {};
         let basicInfo = {};
 
-        const patientRef = ref(db, 'patients/' + patientId);
+        const patientRef = ref(db, 'patients/' + recordId);
         const patientSnapshot = await get(patientRef);
 
         if (!patientSnapshot.exists()) {
@@ -163,7 +156,7 @@ async function getPatientDetails(patientId, visitId = null) { // Changed from re
         }
 
         if (visitId) {
-            const visitRef = ref(db, `patients/${patientId}/visits/${visitId}/information`);
+            const visitRef = ref(db, `patients/${recordId}/visits/${visitId}/information`);
             const visitSnapshot = await get(visitRef);
             if (visitSnapshot.exists()) {
                 structuredNotes = visitSnapshot.val();
@@ -175,7 +168,7 @@ async function getPatientDetails(patientId, visitId = null) { // Changed from re
         document.getElementById('patientNote1').value = structuredNotes.note1 || '';
         document.getElementById('patientNote2').value = structuredNotes.note2 || '';
         document.getElementById('patientNote3').value = structuredNotes.note3 || '';
-        document.getElementById('patientNote4').value = structuredNotes.diagnosis || '';
+        document.getElementById('patientNote4').value = structuredNotes.diagnosis || ''; // Use diagnosis field
         document.getElementById('patientNote5').value = structuredNotes.note5 || '';
 
         const ul = document.getElementById('medicineList');
@@ -183,7 +176,7 @@ async function getPatientDetails(patientId, visitId = null) { // Changed from re
         if (structuredNotes.medicines) {
             structuredNotes.medicines.forEach(med => {
                 const li = addMedicineItem(med);
-                calculateTotals(li);
+                calculateMedicationQuantity(li);
             });
         }
     } catch (error) {
@@ -192,7 +185,7 @@ async function getPatientDetails(patientId, visitId = null) { // Changed from re
 }
 
 // Function to save patient notes
-async function savePatientNotes(patientId, visitId = null) { // Changed from recordId to patientId
+async function savePatientNotes(recordId, visitId = null) {
     const medicines = Array.from(document.querySelectorAll('.medicine-item')).map(item => ({
         name: item.querySelector('.medicine-input').value,
         dosage: item.querySelector('.dosage-select').value,
@@ -200,36 +193,27 @@ async function savePatientNotes(patientId, visitId = null) { // Changed from rec
         morningDose: item.querySelector('.morning-dose').value,
         afternoonDose: item.querySelector('.afternoon-dose').value,
         eveningDose: item.querySelector('.evening-dose').value,
-        quantity: item.querySelector('.quantity-input').value,
-        retailPrice: item.querySelector('.retail-price-input').value,
-        totalPrice: item.querySelector('.total-price-input').value
+        quantity: item.querySelector('.quantity-input').value
     }));
 
     const structuredNotes = {
         note1: document.getElementById('patientNote1').value.trim(),
         note2: document.getElementById('patientNote2').value.trim(),
         note3: document.getElementById('patientNote3').value.trim(),
-        diagnosis: document.getElementById('patientNote4').value.trim(),
+        diagnosis: document.getElementById('patientNote4').value.trim(), // Save as diagnosis
         note5: document.getElementById('patientNote5').value.trim(),
         medicines,
         createdAt: new Date().toISOString()
     };
 
-    // Add validation for diagnosis
-    if (!structuredNotes.diagnosis) {
-        alert('សូមបំពេញរោគវិនិច្ឆ័យ');
-        return;
-    }
-
-    console.log('Saving structured notes:', structuredNotes); // Debug: Log what’s being saved
-
     try {
         if (!visitId) {
-            const visitsRef = ref(db, `patients/${patientId}/visits`);
+            // Create a new visit for initial registration
+            const visitsRef = ref(db, `patients/${recordId}/visits`);
             const newVisitRef = push(visitsRef);
             visitId = newVisitRef.key;
         }
-        await set(ref(db, `patients/${patientId}/visits/${visitId}/information`), structuredNotes);
+        await set(ref(db, `patients/${recordId}/visits/${visitId}/information`), structuredNotes);
         alert('Notes saved successfully!');
         window.history.back();
     } catch (err) {
@@ -285,6 +269,8 @@ function initMedicineDropdown(parentElement) {
 }
 
 // Function to add a medicine item
+// ... (previous imports and functions remain unchanged until addMedicineItem)
+
 window.addMedicineItem = function (medicineData = null) {
     const ul = document.getElementById('medicineList');
     if (!ul) {
@@ -307,7 +293,6 @@ window.addMedicineItem = function (medicineData = null) {
                     <th>ល្ងាច</th>
                     <th>ចំនួនថ្នាំ</th>
                     <th>តម្លៃរាយ</th>
-                    <th>តម្លៃសរុប</th>
                     <th></th>
                 </tr>
             </thead>
@@ -370,7 +355,6 @@ window.addMedicineItem = function (medicineData = null) {
                     </td>
                     <td><input type="text" class="quantity-input" readonly></td>
                     <td><input type="number" class="retail-price-input" placeholder="តម្លៃរាយ" min="0" step="0.01"></td>
-                    <td><input type="text" class="total-price-input" readonly></td>
                     <td><button class="btn-delete" onclick="this.closest('li').remove()">❌</button></td>
                 </tr>
             </tbody>
@@ -389,7 +373,6 @@ window.addMedicineItem = function (medicineData = null) {
         li.querySelector('.evening-dose').value = medicineData.eveningDose || '';
         li.querySelector('.quantity-input').value = medicineData.quantity || '';
         li.querySelector('.retail-price-input').value = medicineData.retailPrice || '';
-        li.querySelector('.total-price-input').value = medicineData.totalPrice || '';
     }
 
     const daysInput = li.querySelector('.time-input');
@@ -405,18 +388,84 @@ window.addMedicineItem = function (medicineData = null) {
     return li;
 };
 
+// Updated function to calculate both quantity and total price
+function calculateTotals(item) {
+    const daysInput = item.querySelector('.time-input');
+    const morningDose = item.querySelector('.morning-dose');
+    const afternoonDose = item.querySelector('.afternoon-dose');
+    const eveningDose = item.querySelector('.evening-dose');
+    const quantityInput = item.querySelector('.quantity-input');
+    const retailPriceInput = item.querySelector('.retail-price-input');
+
+    const days = parseFloat(daysInput.value) || 0;
+    const morningValue = parseDoseValue(morningDose.value);
+    const afternoonValue = parseDoseValue(afternoonDose.value);
+    const eveningValue = parseDoseValue(eveningDose.value);
+    const retailPrice = parseFloat(retailPriceInput.value) || 0;
+
+    const totalPerDay = morningValue + afternoonValue + eveningValue;
+    const totalQuantity = days * totalPerDay;
+    quantityInput.value = totalQuantity % 1 === 0 ? totalQuantity : totalQuantity.toFixed(1);
+
+    const totalPrice = totalQuantity * retailPrice;
+    // You can add a new input or display element for total price if needed
+    // For now, let's log it or add it to the DOM (e.g., next to quantity)
+    console.log(`Total Price: ${totalPrice.toFixed(2)}`); // For debugging
+    // To display it, you could add a new <td> or span (optional enhancement below)
+}
+
+// Update savePatientNotes to include retailPrice
+async function savePatientNotes(recordId, visitId = null) {
+    const medicines = Array.from(document.querySelectorAll('.medicine-item')).map(item => ({
+        name: item.querySelector('.medicine-input').value,
+        dosage: item.querySelector('.dosage-select').value,
+        days: item.querySelector('.time-input').value,
+        morningDose: item.querySelector('.morning-dose').value,
+        afternoonDose: item.querySelector('.afternoon-dose').value,
+        eveningDose: item.querySelector('.evening-dose').value,
+        quantity: item.querySelector('.quantity-input').value,
+        retailPrice: item.querySelector('.retail-price-input').value // Add this
+    }));
+
+    const structuredNotes = {
+        note1: document.getElementById('patientNote1').value.trim(),
+        note2: document.getElementById('patientNote2').value.trim(),
+        note3: document.getElementById('patientNote3').value.trim(),
+        diagnosis: document.getElementById('patientNote4').value.trim(),
+        note5: document.getElementById('patientNote5').value.trim(),
+        medicines,
+        createdAt: new Date().toISOString()
+    };
+
+    try {
+        if (!visitId) {
+            const visitsRef = ref(db, `patients/${recordId}/visits`);
+            const newVisitRef = push(visitsRef);
+            visitId = newVisitRef.key;
+        }
+        await set(ref(db, `patients/${recordId}/visits/${visitId}/information`), structuredNotes);
+        alert('Notes saved successfully!');
+        window.history.back();
+    } catch (err) {
+        console.error('Error saving patient notes:', err);
+        alert('Failed to save notes: ' + err.message);
+    }
+}
+
+// ... (rest of the code remains unchanged)
+
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
-    const patientId = urlParams.get('patientId'); // Changed from recordId to patientId
+    const recordId = urlParams.get('patientId');
     const visitId = urlParams.get('visitId');
 
-    if (patientId) {
-        getPatientDetails(patientId, visitId);
+    if (recordId) {
+        getPatientDetails(recordId, visitId);
         initDiagnosisDropdown();
 
         const saveBtn = document.getElementById('saveBtn');
         if (saveBtn) {
-            saveBtn.addEventListener('click', () => savePatientNotes(patientId, visitId));
+            saveBtn.addEventListener('click', () => savePatientNotes(recordId, visitId));
         }
 
         const addMedicineBtn = document.getElementById('addMedicineBtn');

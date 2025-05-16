@@ -3,7 +3,7 @@ import { ref, get, push, update, remove, set } from 'https://www.gstatic.com/fir
 
 // Global variables
 let rowCount = 1;
-let patientId = null; // Changed from recordId to patientId
+let recordId = null;
 let isFirstVisit = false;
 
 // Utility function for consistent date/time formatting
@@ -35,7 +35,7 @@ function combineDateTime(day, month, year, time) {
     month = String(month || '').trim();
     year = String(year || '').trim();
 
-    if (!day || !month || !year || day === 'DD' || month === 'MM' || year === 'YYYY') return null;
+    if (!day || !month || !year || day === 'DD' || month === 'MM' || year === 'YYYY') return null; // Return null instead of 'N/A' to indicate invalid input
 
     const dayNum = parseInt(day, 10);
     const monthNum = parseInt(month, 10) - 1;
@@ -47,7 +47,7 @@ function combineDateTime(day, month, year, time) {
     const date = new Date(yearNum, monthNum, dayNum);
     if (isNaN(date.getTime())) return null;
 
-    const dateStr = `${day.padStart(2, '0')}/${(monthNum + 1).toString().padStart(2, '0')}/${year.padStart(4, '0')}`;
+    const dateStr = `${day.padStart(2, '0')}/${(monthNum + 1).toString().padStart(2, '0')}/${year.padStart(4, '0')}`; // Fixed the typo here
     return `${dateStr} ${time}`;
 }
 
@@ -316,14 +316,14 @@ function setupDateInputs(cell) {
 }
 
 function checkIn() {
-    if (!patientId) { // Changed from recordId to patientId
+    if (!recordId) {
         console.error('No patient ID available');
         return;
     }
 
     const tableBody = document.getElementById('checkInTable').getElementsByTagName('tbody')[0];
     const newRow = tableBody.insertRow();
-    const visitId = push(ref(db, `patients/${patientId}/visits`)).key; // Changed from recordId to patientId
+    const visitId = push(ref(db, `patients/${recordId}/visits`)).key;
     newRow.dataset.visitId = visitId;
 
     const { timeStr } = formatDateTime(new Date());
@@ -391,7 +391,7 @@ function checkIn() {
     viewBtn.textContent = 'View';
     viewBtn.addEventListener('click', () => {
         const targetPage = isFirstVisit ? 'add-detail-page.html' : 'add-information.html';
-        window.location.href = `${targetPage}?patientId=${patientId}&visitId=${visitId}`; // Changed from recordId to patientId
+        window.location.href = `${targetPage}?patientId=${recordId}&visitId=${visitId}`;
         isFirstVisit = false;
     });
 
@@ -406,14 +406,14 @@ function checkIn() {
         doctor: 'Dr. Minh Hong'
     };
 
-    set(ref(db, `patients/${patientId}/visits/${visitId}`), visitData) // Changed from recordId to patientId
+    set(ref(db, `patients/${recordId}/visits/${visitId}`), visitData)
         .then(() => console.log('New visit saved:', visitId, visitData))
         .catch(error => console.error('Error saving visit:', error));
 }
 
 function checkOutAction(row) {
     const visitId = row.dataset.visitId;
-    if (!visitId || !patientId) return; // Changed from recordId to patientId
+    if (!visitId || !recordId) return;
 
     const { timeStr } = formatDateTime(new Date());
     
@@ -448,9 +448,9 @@ function checkOutAction(row) {
 
 function deleteRow(row) {
     const visitId = row.dataset.visitId;
-    if (!visitId || !patientId) return; // Changed from recordId to patientId
+    if (!visitId || !recordId) return;
 
-    remove(ref(db, `patients/${patientId}/visits/${visitId}`)) // Changed from recordId to patientId
+    remove(ref(db, `patients/${recordId}/visits/${visitId}`))
         .then(() => {
             row.remove();
             const tableBody = document.getElementById('checkInTable').getElementsByTagName('tbody')[0];
@@ -472,7 +472,7 @@ function debounce(func, wait) {
 }
 
 async function saveAllRows() {
-    if (!patientId) return; // Changed from recordId to patientId
+    if (!recordId) return;
 
     const tableBody = document.getElementById('checkInTable').getElementsByTagName('tbody')[0];
     const rows = tableBody.getElementsByTagName('tr');
@@ -481,7 +481,7 @@ async function saveAllRows() {
         const visitId = row.dataset.visitId;
         if (!visitId) continue;
 
-        const visitRef = ref(db, `patients/${patientId}/visits/${visitId}`); // Changed from recordId to patientId
+        const visitRef = ref(db, `patients/${recordId}/visits/${visitId}`);
 
         try {
             const snapshot = await get(visitRef);
@@ -533,13 +533,13 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     console.log(`Patient ID from URL: ${id}`);
-    patientId = id; // Changed from recordId to patientId
+    recordId = id;
     
     document.getElementById('checkInBtn').addEventListener('click', checkIn);
     document.getElementById('backBtn').addEventListener('click', () => window.history.back());
 
     const patientLoaded = await getPatientDetails(id);
     if (patientLoaded) {
-        await loadSavedVisits(patientId); // Changed from id to patientId
+        await loadSavedVisits(id);
     }
 });

@@ -3,7 +3,7 @@ import { ref, get, push, update, remove, set } from 'https://www.gstatic.com/fir
 
 // Global variables
 let rowCount = 1;
-let patientId = null; // Changed from recordId to patientId
+let recordId = null;
 let isFirstVisit = false;
 
 // Utility function for consistent date/time formatting
@@ -31,21 +31,23 @@ function isValidDateString(dateStr) {
 
 // Utility function to combine manual date and auto-generated time for Firebase
 function combineDateTime(day, month, year, time) {
+    // Ensure inputs are strings and trim them
     day = String(day || '').trim();
     month = String(month || '').trim();
     year = String(year || '').trim();
 
-    if (!day || !month || !year || day === 'DD' || month === 'MM' || year === 'YYYY') return null;
+    // If any part is missing, return "N/A"
+    if (!day || !month || !year || day === 'DD' || month === 'MM' || year === 'YYYY') return 'N/A';
 
     const dayNum = parseInt(day, 10);
-    const monthNum = parseInt(month, 10) - 1;
+    const monthNum = parseInt(month, 10) - 1; // Months are 0-based in JavaScript Date
     const yearNum = parseInt(year, 10);
 
-    if (isNaN(dayNum) || isNaN(monthNum) || isNaN(yearNum)) return null;
-    if (dayNum < 1 || dayNum > 31 || monthNum < 0 || monthNum > 11 || yearNum < 1900 || yearNum > new Date().getFullYear()) return null;
+    if (isNaN(dayNum) || isNaN(monthNum) || isNaN(yearNum)) return 'N/A';
+    if (dayNum < 1 || dayNum > 31 || monthNum < 0 || monthNum > 11 || yearNum < 1900 || yearNum > new Date().getFullYear()) return 'N/A';
 
     const date = new Date(yearNum, monthNum, dayNum);
-    if (isNaN(date.getTime())) return null;
+    if (isNaN(date.getTime())) return 'N/A';
 
     const dateStr = `${day.padStart(2, '0')}/${(monthNum + 1).toString().padStart(2, '0')}/${year.padStart(4, '0')}`;
     return `${dateStr} ${time}`;
@@ -67,20 +69,17 @@ function splitDateTime(dateTimeStr) {
 
 async function getPatientDetails(id) {
     try {
-        console.log(`Fetching patient details for ID: ${id}`);
         const [patientSnapshot, visitsSnapshot] = await Promise.all([
             get(ref(db, 'patients/' + id)),
             get(ref(db, 'patients/' + id + '/visits'))
         ]);
 
         if (!patientSnapshot.exists()) {
-            console.error('Patient not found in Firebase.');
-            alert('Patient not found. Please check the patient ID.');
+            console.error('Patient not found.');
             return false;
         }
 
         const patientData = patientSnapshot.val();
-        console.log('Patient data:', patientData);
 
         const updateField = (id, value) => {
             const element = document.getElementById(id);
@@ -124,138 +123,124 @@ async function getPatientDetails(id) {
         return true;
 
     } catch (error) {
-        console.error('Error fetching patient details:', error.message);
-        console.error('Error stack:', error.stack);
-        alert('Failed to load patient details. Please check your connection or Firebase configuration.');
+        console.error('Error fetching patient:', error);
         return false;
     }
 }
 
 async function loadSavedVisits(patientId) {
     try {
-        console.log(`Loading visits for patient ID: ${patientId}`);
-        const visitsRef = ref(db, `patients/${patientId}/visits`);
-        const snapshot = await get(visitsRef);
-        
-        if (!snapshot.exists()) {
-            console.log('No visits found for this patient.');
-            return;
-        }
-
-        const visits = snapshot.val();
-        console.log('Visits data:', visits);
-
+        const snapshot = await get(ref(db, `patients/${patientId}/visits`));
         const tableBody = document.getElementById('checkInTable').querySelector('tbody');
-        if (!tableBody) {
-            console.error('Table body not found in DOM.');
-            return;
-        }
         tableBody.innerHTML = '';
 
-        Object.entries(visits).forEach(([visitId, visit], index) => {
-            const newRow = tableBody.insertRow();
-            newRow.dataset.visitId = visitId;
+        if (snapshot.exists()) {
+            const visits = snapshot.val();
+            
+            Object.entries(visits).forEach(([visitId, visit], index) => {
+                const newRow = tableBody.insertRow();
+                newRow.dataset.visitId = visitId;
 
-            const cleanedVisit = { ...visit };
-            if (visit.checkIn && !isValidDateString(visit.checkIn.split(' ')[0])) {
-                cleanedVisit.checkIn = 'N/A';
-            }
-            if (visit.checkOut && visit.checkOut !== 'N/A' && !isValidDateString(visit.checkOut.split(' ')[0])) {
-                cleanedVisit.checkOut = 'N/A';
-            }
-
-            if (cleanedVisit.checkIn !== visit.checkIn || cleanedVisit.checkOut !== visit.checkOut) {
-                set(ref(db, `patients/${patientId}/visits/${visitId}`), cleanedVisit)
-                    .catch(error => console.error('Error cleaning visit data:', error));
-            }
-
-            const checkInData = splitDateTime(cleanedVisit.checkIn);
-            const checkOutData = splitDateTime(cleanedVisit.checkOut);
-
-            newRow.insertCell(0).textContent = index + 1;
-
-            const checkInCell = newRow.insertCell(1);
-            checkInCell.innerHTML = `
-                <div class="date-inputs">
-                    <input type="text" class="day-input" value="${checkInData.date.split('/')[0] || ''}" placeholder="DD" maxlength="2" size="2">/
-                    <input type="text" class="month-input" value="${checkInData.date.split('/')[1] || ''}" placeholder="MM" maxlength="2" size="2">/
-                    <input type="text" class="year-input" value="${checkInData.date.split('/')[2] || ''}" placeholder="YYYY" maxlength="4" size="4">
-                    <span class="time-display">${checkInData.time || 'N/A'}</span>
-                </div>
-            `;
-
-            const checkOutCell = newRow.insertCell(2);
-            checkOutCell.innerHTML = `
-                <div class="date-inputs">
-                    <input type="text" class="day-input" value="${checkOutData.date.split('/')[0] || ''}" placeholder="DD" maxlength="2" size="2">/
-                    <input type="text" class="month-input" value="${checkOutData.date.split('/')[1] || ''}" placeholder="MM" maxlength="2" size="2">/
-                    <input type="text" class="year-input" value="${checkOutData.date.split('/')[2] || ''}" placeholder="YYYY" maxlength="4" size="4">
-                    <span class="time-display">${checkOutData.time || 'N/A'}</span>
-                </div>
-            `;
-
-            setupDateInputs(checkInCell);
-            setupDateInputs(checkOutCell);
-
-            const clinicCell = newRow.insertCell(3);
-            const clinicSelect = document.createElement('select');
-            const clinics = ['វែលគ្លីនិក I', 'វែលគ្លីនិក II'];
-            clinics.forEach(clinic => {
-                const option = new Option(clinic, clinic);
-                clinicSelect.add(option);
-            });
-            clinicSelect.value = visit.clinic || clinics[0];
-            clinicSelect.addEventListener('change', saveAllRows);
-            clinicCell.appendChild(clinicSelect);
-
-            newRow.insertCell(4).textContent = visit.doctor || 'Dr. Minh Hong';
-
-            const actionCell = newRow.insertCell(5);
-            const deleteBtn = document.createElement('button');
-            deleteBtn.classList.add('btn', 'btn-delete');
-            deleteBtn.textContent = 'Delete';
-            deleteBtn.onclick = () => {
-                const password = prompt('បញ្ចូល 12345 ដើម្បីលុប:');
-                if (password === '12345') {
-                    if (confirm('Are you sure you want to delete this visit?')) {
-                        deleteRow(newRow);
-                    }
-                } else {
-                    alert('Incorrect password. Deletion cancelled.');
+                const cleanedVisit = { ...visit };
+                if (visit.checkIn && !isValidDateString(visit.checkIn.split(' ')[0])) {
+                    cleanedVisit.checkIn = 'N/A';
                 }
-            };
+                if (visit.checkOut && visit.checkOut !== 'N/A' && !isValidDateString(visit.checkOut.split(' ')[0])) {
+                    cleanedVisit.checkOut = 'N/A';
+                }
 
-            const checkOutBtn = document.createElement('button');
-            checkOutBtn.className = 'btn ' + (cleanedVisit.checkOut === 'N/A' ? 'btn-checkout' : 'btn-disabled');
-            checkOutBtn.textContent = cleanedVisit.checkOut === 'N/A' ? 'Check-out' : 'Checked-out';
-            checkOutBtn.disabled = cleanedVisit.checkOut !== 'N/A';
-            checkOutBtn.onclick = () => checkOutAction(newRow);
+                if (cleanedVisit.checkIn !== visit.checkIn || cleanedVisit.checkOut !== visit.checkOut) {
+                    set(ref(db, `patients/${patientId}/visits/${visitId}`), cleanedVisit)
+                        .catch(error => console.error('Error cleaning visit data:', error));
+                }
 
-            const viewBtn = document.createElement('button');
-            viewBtn.className = 'btn btn-edit';
-            viewBtn.textContent = 'View';
-            viewBtn.onclick = () => {
-                const targetPage = index === 0 ? 'add-detail-page.html' : 'add-information.html';
-                window.location.href = `${targetPage}?patientId=${patientId}&visitId=${visitId}`;
-            };
+                const checkInData = splitDateTime(cleanedVisit.checkIn);
+                const checkOutData = splitDateTime(cleanedVisit.checkOut);
 
-            actionCell.append(deleteBtn, checkOutBtn, viewBtn);
-        });
+                newRow.insertCell(0).textContent = index + 1;
 
-        rowCount = Object.keys(visits).length + 1;
+                const checkInCell = newRow.insertCell(1);
+                checkInCell.innerHTML = `
+                    <div class="date-inputs">
+                        <input type="text" class="day-input" value="${checkInData.date.split('/')[0] || ''}" placeholder="DD" maxlength="2" size="2">/
+                        <input type="text" class="month-input" value="${checkInData.date.split('/')[1] || ''}" placeholder="MM" maxlength="2" size="2">/
+                        <input type="text" class="year-input" value="${checkInData.date.split('/')[2] || ''}" placeholder="YYYY" maxlength="4" size="4">
+                        <span class="time-display">${checkInData.time || 'N/A'}</span>
+                    </div>
+                `;
 
+                const checkOutCell = newRow.insertCell(2);
+                checkOutCell.innerHTML = `
+                    <div class="date-inputs">
+                        <input type="text" class="day-input" value="${checkOutData.date.split('/')[0] || ''}" placeholder="DD" maxlength="2" size="2">/
+                        <input type="text" class="month-input" value="${checkOutData.date.split('/')[1] || ''}" placeholder="MM" maxlength="2" size="2">/
+                        <input type="text" class="year-input" value="${checkOutData.date.split('/')[2] || ''}" placeholder="YYYY" maxlength="4" size="4">
+                        <span class="time-display">${checkOutData.time || 'N/A'}</span>
+                    </div>
+                `;
+
+                setupDateInputs(checkInCell);
+                setupDateInputs(checkOutCell);
+
+                const clinicCell = newRow.insertCell(3);
+                const clinicSelect = document.createElement('select');
+                const clinics = ['វែលគ្លីនិក I', 'វែលគ្លីនិក II'];
+                clinics.forEach(clinic => {
+                    const option = new Option(clinic, clinic);
+                    clinicSelect.add(option);
+                });
+                clinicSelect.value = visit.clinic || clinics[0];
+                clinicSelect.addEventListener('change', saveAllRows);
+                clinicCell.appendChild(clinicSelect);
+
+                newRow.insertCell(4).textContent = visit.doctor || 'Dr. Minh Hong';
+
+                const actionCell = newRow.insertCell(5);
+                const deleteBtn = document.createElement('button');
+                deleteBtn.classList.add('btn', 'btn-delete');
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.onclick = () => {
+                    const password = prompt('បញ្ចូល 12345 ដើម្បីលុប:');
+                    if (password === '12345') {
+                        if (confirm('Are you sure you want to delete this visit?')) {
+                            deleteRow(newRow);
+                        }
+                    } else {
+                        alert('Incorrect password. Deletion cancelled.');
+                    }
+                };
+
+                const checkOutBtn = document.createElement('button');
+                checkOutBtn.className = 'btn ' + (cleanedVisit.checkOut === 'N/A' ? 'btn-checkout' : 'btn-disabled');
+                checkOutBtn.textContent = cleanedVisit.checkOut === 'N/A' ? 'Check-out' : 'Checked-out';
+                checkOutBtn.disabled = cleanedVisit.checkOut !== 'N/A';
+                checkOutBtn.onclick = () => checkOutAction(newRow);
+
+                const viewBtn = document.createElement('button');
+                viewBtn.className = 'btn btn-edit';
+                viewBtn.textContent = 'View';
+                viewBtn.onclick = () => {
+                    const targetPage = index === 0 ? 'add-detail-page.html' : 'add-information.html';
+                    window.location.href = `${targetPage}?patientId=${patientId}&visitId=${visitId}`;
+                };
+
+                actionCell.append(deleteBtn, checkOutBtn, viewBtn);
+            });
+
+            rowCount = Object.keys(visits).length + 1;
+        }
     } catch (error) {
-        console.error('Error loading visits:', error.message);
-        console.error('Error stack:', error.stack);
+        console.error('Error loading visits:', error);
         alert('Failed to load visits. Please try again.');
     }
 }
 
 function setupDateInputs(cell) {
-    const dayInput = cell.querySelector('.day-input');
+    const dayикаInput = cell.querySelector('.day-input');
     const monthInput = cell.querySelector('.month-input');
     const yearInput = cell.querySelector('.year-input');
 
+    // Auto-focus to next field when input is filled
     dayInput.addEventListener('input', () => {
         if (dayInput.value.length === 2) {
             monthInput.focus();
@@ -268,6 +253,7 @@ function setupDateInputs(cell) {
         }
     });
 
+    // Validate and format day input
     dayInput.addEventListener('change', () => {
         let day = parseInt(dayInput.value) || 0;
         if (day < 1 || day > 31) {
@@ -276,8 +262,10 @@ function setupDateInputs(cell) {
         } else {
             dayInput.value = day.toString().padStart(2, '0');
         }
+        debouncedSaveAllRows();
     });
 
+    // Validate and format month input
     monthInput.addEventListener('change', () => {
         let month = parseInt(monthInput.value) || 0;
         if (month < 1 || month > 12) {
@@ -286,8 +274,10 @@ function setupDateInputs(cell) {
         } else {
             monthInput.value = month.toString().padStart(2, '0');
         }
+        debouncedSaveAllRows();
     });
 
+    // Validate year input
     yearInput.addEventListener('change', () => {
         let year = parseInt(yearInput.value) || 0;
         if (year < 1900 || year > new Date().getFullYear()) {
@@ -296,37 +286,23 @@ function setupDateInputs(cell) {
         } else {
             yearInput.value = year.toString().padStart(4, '0');
         }
-    });
-
-    [dayInput, monthInput, yearInput].forEach(input => {
-        input.addEventListener('change', () => {
-            if (dayInput.value && monthInput.value && yearInput.value) {
-                const combined = combineDateTime(dayInput.value, monthInput.value, yearInput.value, cell.querySelector('.time-display').textContent);
-                if (!combined) {
-                    alert('Please enter a valid date (DD/MM/YYYY).');
-                    dayInput.value = '';
-                    monthInput.value = '';
-                    yearInput.value = '';
-                } else {
-                    debouncedSaveAllRows();
-                }
-            }
-        });
+        debouncedSaveAllRows();
     });
 }
 
 function checkIn() {
-    if (!patientId) { // Changed from recordId to patientId
+    if (!recordId) {
         console.error('No patient ID available');
         return;
     }
 
     const tableBody = document.getElementById('checkInTable').getElementsByTagName('tbody')[0];
     const newRow = tableBody.insertRow();
-    const visitId = push(ref(db, `patients/${patientId}/visits`)).key; // Changed from recordId to patientId
+    const visitId = push(ref(db, `patients/${recordId}/visits`)).key;
     newRow.dataset.visitId = visitId;
 
-    const { timeStr } = formatDateTime(new Date());
+    const { dateStr, timeStr } = formatDateTime(new Date());
+    const [day, month, year] = dateStr.split('/');
 
     const serialCell = newRow.insertCell(0);
     serialCell.textContent = rowCount++;
@@ -334,9 +310,9 @@ function checkIn() {
     const checkInCell = newRow.insertCell(1);
     checkInCell.innerHTML = `
         <div class="date-inputs">
-            <input type="text" class="day-input" placeholder="DD" maxlength="2" size="2">/
-            <input type="text" class="month-input" placeholder="MM" maxlength="2" size="2">/
-            <input type="text" class="year-input" placeholder="YYYY" maxlength="4" size="4">
+            <input type="text" class="day-input" value="${day}" placeholder="DD" maxlength="2" size="2">/
+            <input type="text" class="month-input" value="${month}" placeholder="MM" maxlength="2" size="2">/
+            <input type="text" class="year-input" value="${year}" placeholder="YYYY" maxlength="4" size="4">
             <span class="time-display">${timeStr}</span>
         </div>
     `;
@@ -391,7 +367,7 @@ function checkIn() {
     viewBtn.textContent = 'View';
     viewBtn.addEventListener('click', () => {
         const targetPage = isFirstVisit ? 'add-detail-page.html' : 'add-information.html';
-        window.location.href = `${targetPage}?patientId=${patientId}&visitId=${visitId}`; // Changed from recordId to patientId
+        window.location.href = `${targetPage}?patientId=${recordId}&visitId=${visitId}`;
         isFirstVisit = false;
     });
 
@@ -400,43 +376,38 @@ function checkIn() {
     actionCell.appendChild(viewBtn);
 
     const visitData = {
-        checkIn: 'N/A',
+        checkIn: `${dateStr} ${timeStr}`,
         checkOut: 'N/A',
         clinic: clinicSelect.value,
         doctor: 'Dr. Minh Hong'
     };
 
-    set(ref(db, `patients/${patientId}/visits/${visitId}`), visitData) // Changed from recordId to patientId
+    set(ref(db, `patients/${recordId}/visits/${visitId}`), visitData)
         .then(() => console.log('New visit saved:', visitId, visitData))
         .catch(error => console.error('Error saving visit:', error));
 }
 
 function checkOutAction(row) {
     const visitId = row.dataset.visitId;
-    if (!visitId || !patientId) return; // Changed from recordId to patientId
+    if (!visitId || !recordId) return;
 
-    const { timeStr } = formatDateTime(new Date());
+    const { timeStr, dateStr } = formatDateTime(new Date());
     
     const checkOutCell = row.cells[2];
     const checkOutInputs = checkOutCell.querySelector('.date-inputs');
     const timeDisplay = checkOutInputs.querySelector('.time-display');
     timeDisplay.textContent = timeStr;
 
-    const checkOutDayInput = checkOutInputs.querySelector('.day-input').value.trim();
-    const checkOutMonthInput = checkOutInputs.querySelector('.month-input').value.trim();
-    const checkOutYearInput = checkOutInputs.querySelector('.year-input').value.trim();
+    // If checkOut date fields are empty, fill with the current date
+    const checkOutDayInput = checkOutInputs.querySelector('.day-input');
+    const checkOutMonthInput = checkOutInputs.querySelector('.month-input');
+    const checkOutYearInput = checkOutInputs.querySelector('.year-input');
 
-    if (!checkOutDayInput || !checkOutMonthInput || !checkOutYearInput) {
-        alert('Please enter a valid check-out date (DD/MM/YYYY).');
-        timeDisplay.textContent = 'N/A';
-        return;
-    }
-
-    const combined = combineDateTime(checkOutDayInput, checkOutMonthInput, checkOutYearInput, timeStr);
-    if (!combined) {
-        alert('Please enter a valid check-out date (DD/MM/YYYY).');
-        timeDisplay.textContent = 'N/A';
-        return;
+    if (!checkOutDayInput.value || !checkOutMonthInput.value || !checkOutYearInput.value) {
+        const [day, month, year] = dateStr.split('/');
+        checkOutDayInput.value = day;
+        checkOutMonthInput.value = month;
+        checkOutYearInput.value = year;
     }
 
     const checkOutBtn = row.querySelector('button:nth-child(2)');
@@ -448,9 +419,9 @@ function checkOutAction(row) {
 
 function deleteRow(row) {
     const visitId = row.dataset.visitId;
-    if (!visitId || !patientId) return; // Changed from recordId to patientId
+    if (!visitId || !recordId) return;
 
-    remove(ref(db, `patients/${patientId}/visits/${visitId}`)) // Changed from recordId to patientId
+    remove(ref(db, `patients/${recordId}/visits/${visitId}`))
         .then(() => {
             row.remove();
             const tableBody = document.getElementById('checkInTable').getElementsByTagName('tbody')[0];
@@ -463,6 +434,7 @@ function deleteRow(row) {
         .catch(error => console.error('Error deleting visit:', error));
 }
 
+// Debounce utility to prevent rapid save calls
 function debounce(func, wait) {
     let timeout;
     return function (...args) {
@@ -472,7 +444,7 @@ function debounce(func, wait) {
 }
 
 async function saveAllRows() {
-    if (!patientId) return; // Changed from recordId to patientId
+    if (!recordId) return;
 
     const tableBody = document.getElementById('checkInTable').getElementsByTagName('tbody')[0];
     const rows = tableBody.getElementsByTagName('tr');
@@ -481,7 +453,7 @@ async function saveAllRows() {
         const visitId = row.dataset.visitId;
         if (!visitId) continue;
 
-        const visitRef = ref(db, `patients/${patientId}/visits/${visitId}`); // Changed from recordId to patientId
+        const visitRef = ref(db, `patients/${recordId}/visits/${visitId}`);
 
         try {
             const snapshot = await get(visitRef);
@@ -503,10 +475,11 @@ async function saveAllRows() {
                 const checkInDateTime = combineDateTime(checkInDay, checkInMonth, checkInYear, checkInTime);
                 const checkOutDateTime = checkOutTime === 'N/A' ? 'N/A' : combineDateTime(checkOutDay, checkOutMonth, checkOutYear, checkOutTime);
 
+                // Only update date fields if they're valid; otherwise, keep existing data
                 const updatedData = {
                     ...existingData,
-                    checkIn: checkInDateTime ? checkInDateTime : existingData.checkIn,
-                    checkOut: checkOutDateTime && checkOutDateTime !== 'N/A' ? checkOutDateTime : existingData.checkOut,
+                    checkIn: checkInDateTime !== 'N/A' ? checkInDateTime : existingData.checkIn,
+                    checkOut: checkOutDateTime !== 'N/A' ? checkOutDateTime : existingData.checkOut,
                     clinic: row.cells[3].querySelector('select').value,
                     doctor: row.cells[4].textContent
                 };
@@ -524,22 +497,19 @@ async function saveAllRows() {
 const debouncedSaveAllRows = debounce(saveAllRows, 300);
 
 document.addEventListener('DOMContentLoaded', async function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get('id');
+    const id = new URLSearchParams(window.location.search).get('id');
     if (!id) {
         console.error('No patient ID in URL');
-        alert('No patient ID provided in URL. Please check the link.');
         return;
     }
 
-    console.log(`Patient ID from URL: ${id}`);
-    patientId = id; // Changed from recordId to patientId
+    recordId = id;
     
     document.getElementById('checkInBtn').addEventListener('click', checkIn);
     document.getElementById('backBtn').addEventListener('click', () => window.history.back());
 
     const patientLoaded = await getPatientDetails(id);
     if (patientLoaded) {
-        await loadSavedVisits(patientId); // Changed from id to patientId
+        await loadSavedVisits(id);
     }
 });

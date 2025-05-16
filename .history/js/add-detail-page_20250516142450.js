@@ -88,12 +88,12 @@ function calculateTotals(item) {
 }
 
 // Function to fetch patient data
-async function getPatientDetails(patientId, visitId = null) { // Changed from recordId to patientId
+async function getPatientDetails(recordId, visitId = null) {
     try {
         let structuredNotes = {};
         let basicInfo = {};
 
-        const patientRef = ref(db, 'patients/' + patientId);
+        const patientRef = ref(db, 'patients/' + recordId);
         const patientSnapshot = await get(patientRef);
 
         if (!patientSnapshot.exists()) {
@@ -163,7 +163,7 @@ async function getPatientDetails(patientId, visitId = null) { // Changed from re
         }
 
         if (visitId) {
-            const visitRef = ref(db, `patients/${patientId}/visits/${visitId}/information`);
+            const visitRef = ref(db, `patients/${recordId}/visits/${visitId}/information`);
             const visitSnapshot = await get(visitRef);
             if (visitSnapshot.exists()) {
                 structuredNotes = visitSnapshot.val();
@@ -192,7 +192,7 @@ async function getPatientDetails(patientId, visitId = null) { // Changed from re
 }
 
 // Function to save patient notes
-async function savePatientNotes(patientId, visitId = null) { // Changed from recordId to patientId
+async function savePatientNotes(recordId, visitId = null) {
     const medicines = Array.from(document.querySelectorAll('.medicine-item')).map(item => ({
         name: item.querySelector('.medicine-input').value,
         dosage: item.querySelector('.dosage-select').value,
@@ -225,11 +225,11 @@ async function savePatientNotes(patientId, visitId = null) { // Changed from rec
 
     try {
         if (!visitId) {
-            const visitsRef = ref(db, `patients/${patientId}/visits`);
+            const visitsRef = ref(db, `patients/${recordId}/visits`);
             const newVisitRef = push(visitsRef);
             visitId = newVisitRef.key;
         }
-        await set(ref(db, `patients/${patientId}/visits/${visitId}/information`), structuredNotes);
+        await set(ref(db, `patients/${recordId}/visits/${visitId}/information`), structuredNotes);
         alert('Notes saved successfully!');
         window.history.back();
     } catch (err) {
@@ -407,16 +407,16 @@ window.addMedicineItem = function (medicineData = null) {
 
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
-    const patientId = urlParams.get('patientId'); // Changed from recordId to patientId
+    const recordId = urlParams.get('patientId');
     const visitId = urlParams.get('visitId');
 
-    if (patientId) {
-        getPatientDetails(patientId, visitId);
+    if (recordId) {
+        getPatientDetails(recordId, visitId);
         initDiagnosisDropdown();
 
         const saveBtn = document.getElementById('saveBtn');
         if (saveBtn) {
-            saveBtn.addEventListener('click', () => savePatientNotes(patientId, visitId));
+            saveBtn.addEventListener('click', () => savePatientNotes(recordId, visitId));
         }
 
         const addMedicineBtn = document.getElementById('addMedicineBtn');
