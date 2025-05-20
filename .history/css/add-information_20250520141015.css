@@ -1,0 +1,610 @@
+body, input, textarea, select, button {
+    font-family: "Noto Sans Khmer", sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #f5f5f5;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+h1 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 24px;
+}
+
+.form-section {
+    margin-bottom: 25px;
+}
+
+.form-section h2 {
+    font-size: 18px;
+    color: #3498db;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}
+
+textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    min-height: 100px;
+    resize: vertical;
+    font-size: 14px;
+}
+
+.dropdown-wrapper {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.dropdown-wrapper input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 0 0 5px 5px;
+    z-index: 100;
+    display: none;
+}
+
+.dropdown-item {
+    padding: 8px 10px;
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    background-color: #f5f5f5;
+}
+
+.medicine-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.medicine-table th, .medicine-table td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+.medicine-table th {
+    background-color: #f5f5f5;
+    font-weight: normal;
+}
+
+.medicine-input {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+.dosage-select, .time-input {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+.quantity-input {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    background-color: #f9f9f9;
+}
+
+.btn-add {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.btn-add:hover {
+    background-color: #2980b9;
+}
+
+.btn-delete {
+    background-color: #d7d7d7;
+    color: white;
+    border: none;
+    padding: 5px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.btn-delete:hover {
+    background-color: #c0392b;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn-save {
+    background-color: #2ecc71;
+    color: white;
+}
+
+.btn-save:hover {
+    background-color: #27ae60;
+}
+
+.btn-back {
+    background-color: #95a5a6;
+    color: white;
+}
+
+.btn-back:hover {
+    background-color: #7f8c8d;
+}
+
+.btn-save:hover {
+    background-color: #27ae60;
+}
+
+/* Make sure all dropdowns have consistent styling */
+#diagnosis-dropdown, 
+#note4-dropdown, 
+.medicine-dropdown {
+    display: none;
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ddd;
+    z-index: 1000;
+    max-height: 300px;
+    overflow-y: auto;
+    width: 100%;
+}
+
+.dropdown-item {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    background-color: #f5f5f5;
+}
+
+.dropdown-wrapper {
+    position: relative;
+    display: block;
+}
+
+/* Total Price Popup Styling */
+.total-price-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #ffffff;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    z-index: 10000;
+    max-width: 550px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    font-family: "Noto Sans Khmer", sans-serif;
+    color: #333;
+}
+
+/* Table Styling */
+.total-price-popup table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.total-price-popup th,
+.total-price-popup td {
+    padding: 12px;
+    border-bottom: 1px solid #e0e0e0;
+    text-align: center;
+    font-size: 14px;
+    font-family: "Noto Sans Khmer", sans-serif;
+}
+
+.total-price-popup th {
+    background-color: #4a90e2;
+    color: #ffffff;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.total-price-popup td {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+.total-price-popup tr:last-child td {
+    border-bottom: none;
+}
+
+.total-price-popup tr:hover td {
+    background-color: #f1f8ff;
+}
+
+/* Checkbox Styling */
+.total-price-popup input[type="checkbox"] {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #4a90e2;
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+    vertical-align: middle;
+    margin: 0 auto;
+    display: inline-block;
+}
+
+.total-price-popup input[type="checkbox"]:checked {
+    background-color: #4a90e2;
+    border-color: #4a90e2;
+}
+
+.total-price-popup input[type="checkbox"]:checked::after {
+    content: '\2714';
+    color: #ffffff;
+    font-size: 12px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Button Styling */
+.total-price-popup button {
+    display: block;
+    margin: 10px auto 0;
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #ffffff;
+    background-color: #4a90e2;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    font-family: "Noto Sans Khmer", sans-serif;
+}
+
+.total-price-popup button:hover {
+    background-color: #357abd;
+    transform: translateY(-1px);
+}
+
+.total-price-popup button:active {
+    transform: translateY(0);
+}
+
+.total-price-popup button:focus {
+    outline: 2px solid #2a5d9c;
+    outline-offset: 2px;
+}
+
+/* Scrollbar Styling (for overflow) */
+.total-price-popup::-webkit-scrollbar {
+    width: 8px;
+}
+
+.total-price-popup::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.total-price-popup::-webkit-scrollbar-thumb {
+    background: #4a90e2;
+    border-radius: 4px;
+}
+
+.total-price-popup::-webkit-scrollbar-thumb:hover {
+    background: #357abd;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 600px) {
+    .total-price-popup {
+        width: 95%;
+        padding: 16px;
+    }
+
+    .total-price-popup th,
+    .total-price-popup td {
+        padding: 8px;
+        font-size: 12px;
+    }
+
+    .total-price-popup button {
+        padding: 10px 20px;
+        font-size: 12px;
+    }
+}
+
+/* Enhanced Total Price Section Styling */
+.total-price-section {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 20px;
+    padding: 10px 0;
+    border-top: 1px solid #000000;
+    font-family: "Noto Sans Khmer", sans-serif;
+}
+
+.total-price-label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #000;
+    text-transform: uppercase;
+    flex-shrink: 0;
+    background-color: rgba(157, 63, 245, 0.73); /* Updated background color */
+    padding: 5px 10px; /* Added padding for better appearance */
+    border-radius: 5px; /* Added rounded corners for consistency */
+}
+
+.total-price-value {
+    width: 150px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    font-size: 14px;
+    color: #333;
+    text-align: center;
+    font-family: "Noto Sans Khmer", sans-serif;
+}
+
+.total-price-value:empty:before {
+    content: "Value of total price";
+    color: #999;
+    font-style: italic;
+}
+
+/* Responsive Adjustments for Total Price Section */
+@media (max-width: 600px) {
+    .total-price-section {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 10px;
+    }
+
+    .total-price-label {
+        font-size: 12px;
+    }
+
+    .total-price-value {
+        font-size: 12px;
+        padding: 15px;
+        width: 120px;
+    }
+}
+
+.total-price-section button {
+    background-color: rgba(157, 63, 245, 0.73); 
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+#totalPriceValue:empty:before {
+    content: "Value of total price";
+    color: #999;
+    font-style: italic;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 600px) {
+    #totalPriceValue {
+        width: 200px; /* Adjusted for mobile */
+        padding: 10px;
+        font-size: 12px;
+    }
+}
+#totalPriceValue {
+    width: 100px; /* Larger width */
+    padding: 10px; /* Adjusted padding for height */
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    font-size: 14px;
+    color: #333;
+    text-align: center;
+    font-family: "Noto Sans Khmer", sans-serif;
+
+}
+
+/* Medicine Table Header Styling */
+.medicine-table th.medicine-type-header {
+    padding: 12px 20px; /* Increased padding for a larger box */
+    width: 150px; /* Fixed width to make the column wider */
+    font-size: 1rem; /* Slightly larger font for readability */
+    background-color: #f2f2f2;
+    font-weight: bold;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+/* Ensure the corresponding <td> aligns with the header */
+.medicine-table td:nth-child(2) {
+    width: 90px; /* Match the width of the header */
+    padding: 8px 12px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .medicine-table th.medicine-type-header {
+        padding: 10px 15px;
+        width: 120px; /* Slightly smaller width for mobile */
+        font-size: 0.9rem;
+    }
+
+    .medicine-table td:nth-child(2) {
+        width: 120px;
+        padding: 6px 10px;
+    }
+}
+
+
+
+
+/* Medicine Table Header Styling */
+/* Target the specific <th> for "រយះពេល (ថ្ងៃ)" */
+.medicine-table th.duration-header {
+    padding: 6px 8px; /* Reduced padding for a smaller box */
+    width: 90px; /* Smaller width for the column */
+    font-size: 0.85rem; /* Smaller font for compactness */
+    background-color: #f2f2f2;
+    font-weight: bold;
+    border: 1px solid #ddd;
+    text-align: left;
+    white-space: nowrap; /* Prevent text wrapping */
+}
+
+/* Ensure the corresponding <td> aligns with the header */
+.medicine-table td:nth-child(3) {
+    width: 80px; /* Match the width of the header */
+    padding: 6px 8px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .medicine-table th.duration-header {
+        padding: 5px 6px;
+        width: 60px; /* Even smaller width for mobile */
+        font-size: 0.8rem;
+    }
+
+    .medicine-table td:nth-child(3) {
+        width: 60px;
+        padding: 5px 6px;
+    }
+}
+.medicine-table td:nth-child(3) .time-input {
+    width: 90px; /* Match the width of the column */
+    padding: 6px; /* Adjusted padding for a balanced look */
+    font-size: 0.9rem; /* Slightly smaller font for consistency */
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-align: center; /* Center the input text */
+    font-family: "Noto Sans Khmer", sans-serif;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .medicine-table td:nth-child(3) .time-input {
+        width: 60px; /* Smaller width for mobile */
+        padding: 5px;
+        font-size: 0.85rem;
+    }
+}
+
+
+
+
+
+/* Target the "ឈ្មោះថ្នាំ" header in the medicine table */
+.medicine-table th.medicine-name-header {
+    padding: 8px 12px; /* Default padding */
+    width: 150px; /* Example width */
+    font-size: 0.9rem; /* Default font size */
+    background-color: #f2f2f2;
+    font-weight: bold;
+    border: 1px solid #ddd;
+    text-align: center; /* Center-align the text */
+}
+
+/* Ensure the corresponding <td> aligns with the header */
+.medicine-table td:nth-child(1) {
+    width: 150px; /* Match the width of the header */
+    padding: 8px 12px;
+    text-align: center; /* Center-align the text in the corresponding <td> */
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .medicine-table th.medicine-name-header {
+        padding: 6px 10px;
+        width: 120px; /* Smaller width for mobile */
+        font-size: 0.85rem;
+        text-align: center; /* Center-align on mobile */
+    }
+
+    .medicine-table td:nth-child(1) {
+        width: 120px;
+        padding: 6px 10px;
+        text-align: center; /* Center-align on mobile */
+    }
+}
+/* Specific styling for medicine dropdown to avoid interference with diagnosis dropdown */
+.medicine-dropdown {
+    position: fixed !important; /* Override absolute positioning and make it fixed relative to viewport */
+    top: auto !important;
+    left: auto !important;
+    width: auto; /* Allow natural width based on content */
+ /* Ensure enough height for all items */
+    overflow-y: auto; /* Allow scrolling within the dropdown if needed */
+    background: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000; /* Ensure it stays above other elements */
+}
+
+/* JavaScript will handle the exact positioning, but this CSS sets the foundation */
