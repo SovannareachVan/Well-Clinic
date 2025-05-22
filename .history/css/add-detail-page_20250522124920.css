@@ -1034,7 +1034,8 @@ body {
 /* Target the input fields within the medicine table columns */
 .medicine-table td:nth-child(5) input[type="text"],
 .medicine-table td:nth-child(6) input[type="text"],
-.medicine-table td:nth-child(7) input[type="text"] { /* Explicitly set a small width */
+.medicine-table td:nth-child(7) input[type="text"] {
+    width: 20px; /* Explicitly set a small width */
     padding: 2px; /* Minimal padding to reduce size */
     font-size: 0.8rem; /* Smaller font to fit the reduced width */
     border: 1px solid #ddd; /* Keep border for visibility */

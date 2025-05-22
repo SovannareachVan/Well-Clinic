@@ -3,19 +3,17 @@ import { ref, get } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-data
 
 async function getPatientDetails(recordId, visitId = null) {
     console.log("Fetching patient data for ID:", recordId, "Visit ID:", visitId);
-    const patientNotesContainer = document.getElementById('patientNotes');
-    patientNotesContainer.innerHTML = '<div class="loading">Loading...</div>';
-
     try {
         const patientRef = ref(db, 'patients/' + recordId);
         const snapshot = await get(patientRef);
 
         if (!snapshot.exists()) {
-            patientNotesContainer.textContent = 'No patient records available.';
+            document.getElementById('patientNotes').textContent = 'No patient records available.';
             return;
         }
 
         const patientData = snapshot.val();
+        const patientNotesContainer = document.getElementById('patientNotes');
 
         const patientNameHeader = document.getElementById('patientName');
         if (patientNameHeader) {
@@ -143,7 +141,7 @@ async function getPatientDetails(recordId, visitId = null) {
 
     } catch (error) {
         console.error('Error loading patient data:', error);
-        patientNotesContainer.textContent = 'Failed to load patient details.';
+        document.getElementById('patientNotes').textContent = 'Failed to load patient details.';
     }
 }
 
@@ -171,19 +169,14 @@ function generateVisitHtml(title, checkIn, checkOut, clinic, doctor, info, isFir
 
 function isValidDate(dateStr) {
     if (!dateStr || dateStr === 'N/A') return false;
-    const [datePart, timePart] = dateStr.split(' ');
-    if (!datePart || !timePart) return false;
+    const date = new Date(dateStr);
+    const [datePart] = dateStr.split(' ');
     const [day, month, year] = datePart.split('/').map(num => parseInt(num, 10));
-    const [hours, minutes, seconds] = timePart.split(':').map(num => parseInt(num, 10));
-    const date = new Date(year, month - 1, day, hours, minutes, seconds);
     return !isNaN(date.getTime()) && 
            dateStr.match(/^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$/) && 
            day >= 1 && day <= 31 && 
            month >= 1 && month <= 12 && 
-           year >= 1900 && year <= new Date().getFullYear() &&
-           hours >= 0 && hours <= 23 &&
-           minutes >= 0 && minutes <= 59 &&
-           seconds >= 0 && seconds <= 59;
+           year >= 1900 && year <= new Date().getFullYear();
 }
 
 function generateFirstVisitContent(info) {
@@ -239,7 +232,7 @@ function generateMedicineTable(medicines) {
 
 window.onload = function () {
     const urlParams = new URLSearchParams(window.location.search);
-    const recordId = urlParams.get('recordId');
+    const recordId = urlParams.get('recordId'); // Changed to match the function parameter
     const visitId = urlParams.get('visitId');
     if (recordId) {
         getPatientDetails(recordId, visitId).then(() => {
@@ -252,4 +245,3 @@ window.onload = function () {
         console.error('No recordId found in URL');
     }
 };
-w

@@ -594,7 +594,7 @@ textarea {
     }
 }
 .medicine-table td input.retail-price-input {
-    width: 60px; /* Adjusted to a reasonable small size for decimals */
+    width: 80px; /* Adjusted to a reasonable small size for decimals */
     padding: 2px; /* Minimal padding */
     font-size: 0.8rem; /* Smaller font to fit */
     border: 1px solid #ddd;
@@ -603,8 +603,8 @@ textarea {
     font-family: "Noto Sans Khmer", sans-serif;
     box-sizing: border-box; /* Include padding and border in width */
 }
-.medicine-table td input.total-price-input, input.quantity-input {
-    width: 60px; /* Adjusted to a reasonable small size for decimals */
+.medicine-table td input.retail-price-input {
+    width: 80px; /* Adjusted to a reasonable small size for decimals */
     padding: 2px; /* Minimal padding */
     font-size: 0.8rem; /* Smaller font to fit */
     border: 1px solid #ddd;

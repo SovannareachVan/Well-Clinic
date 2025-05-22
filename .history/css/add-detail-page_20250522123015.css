@@ -1034,7 +1034,8 @@ body {
 /* Target the input fields within the medicine table columns */
 .medicine-table td:nth-child(5) input[type="text"],
 .medicine-table td:nth-child(6) input[type="text"],
-.medicine-table td:nth-child(7) input[type="text"] { /* Explicitly set a small width */
+.medicine-table td:nth-child(7) input[type="text"] {
+    width: 20px; /* Explicitly set a small width */
     padding: 2px; /* Minimal padding to reduce size */
     font-size: 0.8rem; /* Smaller font to fit the reduced width */
     border: 1px solid #ddd; /* Keep border for visibility */
@@ -1049,7 +1050,7 @@ body {
 .medicine-table td:nth-child(6),
 .medicine-table td:nth-child(7) {
     width: 20px; /* Match the input width */
-        padding: 8px, 12px;/* Remove extra padding to avoid expanding the cell */
+    padding: 0; /* Remove extra padding to avoid expanding the cell */
 }
 
 /* Responsive adjustment to maintain small size on mobile */
@@ -1065,40 +1066,6 @@ body {
     .medicine-table td:nth-child(6),
     .medicine-table td:nth-child(7) {
         width: 20px;
-        padding: 8px, 12px;
+        padding: 0;
     }
-}
-.medicine-table td input.retail-price-input {
-    width: 50px; /* Adjusted to a reasonable small size for decimals */
-    padding: 2px; /* Minimal padding */
-    font-size: 0.8rem; /* Smaller font to fit */
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    text-align: center;
-    font-family: "Noto Sans Khmer", sans-serif;
-    box-sizing: border-box; /* Include padding and border in width */
-}
-
-@media (max-width: 768px) {
-    .medicine-table td input.retail-price-input,
-    .medicine-table td input.quantity-input,
-    .medicine-table td input.total-price-input {
-        width: 40px; /* Slightly smaller on mobile */
-        font-size: 0.7rem;
-    }
-    .medicine-table td:nth-child(8),
-    .medicine-table td:nth-child(7),
-    .medicine-table td:nth-child(9) {
-        width: 40px;
-    }
-}
-.medicine-table td select.dosage-select.morning-dose, select.dosage-select.afternoon-dose, select.dosage-select.evening-dose{
-    width: 60px; /* Adjusted to a reasonable small size for decimals */
-    padding: 2px; /* Minimal padding */
-    font-size: 0.8rem; /* Smaller font to fit */
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    text-align: center;
-    font-family: "Noto Sans Khmer", sans-serif;
-    box-sizing: border-box; /* Include padding and border in width */
 }

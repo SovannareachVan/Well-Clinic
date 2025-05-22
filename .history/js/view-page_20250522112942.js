@@ -252,4 +252,5 @@ window.onload = function () {
         console.error('No recordId found in URL');
     }
 };
-w
+window.onload();
+// Function to delete patient   

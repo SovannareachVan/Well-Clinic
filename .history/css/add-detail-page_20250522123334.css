@@ -1022,52 +1022,7 @@ body {
 }
 
 /* Style the input field within this column */
-.medicine-table td:nth-child(7) input[type="text"] {
-    width: 60px;
-    padding: 4px;
-    font-size: 0.85rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    text-align: center;
-    font-family: "Noto Sans Khmer", sans-serif;
-}
-/* Target the input fields within the medicine table columns */
-.medicine-table td:nth-child(5) input[type="text"],
-.medicine-table td:nth-child(6) input[type="text"],
-.medicine-table td:nth-child(7) input[type="text"] { /* Explicitly set a small width */
-    padding: 2px; /* Minimal padding to reduce size */
-    font-size: 0.8rem; /* Smaller font to fit the reduced width */
-    border: 1px solid #ddd; /* Keep border for visibility */
-    border-radius: 4px; /* Maintain rounded corners */
-    text-align: center; /* Center the text */
-    font-family: "Noto Sans Khmer", sans-serif;
-    box-sizing: content-box; /* Ensure width includes only content, not padding/border */
-}
-
-/* Ensure the table cells match the input width */
-.medicine-table td:nth-child(5),
-.medicine-table td:nth-child(6),
-.medicine-table td:nth-child(7) {
-    width: 20px; /* Match the input width */
-        padding: 8px, 12px;/* Remove extra padding to avoid expanding the cell */
-}
-
-/* Responsive adjustment to maintain small size on mobile */
-@media (max-width: 768px) {
-    .medicine-table td:nth-child(5) input[type="text"],
-    .medicine-table td:nth-child(6) input[type="text"],
-    .medicine-table td:nth-child(7) input[type="text"] {
-        width: 20px;
-        padding: 2px;
-        font-size: 0.8rem;
-    }
-    .medicine-table td:nth-child(5),
-    .medicine-table td:nth-child(6),
-    .medicine-table td:nth-child(7) {
-        width: 20px;
-        padding: 8px, 12px;
-    }
-}
+/* Target the retail price input specifically */
 .medicine-table td input.retail-price-input {
     width: 50px; /* Adjusted to a reasonable small size for decimals */
     padding: 2px; /* Minimal padding */
@@ -1079,6 +1034,28 @@ body {
     box-sizing: border-box; /* Include padding and border in width */
 }
 
+/* Ensure quantity and total price inputs are also sized appropriately */
+.medicine-table td input.quantity-input,
+.medicine-table td input.total-price-input {
+    width: 50px;
+    padding: 2px;
+    font-size: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-align: center;
+    font-family: "Noto Sans Khmer", sans-serif;
+    box-sizing: border-box;
+}
+
+/* Adjust table cell width to match inputs */
+.medicine-table td:nth-child(8), /* retail price column */
+.medicine-table td:nth-child(7), /* quantity column */
+.medicine-table td:nth-child(9) { /* total price column */
+    width: 50px;
+    padding: 0;
+}
+
+/* Responsive adjustments */
 @media (max-width: 768px) {
     .medicine-table td input.retail-price-input,
     .medicine-table td input.quantity-input,
@@ -1091,14 +1068,4 @@ body {
     .medicine-table td:nth-child(9) {
         width: 40px;
     }
-}
-.medicine-table td select.dosage-select.morning-dose, select.dosage-select.afternoon-dose, select.dosage-select.evening-dose{
-    width: 60px; /* Adjusted to a reasonable small size for decimals */
-    padding: 2px; /* Minimal padding */
-    font-size: 0.8rem; /* Smaller font to fit */
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    text-align: center;
-    font-family: "Noto Sans Khmer", sans-serif;
-    box-sizing: border-box; /* Include padding and border in width */
 }
