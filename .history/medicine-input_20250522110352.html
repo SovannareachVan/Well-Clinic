@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medicine Input</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/css/medicine-input.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="icon" href="/image/DC1D71C0-68A8-47C5-8634-5585C79D5CF4_1_102_o.jpeg" type="image/png">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@100..900&family=Siemreap&display=swap" rel="stylesheet">
+    <style>
+    body, input, textarea, select, button {
+        font-family: "Noto Sans Khmer", sans-serif;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1></h1>
+        <button id="addMedicineBtn" class="add-medicine-btn">  បញ្ចូលឈ្មោះថ្នាំ</button>
+        <table id="medicinesTable">
+            <thead>
+                <tr>
+                    <th>ឈ្មោះថ្នាំ</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="medicinesTableBody"></tbody>
+        </table>
+    </div>
+
+    <!-- Modal for adding medicine -->
+    <div id="medicineModal" class="modal">
+        <div class="modal-content">
+            <span class="close">×</span>
+            <h2>Add Medicine</h2>
+            <form id="medicineForm">
+                <label for="medicineName">Medicine Name:</label>
+                <input type="text" id="medicineName" name="medicineName" placeholder="Enter medicine name" required>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="/js/medicine-input.js"></script>
+</body>
+</html>

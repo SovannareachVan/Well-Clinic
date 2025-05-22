@@ -1,0 +1,255 @@
+/* Base Styles */
+body, input, textarea, select, button {
+    font-family: "Noto Sans Khmer", sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #f5f5f5;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 24px;
+}
+
+.form-section {
+    margin-bottom: 25px;
+}
+
+.form-section h2 {
+    font-size: 18px;
+    color: #3498db;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}
+
+textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    min-height: 100px;
+    resize: vertical;
+    font-size: 14px;
+}
+
+.dropdown-wrapper {
+    position: relative;
+    display: block;
+    margin-bottom: 15px;
+}
+
+.dropdown-wrapper input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+/* Fix for dropdown positioning in table */
+.medicine-dropdown {
+    display: none;
+    position: fixed; /* Changed from absolute to fixed */
+    background-color: white;
+    border: 1px solid #ddd;
+    z-index: 10000; /* Higher z-index */
+    max-height: 300px;
+    overflow-y: auto;
+    width: 200px; /* Match width of input */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+}
+
+.dropdown-item {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    background-color: #f5f5f5;
+}
+
+/* Medicine Table */
+.medicine-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.medicine-table th,
+.medicine-table td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+.medicine-table th {
+    background-color: #f5f5f5;
+    font-weight: normal;
+}
+
+.medicine-input {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+.dosage-select,
+.time-input {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+.quantity-input {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    background-color: #f9f9f9;
+}
+
+.btn-add {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.btn-add:hover {
+    background-color: #2980b9;
+}
+
+.btn-delete {
+    background-color: #d7d7d7;
+    color: white;
+    border: none;
+    padding: 5px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.btn-delete:hover {
+    background-color: #c0392b;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn-save {
+    background-color: #2ecc71;
+    color: white;
+}
+
+.btn-save:hover {
+    background-color: #27ae60;
+}
+
+.btn-back {
+    background-color: #95a5a6;
+    color: white;
+}
+
+.btn-back:hover {
+    background-color: #7f8c8d;
+}
+
+/* Total Price Popup Styling */
+.total-price-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #ffffff;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    z-index: 10000;
+    max-width: 550px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    font-family: "Noto Sans Khmer", sans-serif;
+    color: #333;
+}
+
+/* Enhanced Total Price Section Styling */
+.total-price-section {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 20px;
+    padding: 10px 0;
+    border-top: 1px solid #000000;
+    font-family: "Noto Sans Khmer", sans-serif;
+}
+
+.total-price-label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #000;
+    text-transform: uppercase;
+    flex-shrink: 0;
+    background-color: rgba(157, 63, 245, 0.73);
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.total-price-value {
+    width: 150px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    font-size: 14px;
+    color: #333;
+    text-align: center;
+    font-family: "Noto Sans Khmer", sans-serif;
+}
+
+.total-price-section button {
+    background-color: rgba(157, 63, 245, 0.73);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medicine Input</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/css/">
+</head>
+<body>
+    <div class="container">
+        <h1>Manage Medicines</h1>
+        <button id="addMedicineBtn" class="add-medicine-btn"><i class="fas fa-plus"></i> Add Medicine</button>
+        <table id="medicinesTable">
+            <thead>
+                <tr>
+                    <th>Medicine Name</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="medicinesTableBody"></tbody>
+        </table>
+    </div>
+
+    <!-- Modal for adding medicine -->
+    <div id="medicineModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Add Medicine</h2>
+            <form id="medicineForm">
+                <label for="medicineName">Medicine Name:</label>
+                <select id="medicineName" name="medicineName" required>
+                    <option value="">Select Medicine</option>
+                </select>
+                <label for="medicineDate">Date:</label>
+                <input type="date" id="medicineDate" name="medicineDate" required>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="medicine-input.js"></script>
+</body>
+</html>
