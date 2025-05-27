@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/doctor.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="icon" href="/image/DC1D71C0-68A8-47C5-8634-5585C79D5CF4_1_102_o.jpeg" type="image/png">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@100..900&family=Siemreap&display=swap" rel="stylesheet">
+    <style>
+    body, input, textarea, select, button {
+        font-family: "Noto Sans Khmer", sans-serif;
+    }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <img src="/image/Logo copy - Copy-01.png" alt="Well Clinic Logo" class="logo-image">
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item" onclick="location.href='index.html'">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </li>
+            <li class="nav-item" onclick="location.href='receptionist.html'">
+                <i class="fas fa-user-tie"></i>
+                <span>Receptionist</span>
+            </li>
+            <li class="nav-item active" onclick="location.href='doctor.html'">
+                <i class="fas fa-user-md"></i>
+                <span>Doctor</span>
+            </li>
+                <li class="nav-item active" onclick="location.href='doctor.html'">
+                <i class="fas fa-user-md"></i>
+                <span>hi</span>
+            </li>
+            
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="patients-container">
+            <h1>អ្នកជំងឺ</h1>
+            
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search by name...">
+            </div>
+            
+            <table class="patients-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="patientsTableBody">
+                    <!-- Patients will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script type="module" src="/js/doctor.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script
+        
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>បញ្ជីថ្នាំ</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Assume CSS is in a separate file -->
+</head>
+<body>
+    <div class="container">
+        <h1>ថ្នាំ</h1>
+        <button class="add-medicine-btn" style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; cursor: pointer;">បន្ថែមថ្នាំ</button>
+
+        <table id="medicineTable">
+            <thead>
+                <tr>
+                    <th>លេខរៀង</th>
+                    <th>ឈ្មោះថ្នាំ</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <!-- Modal -->
+        <div id="addMedicineModal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2>Add Medicine</h2>
+                <form>
+                    <label for="medicineNameInput">Medicine Name:</label>
+                    <input type="text" id="medicineNameInput" name="medicineNameInput">
+                    <button type="button" id="submitMedicine">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="medicine-input.js"></script>
+</body>
+</html>
