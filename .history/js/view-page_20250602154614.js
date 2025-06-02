@@ -68,7 +68,7 @@ async function getPatientDetails(recordId, visitId = null) {
             }
         }
 
-        const visits = patientData.visits ? Object.entries(patientData.visits) : [];
+        const visits = patientData.visits ? Object.entries(patientData.visits venu) : [];
         let outputHtml = '';
 
         if (patientData.notes) {
@@ -81,6 +81,7 @@ async function getPatientDetails(recordId, visitId = null) {
             return;
         }
 
+        // Sort visits in descending order (newest to oldest)
         visits.sort((a, b) => {
             const checkInA = a[1].checkIn;
             const checkInB = b[1].checkIn;
@@ -92,7 +93,7 @@ async function getPatientDetails(recordId, visitId = null) {
             if (isNaN(dateA.getTime())) return -1;
             if (isNaN(dateB.getTime())) return 1;
 
-            return dateB - dateA;
+            return dateB - dateA; // Sorts in descending order (newest first)
         });
 
         if (visitId) {
@@ -110,25 +111,28 @@ async function getPatientDetails(recordId, visitId = null) {
             const infoSnapshot = await get(infoRef);
             const visitInfo = infoSnapshot.exists() ? infoSnapshot.val() : {};
 
-            const isFirstVisit = visits.findIndex(v => v[0] === visitId) === visits.length - 1;
+            const isFirstVisit = visits.findIndex(v => v[0] === visitId) === 0; // Newest visit
             outputHtml += generateVisitHtml(
                 'ព័ត៌មានពិនិត្យ',
                 visit.checkIn,
-                visit.checkOut,
+                visit.checkOut, // Fixed: Use visit.checkOut instead of undefined checkOut
                 visit.clinic,
                 visit.doctor,
                 visitInfo,
                 isFirstVisit
             );
         } else {
+            // Assign visit numbers in descending order (newest = highest number)
+            const totalVisits = visits.length;
             for (const [currentVisitId, visit] of visits) {
                 const infoRef = ref(db, `patients/${recordId}/visits/${currentVisitId}/information`);
                 const infoSnapshot = await get(infoRef);
                 const visitInfo = infoSnapshot.exists() ? infoSnapshot.val() : {};
 
-                const isFirstVisit = visits.findIndex(v => v[0] === currentVisitId) === visits.length - 1;
+                const visitNumber = totalVisits - visits.findIndex(v => v[0] === currentVisitId); // e.g., 4, 3, 2, 1
+                const isFirstVisit = visits.findIndex(v => v[0] === currentVisitId) === 0; // Newest visit
                 outputHtml += generateVisitHtml(
-                    `ព័ត៌មានពិនិត្យលើកទី ${visits.length - visits.findIndex(v => v[0] === currentVisitId)}`,
+                    `ព័ត៌មានពិនိត្យលើកទី ${visitNumber}`,
                     visit.checkIn,
                     visit.checkOut,
                     visit.clinic,
@@ -156,7 +160,9 @@ function generateVisitHtml(title, checkIn, checkOut, clinic, doctor, info, isFir
             <div class="visit-note-header">
                 <h3>${title}</h3>
                 <div class="visit-meta">
-                    <div><strong>ថ្ងៃចូល:</strong> ${checkInDisplay}</div>
+                    <div><strong>ថ្ងៃច
+
+System: ូល:</strong> ${checkInDisplay}</div>
                     <div><strong>ថ្ងៃចេញ:</strong> ${checkOutDisplay}</div>
                     <div><strong>មន្ទីរពេទ្យ:</strong> ${clinic || 'N/A'}</div>
                     <div><strong>វេជ្ជបណ្ឌិត:</strong> ${doctor || 'N/A'}</div>
@@ -193,7 +199,7 @@ function generateFirstVisitContent(info) {
         <div class="note-item"><strong>តេស្តមន្ទីពិសោធន៍:</strong> ${info.note3 || 'មិនទាន់បំពេញ'}</div>
         <div class="note-item"><strong>រោគវិនិច្ឆ័យ:</strong> ${info.diagnosis || 'មិនទាន់បំពេញ'}</div>
         <div class="note-item"><strong>រោគវិនិច្ឆ័យញែក:</strong> ${info.note5 || 'មិនទាន់បំពេញ'}</div>
-        <div class="note-item"><strong>របៀបប្រើប្រាស់ថ្នាំ:</strong> ${info.medicines ? generateMedicineTable(info.medicines) : 'មិនទាន់បំពេញ'}</div>
+        <div class="note-item"><strong>របៀបប្រើប្រាស់ថ្នaំ:</strong> ${info.medicines ? generateMedicineTable(info.medicines) : 'មិនទាន់បំពេញ'}</div>
     `;
 }
 
@@ -202,7 +208,7 @@ function generateSecondVisitContent(info) {
         <div class="note-item"><strong>ប្រវត្តិព្យាបាល:</strong> ${info.treatmentHistory || 'មិនទាន់បំពេញ'}</div>
         <div class="note-item"><strong>តេស្តមន្ទីពិសោធន៍:</strong> ${info.labTest || 'មិនទាន់បំពេញ'}</div>
         <div class="note-item"><strong>រោគវិនិច្ឆ័យ:</strong> ${info.diagnosis || 'មិនទាន់បំពេញ'}</div>
-        <div class="note-item"><strong>របៀបប្រើប្រាស់ថ្នាំ:</strong> ${info.medicines ? generateMedicineTable(info.medicines) : 'មិនទាន់បំពេញ'}</div>
+        <div class="note-item"><strong>របៀបប្រើប្រាស់ថ្នaំ:</strong> ${info.medicines ? generateMedicineTable(info.medicines) : 'មិនទាន់បំពេញ'}</div>
     `;
 }
 

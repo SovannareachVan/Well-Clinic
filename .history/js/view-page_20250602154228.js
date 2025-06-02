@@ -81,6 +81,7 @@ async function getPatientDetails(recordId, visitId = null) {
             return;
         }
 
+        // Sort visits in descending order (newest to oldest)
         visits.sort((a, b) => {
             const checkInA = a[1].checkIn;
             const checkInB = b[1].checkIn;
@@ -92,7 +93,7 @@ async function getPatientDetails(recordId, visitId = null) {
             if (isNaN(dateA.getTime())) return -1;
             if (isNaN(dateB.getTime())) return 1;
 
-            return dateB - dateA;
+            return dateB - dateA; // Sorts in descending order (newest first)
         });
 
         if (visitId) {
@@ -110,7 +111,7 @@ async function getPatientDetails(recordId, visitId = null) {
             const infoSnapshot = await get(infoRef);
             const visitInfo = infoSnapshot.exists() ? infoSnapshot.val() : {};
 
-            const isFirstVisit = visits.findIndex(v => v[0] === visitId) === visits.length - 1;
+            const isFirstVisit = visits.findIndex(v => v[0] === visitId) === 0; // First displayed visit (newest)
             outputHtml += generateVisitHtml(
                 'ព័ត៌មានពិនិត្យ',
                 visit.checkIn,
@@ -121,16 +122,19 @@ async function getPatientDetails(recordId, visitId = null) {
                 isFirstVisit
             );
         } else {
+            // Assign visit numbers in descending order (newest = highest number)
+            const totalVisits = visits.length;
             for (const [currentVisitId, visit] of visits) {
                 const infoRef = ref(db, `patients/${recordId}/visits/${currentVisitId}/information`);
                 const infoSnapshot = await get(infoRef);
                 const visitInfo = infoSnapshot.exists() ? infoSnapshot.val() : {};
 
-                const isFirstVisit = visits.findIndex(v => v[0] === currentVisitId) === visits.length - 1;
+                const visitNumber = totalVisits - visits.findIndex(v => v[0] === currentVisitId); // e.g., 4, 3, 2, 1
+                const isFirstVisit = visits.findIndex(v => v[0] === currentVisitId) === 0; // Newest visit
                 outputHtml += generateVisitHtml(
-                    `ព័ត៌មានពិនិត្យលើកទី ${visits.length - visits.findIndex(v => v[0] === currentVisitId)}`,
+                    `ព័ត៌មានពិនិត្យលើកទី ${visitNumber}`,
                     visit.checkIn,
-                    visit.checkOut,
+                    checkOut,
                     visit.clinic,
                     visit.doctor,
                     visitInfo,

@@ -81,6 +81,7 @@ async function getPatientDetails(recordId, visitId = null) {
             return;
         }
 
+        // Sort visits in ascending order (oldest to newest)
         visits.sort((a, b) => {
             const checkInA = a[1].checkIn;
             const checkInB = b[1].checkIn;
@@ -92,7 +93,7 @@ async function getPatientDetails(recordId, visitId = null) {
             if (isNaN(dateA.getTime())) return -1;
             if (isNaN(dateB.getTime())) return 1;
 
-            return dateB - dateA;
+            return dateA - dateB; // Sorts in ascending order (oldest first)
         });
 
         if (visitId) {
@@ -110,7 +111,7 @@ async function getPatientDetails(recordId, visitId = null) {
             const infoSnapshot = await get(infoRef);
             const visitInfo = infoSnapshot.exists() ? infoSnapshot.val() : {};
 
-            const isFirstVisit = visits.findIndex(v => v[0] === visitId) === visits.length - 1;
+            const isFirstVisit = visits.findIndex(v => v[0] === visitId) === 0; // First visit is now at index 0
             outputHtml += generateVisitHtml(
                 'ព័ត៌មានពិនិត្យ',
                 visit.checkIn,
@@ -126,9 +127,9 @@ async function getPatientDetails(recordId, visitId = null) {
                 const infoSnapshot = await get(infoRef);
                 const visitInfo = infoSnapshot.exists() ? infoSnapshot.val() : {};
 
-                const isFirstVisit = visits.findIndex(v => v[0] === currentVisitId) === visits.length - 1;
+                const isFirstVisit = visits.findIndex(v => v[0] === currentVisitId) === 0; // First visit is now at index 0
                 outputHtml += generateVisitHtml(
-                    `ព័ត៌មានពិនិត្យលើកទី ${visits.length - visits.findIndex(v => v[0] === currentVisitId)}`,
+                    `ព័ត៌មានពិនិត្យលើកទី ${visits.findIndex(v => v[0] === currentVisitId) + 1}`, // Adjust numbering
                     visit.checkIn,
                     visit.checkOut,
                     visit.clinic,
