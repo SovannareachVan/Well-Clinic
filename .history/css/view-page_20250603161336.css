@@ -832,38 +832,35 @@ html, body {
 
 .global-note-popup {
     position: fixed;
-    background: linear-gradient(135deg, #ffffff, #f9f9f9);
+    background: linear-gradient(135deg, #ffffff, #f9f9f9); /* Subtle gradient */
     border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border-radius: 10px; /* Rounded corners */
+    padding: 20px; /* More padding for comfort */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); /* Softer shadow */
     z-index: 1000;
-    min-width: 250px;
-    max-width: 450px;
-    animation: fadeIn 0.3s ease-in-out;
+    min-width: 250px; /* Slightly wider minimum */
+    max-width: 450px; /* Slightly wider maximum */
+    animation: fadeIn 0.3s ease-in-out; /* Fade-in animation */
 }
 
 .global-note-popup-content {
     position: relative;
-    font-family: 'Arial', sans-serif;
-    color: #333;
-    line-height: 1.5;
+    font-family: 'Arial', sans-serif; /* Clean font */
+    color: #333; /* Darker text for readability */
+    line-height: 1.5; /* Better line spacing */
 }
 
 .global-note-popup-content h3 {
-    margin: 0 0 10px 0;
-    font-size: 1.25rem;
-    color: white;
-    font-weight: 600;
-    text-align: center; /* Center the text */
-    background-color: var(--primary);
+    margin: 0 0 10px 0; /* Spacing below header */
+    font-size: 1.25rem; /* Slightly larger header */
+    color: #2c3e50; /* Darker shade for header */
+    font-weight: 600; /* Semi-bold */
 }
 
 .global-note-popup-content p {
-    margin: 0;
-    font-size: 1rem;
-    color: #000000;
-    text-align: center; 
+    margin: 0; /* Remove default margin */
+    font-size: 1rem; /* Readable text size */
+    color: #555; /* Softer text color */
 }
 
 .close-global-note-popup {
@@ -871,17 +868,18 @@ html, body {
     top: 10px;
     right: 10px;
     cursor: pointer;
-    font-size: 24px;
-    color: #888;
-    transition: color 0.2s ease, transform 0.2s ease;
-    line-height: 1;
+    font-size: 24px; /* Larger for easier clicking */
+    color: #888; /* Neutral color */
+    transition: color 0.2s ease, transform 0.2s ease; /* Smooth hover effects */
+    line-height: 1; /* Ensure proper alignment */
 }
 
 .close-global-note-popup:hover {
-    color: #e74c3c;
-    transform: scale(1.2);
+    color: #e74c3c; /* Red on hover */
+    transform: scale(1.2); /* Slight scale-up on hover */
 }
 
+/* Fade-in animation */
 @keyframes fadeIn {
     from {
         opacity: 0;

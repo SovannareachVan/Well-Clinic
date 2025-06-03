@@ -853,7 +853,7 @@ html, body {
 .global-note-popup-content h3 {
     margin: 0 0 10px 0;
     font-size: 1.25rem;
-    color: white;
+    color: #000000;
     font-weight: 600;
     text-align: center; /* Center the text */
     background-color: var(--primary);

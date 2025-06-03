@@ -1,4 +1,4 @@
-
+```javascript
 import { db } from './firebase-config.js';
 import { ref, get } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js';
 
@@ -280,7 +280,7 @@ function showGlobalNotePopup(recordId, visitId, itemId, rowElement) {
         popup.innerHTML = `
             <div class="global-note-popup-content">
                 <span class="close-global-note-popup">×</span>
-                <h3>Note</h3>
+                <h3>កំណត់ចំណាំសាកល</h3>
                 <p>Error: Missing recordId, visitId, or itemId</p>
             </div>
         `;
@@ -290,8 +290,8 @@ function showGlobalNotePopup(recordId, visitId, itemId, rowElement) {
             const globalNote = snapshot.exists() ? snapshot.val() : 'No global note available';
             popup.innerHTML = `
                 <div class="global-note-popup-content">
-                    <span class="close-global-note-popup"></span>
-                    <h3>Note</h3>
+                    <span class="close-global-note-popup">×</span>
+                    <h3>កំណត់ចំណាំសាកល</h3>
                     <p>${globalNote}</p>
                 </div>
             `;
@@ -406,3 +406,4 @@ window.onload = function () {
         console.error('No recordId found in URL');
     }
 };
+```

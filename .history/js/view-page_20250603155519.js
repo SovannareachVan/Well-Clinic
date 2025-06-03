@@ -1,4 +1,4 @@
-
+```javascript
 import { db } from './firebase-config.js';
 import { ref, get } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js';
 
@@ -13,7 +13,7 @@ async function getPatientDetails(recordId, visitId = null) {
 
         if (!snapshot.exists()) {
             patientNotesContainer.textContent = 'No patient records available.';
-            return { visits: [] };
+            return;
         }
 
         const patientData = snapshot.val();
@@ -79,7 +79,7 @@ async function getPatientDetails(recordId, visitId = null) {
         if (visits.length === 0) {
             outputHtml += `<div>មិនទាន់មានការចូលពិនិត្យ</div>`;
             patientNotesContainer.innerHTML = outputHtml;
-            return { visits };
+            return;
         }
 
         visits.sort((a, b) => {
@@ -103,7 +103,7 @@ async function getPatientDetails(recordId, visitId = null) {
                 console.error(`Visit ID ${visitId} not found.`);
                 outputHtml += `<div>Visit not found.</div>`;
                 patientNotesContainer.innerHTML = outputHtml;
-                return { visits };
+                return;
             }
 
             const visit = visitSnapshot.val();
@@ -122,6 +122,7 @@ async function getPatientDetails(recordId, visitId = null) {
                 isFirstVisit
             );
         } else {
+            // Use the most recent visit if visitId is not provided
             const [currentVisitId, visit] = visits[0];
             const infoRef = ref(db, `patients/${recordId}/visits/${currentVisitId}/information`);
             const infoSnapshot = await get(infoRef);
@@ -140,12 +141,10 @@ async function getPatientDetails(recordId, visitId = null) {
         }
 
         patientNotesContainer.innerHTML = outputHtml;
-        return { visits };
 
     } catch (error) {
         console.error('Error loading patient data:', error);
         patientNotesContainer.textContent = 'Failed to load patient details.';
-        return { visits: [] };
     }
 }
 
@@ -261,17 +260,6 @@ function generateMedicineTable(medicines) {
 }
 
 function showGlobalNotePopup(recordId, visitId, itemId, rowElement) {
-    // Create backdrop
-    const backdrop = document.createElement('div');
-    backdrop.classList.add('global-note-backdrop');
-    backdrop.style.position = 'fixed';
-    backdrop.style.top = '0';
-    backdrop.style.left = '0';
-    backdrop.style.width = '100%';
-    backdrop.style.height = '100%';
-    backdrop.style.background = 'rgba(0, 0, 0, 0.5)';
-    backdrop.style.zIndex = '999';
-
     const popup = document.createElement('div');
     popup.classList.add('global-note-popup');
 
@@ -280,7 +268,7 @@ function showGlobalNotePopup(recordId, visitId, itemId, rowElement) {
         popup.innerHTML = `
             <div class="global-note-popup-content">
                 <span class="close-global-note-popup">×</span>
-                <h3>Note</h3>
+                <h3>កំណត់ចំណាំសាកល</h3>
                 <p>Error: Missing recordId, visitId, or itemId</p>
             </div>
         `;
@@ -290,36 +278,30 @@ function showGlobalNotePopup(recordId, visitId, itemId, rowElement) {
             const globalNote = snapshot.exists() ? snapshot.val() : 'No global note available';
             popup.innerHTML = `
                 <div class="global-note-popup-content">
-                    <span class="close-global-note-popup"></span>
-                    <h3>Note</h3>
+                    <span class="close-global-note-popup">×</span>
+                    <h3>កំណត់ចំណាំសាកល</h3>
                     <p>${globalNote}</p>
                 </div>
             `;
 
-            popup.style.position = 'fixed';
-            popup.style.top = '50%';
-            popup.style.left = '50%';
-            popup.style.transform = 'translate(-50%, -50%)';
+            const rect = rowElement.getBoundingClientRect();
+            popup.style.position = 'absolute';
+            popup.style.top = `${rect.bottom + window.scrollY + 5}px`;
+            popup.style.left = `${rect.left + window.scrollX}px`;
             popup.style.zIndex = '1000';
             popup.style.background = '#fff';
             popup.style.border = '1px solid #ccc';
             popup.style.padding = '10px';
             popup.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
-            popup.style.minWidth = '200px';
 
-            document.body.appendChild(backdrop);
             document.body.appendChild(popup);
 
             const closeBtn = popup.querySelector('.close-global-note-popup');
-            closeBtn.addEventListener('click', () => {
-                popup.remove();
-                backdrop.remove();
-            });
+            closeBtn.addEventListener('click', () => popup.remove());
 
             const handleOutsideClick = (event) => {
                 if (!popup.contains(event.target) && !rowElement.contains(event.target)) {
                     popup.remove();
-                    backdrop.remove();
                     document.removeEventListener('click', handleOutsideClick);
                 }
             };
@@ -333,31 +315,14 @@ function showGlobalNotePopup(recordId, visitId, itemId, rowElement) {
                     <p>Error loading note: ${error.message}</p>
                 </div>
             `;
-
-            popup.style.position = 'fixed';
-            popup.style.top = '50%';
-            popup.style.left = '50%';
-            popup.style.transform = 'translate(-50%, -50%)';
-            popup.style.zIndex = '1000';
-            popup.style.background = '#fff';
-            popup.style.border = '1px solid #ccc';
-            popup.style.padding = '10px';
-            popup.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
-            popup.style.minWidth = '200px';
-
-            document.body.appendChild(backdrop);
             document.body.appendChild(popup);
 
             const closeBtn = popup.querySelector('.close-global-note-popup');
-            closeBtn.addEventListener('click', () => {
-                popup.remove();
-                backdrop.remove();
-            });
+            closeBtn.addEventListener('click', () => popup.remove());
 
             const handleOutsideClick = (event) => {
                 if (!popup.contains(event.target) && !rowElement.contains(event.target)) {
                     popup.remove();
-                    backdrop.remove();
                     document.removeEventListener('click', handleOutsideClick);
                 }
             };
@@ -370,15 +335,13 @@ window.onload = function () {
     const urlParams = new URLSearchParams(window.location.search);
     const recordId = urlParams.get('recordId');
     let visitId = urlParams.get('visitId');
-
     if (recordId) {
-        getPatientDetails(recordId, visitId).then(({ visits }) => {
+        if (!visitId && visits && visits.length > 0) {
+            visitId = visits[0][0]; // Use the most recent visitId if not provided
+            console.log('Using default visitId:', visitId);
+        }
+        getPatientDetails(recordId, visitId).then(() => {
             console.log(`Loaded data for recordId: ${recordId}, visitId: ${visitId}`);
-
-            if (!visitId && visits && visits.length > 0) {
-                visitId = visits[0][0];
-                console.log('Using default visitId:', visitId);
-            }
 
             const patientNotesContainer = document.getElementById('patientNotes');
             patientNotesContainer.addEventListener('click', (event) => {
@@ -393,11 +356,6 @@ window.onload = function () {
                     }
                 }
             });
-        }).catch(error => {
-            console.error('Failed to load patient details:', error);
-            document.getElementById('patientNotes').innerHTML = `
-                <div class="error-message">Error: Failed to load patient details.</div>
-            `;
         });
     } else {
         document.getElementById('patientNotes').innerHTML = `

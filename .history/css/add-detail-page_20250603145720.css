@@ -1103,6 +1103,7 @@ body {
     box-sizing: border-box; /* Include padding and border in width */
 }
 
+
 .medicine-table th, .medicine-table td {
     padding: 8px 12px;
     border: 1px solid #ddd;
@@ -1193,4 +1194,8 @@ body {
 
 .save-global-note-btn:hover {
     background: #0056b3;
+}
+.global-note-icon i {
+    font-size: 18px;
+    color: #333;
 }

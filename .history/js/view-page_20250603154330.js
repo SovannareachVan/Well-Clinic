@@ -13,7 +13,7 @@ async function getPatientDetails(recordId, visitId = null) {
 
         if (!snapshot.exists()) {
             patientNotesContainer.textContent = 'No patient records available.';
-            return { visits: [] };
+            return;
         }
 
         const patientData = snapshot.val();
@@ -79,7 +79,7 @@ async function getPatientDetails(recordId, visitId = null) {
         if (visits.length === 0) {
             outputHtml += `<div>មិនទាន់មានការចូលពិនិត្យ</div>`;
             patientNotesContainer.innerHTML = outputHtml;
-            return { visits };
+            return;
         }
 
         visits.sort((a, b) => {
@@ -103,7 +103,7 @@ async function getPatientDetails(recordId, visitId = null) {
                 console.error(`Visit ID ${visitId} not found.`);
                 outputHtml += `<div>Visit not found.</div>`;
                 patientNotesContainer.innerHTML = outputHtml;
-                return { visits };
+                return;
             }
 
             const visit = visitSnapshot.val();
@@ -122,30 +122,29 @@ async function getPatientDetails(recordId, visitId = null) {
                 isFirstVisit
             );
         } else {
-            const [currentVisitId, visit] = visits[0];
-            const infoRef = ref(db, `patients/${recordId}/visits/${currentVisitId}/information`);
-            const infoSnapshot = await get(infoRef);
-            const visitInfo = infoSnapshot.exists() ? infoSnapshot.val() : {};
+            for (const [currentVisitId, visit] of visits) {
+                const infoRef = ref(db, `patients/${recordId}/visits/${currentVisitId}/information`);
+                const infoSnapshot = await get(infoRef);
+                const visitInfo = infoSnapshot.exists() ? infoSnapshot.val() : {};
 
-            const isFirstVisit = visits.findIndex(v => v[0] === currentVisitId) === visits.length - 1;
-            outputHtml += generateVisitHtml(
-                `ព័ត៌មានពិនិត្យលើកទី ${visits.length - visits.findIndex(v => v[0] === currentVisitId)}`,
-                visit.checkIn,
-                visit.checkOut,
-                visit.clinic,
-                visit.doctor,
-                visitInfo,
-                isFirstVisit
-            );
+                const isFirstVisit = visits.findIndex(v => v[0] === currentVisitId) === visits.length - 1;
+                outputHtml += generateVisitHtml(
+                    `ព័ត៌មានពិនិត្យលើកទី ${visits.length - visits.findIndex(v => v[0] === currentVisitId)}`,
+                    visit.checkIn,
+                    visit.checkOut,
+                    visit.clinic,
+                    visit.doctor,
+                    visitInfo,
+                    isFirstVisit
+                );
+            }
         }
 
         patientNotesContainer.innerHTML = outputHtml;
-        return { visits };
 
     } catch (error) {
         console.error('Error loading patient data:', error);
         patientNotesContainer.textContent = 'Failed to load patient details.';
-        return { visits: [] };
     }
 }
 
@@ -211,14 +210,17 @@ function generateSecondVisitContent(info) {
 function generateMedicineTable(medicines) {
     console.log("Generating medicine table with data:", medicines);
 
+    // Handle different data structures for medicines
     let medicineArray = [];
     if (medicines) {
         if (Array.isArray(medicines)) {
+            // Backward compatibility for older data where medicines is an array
             medicineArray = medicines;
             console.log("Medicines is an array:", medicineArray);
         } else if (typeof medicines === 'object') {
-            medicineArray = Object.entries(medicines).map(([itemId, med]) => ({ ...med, itemId }));
-            console.log("Medicines is an object, converted to array with itemId:", medicineArray);
+            // New structure where medicines is an object with itemId keys
+            medicineArray = Object.values(medicines);
+            console.log("Medicines is an object, converted to array:", medicineArray);
         } else {
             console.warn("Unexpected medicines data type:", typeof medicines);
             return 'មិនទាន់បំពេញ';
@@ -244,7 +246,7 @@ function generateMedicineTable(medicines) {
                 <div class="medicine-col">ចំនួន</div>
             </div>
             ${medicineArray.map((med, index) => `
-                <div class="medicine-row" data-item-id="${med.itemId || ''}">
+                <div class="medicine-row">
                     <div class="medicine-col">${index + 1}.</div>
                     <div class="medicine-col">${med.name || ''}</div>
                     <div class="medicine-col">${med.dosage || ''}</div>
@@ -260,144 +262,13 @@ function generateMedicineTable(medicines) {
     `;
 }
 
-function showGlobalNotePopup(recordId, visitId, itemId, rowElement) {
-    // Create backdrop
-    const backdrop = document.createElement('div');
-    backdrop.classList.add('global-note-backdrop');
-    backdrop.style.position = 'fixed';
-    backdrop.style.top = '0';
-    backdrop.style.left = '0';
-    backdrop.style.width = '100%';
-    backdrop.style.height = '100%';
-    backdrop.style.background = 'rgba(0, 0, 0, 0.5)';
-    backdrop.style.zIndex = '999';
-
-    const popup = document.createElement('div');
-    popup.classList.add('global-note-popup');
-
-    if (!recordId || !visitId || !itemId) {
-        console.error('Missing required parameters:', { recordId, visitId, itemId });
-        popup.innerHTML = `
-            <div class="global-note-popup-content">
-                <span class="close-global-note-popup">×</span>
-                <h3>Note</h3>
-                <p>Error: Missing recordId, visitId, or itemId</p>
-            </div>
-        `;
-    } else {
-        const noteRef = ref(db, `patients/${recordId}/visits/${visitId}/information/medicines/${itemId}/globalNote`);
-        get(noteRef).then(snapshot => {
-            const globalNote = snapshot.exists() ? snapshot.val() : 'No global note available';
-            popup.innerHTML = `
-                <div class="global-note-popup-content">
-                    <span class="close-global-note-popup"></span>
-                    <h3>Note</h3>
-                    <p>${globalNote}</p>
-                </div>
-            `;
-
-            popup.style.position = 'fixed';
-            popup.style.top = '50%';
-            popup.style.left = '50%';
-            popup.style.transform = 'translate(-50%, -50%)';
-            popup.style.zIndex = '1000';
-            popup.style.background = '#fff';
-            popup.style.border = '1px solid #ccc';
-            popup.style.padding = '10px';
-            popup.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
-            popup.style.minWidth = '200px';
-
-            document.body.appendChild(backdrop);
-            document.body.appendChild(popup);
-
-            const closeBtn = popup.querySelector('.close-global-note-popup');
-            closeBtn.addEventListener('click', () => {
-                popup.remove();
-                backdrop.remove();
-            });
-
-            const handleOutsideClick = (event) => {
-                if (!popup.contains(event.target) && !rowElement.contains(event.target)) {
-                    popup.remove();
-                    backdrop.remove();
-                    document.removeEventListener('click', handleOutsideClick);
-                }
-            };
-            document.addEventListener('click', handleOutsideClick);
-        }).catch(error => {
-            console.error('Error fetching global note:', error);
-            popup.innerHTML = `
-                <div class="global-note-popup-content">
-                    <span class="close-global-note-popup">×</span>
-                    <h3>កំណត់ចំណាំសាកល</h3>
-                    <p>Error loading note: ${error.message}</p>
-                </div>
-            `;
-
-            popup.style.position = 'fixed';
-            popup.style.top = '50%';
-            popup.style.left = '50%';
-            popup.style.transform = 'translate(-50%, -50%)';
-            popup.style.zIndex = '1000';
-            popup.style.background = '#fff';
-            popup.style.border = '1px solid #ccc';
-            popup.style.padding = '10px';
-            popup.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
-            popup.style.minWidth = '200px';
-
-            document.body.appendChild(backdrop);
-            document.body.appendChild(popup);
-
-            const closeBtn = popup.querySelector('.close-global-note-popup');
-            closeBtn.addEventListener('click', () => {
-                popup.remove();
-                backdrop.remove();
-            });
-
-            const handleOutsideClick = (event) => {
-                if (!popup.contains(event.target) && !rowElement.contains(event.target)) {
-                    popup.remove();
-                    backdrop.remove();
-                    document.removeEventListener('click', handleOutsideClick);
-                }
-            };
-            document.addEventListener('click', handleOutsideClick);
-        });
-    }
-}
-
 window.onload = function () {
     const urlParams = new URLSearchParams(window.location.search);
     const recordId = urlParams.get('recordId');
-    let visitId = urlParams.get('visitId');
-
+    const visitId = urlParams.get('visitId');
     if (recordId) {
-        getPatientDetails(recordId, visitId).then(({ visits }) => {
+        getPatientDetails(recordId, visitId).then(() => {
             console.log(`Loaded data for recordId: ${recordId}, visitId: ${visitId}`);
-
-            if (!visitId && visits && visits.length > 0) {
-                visitId = visits[0][0];
-                console.log('Using default visitId:', visitId);
-            }
-
-            const patientNotesContainer = document.getElementById('patientNotes');
-            patientNotesContainer.addEventListener('click', (event) => {
-                const row = event.target.closest('.medicine-row');
-                if (row) {
-                    const itemId = row.dataset.itemId;
-                    console.log('Clicked row itemId:', itemId, 'recordId:', recordId, 'visitId:', visitId);
-                    if (itemId && recordId && visitId) {
-                        showGlobalNotePopup(recordId, visitId, itemId, row);
-                    } else {
-                        console.warn('Missing itemId, recordId, or visitId:', { itemId, recordId, visitId });
-                    }
-                }
-            });
-        }).catch(error => {
-            console.error('Failed to load patient details:', error);
-            document.getElementById('patientNotes').innerHTML = `
-                <div class="error-message">Error: Failed to load patient details.</div>
-            `;
         });
     } else {
         document.getElementById('patientNotes').innerHTML = `

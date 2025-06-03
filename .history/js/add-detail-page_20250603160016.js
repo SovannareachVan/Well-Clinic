@@ -535,7 +535,7 @@ window.showGlobalNotePopup = function () {
     popup.innerHTML = `
         <div class="global-note-popup-content">
             <span class="close-global-note-popup">×</span>
-            <h3>Note</h3>
+            <h3>កំណត់ចំណាំ</h3>
             <textarea class="global-note-input-textarea" placeholder="បញ្ចូលកំណត់ចំណាំនៅទីនេះ...">${existingNote}</textarea>
             <button class="save-global-note-btn">រក្សាទុក</button>
         </div>

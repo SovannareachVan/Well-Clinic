@@ -290,7 +290,7 @@ function showGlobalNotePopup(recordId, visitId, itemId, rowElement) {
             const globalNote = snapshot.exists() ? snapshot.val() : 'No global note available';
             popup.innerHTML = `
                 <div class="global-note-popup-content">
-                    <span class="close-global-note-popup"></span>
+                    <span class="close-global-note-popup">×</span>
                     <h3>Note</h3>
                     <p>${globalNote}</p>
                 </div>

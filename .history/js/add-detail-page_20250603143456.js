@@ -1,8 +1,7 @@
-
 import { db } from './firebase-config.js';
-import { ref, set, get, update, push, onValue, remove } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js';
+import { ref, set, get, update, push, onValue } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js';
 import { diagnosisOptions as note4Options } from './add-info-dropdown.js';
-import { medicineOptions as hardcodedMedicineOptions } from './medicine-dropdown.js';
+import { medicineOptions as hardcodedMedicineOptions } from './medicine-dropdown.js'; // Import hardcoded list
 
 // Function to initialize diagnosis dropdown
 function initDiagnosisDropdown() {
@@ -175,19 +174,15 @@ async function getPatientDetails(patientId, visitId = null) {
         document.getElementById('patientNote4').value = structuredNotes.diagnosis || '';
         document.getElementById('patientNote5').value = structuredNotes.note5 || '';
         const totalPriceValue = structuredNotes.totalPrice || '0.00';
-        document.getElementById('totalPriceValue').value = '$' + totalPriceValue;
+        document.getElementById('totalPriceValue').value = '$' + totalPriceValue; // Add $ symbol
 
         const ul = document.getElementById('medicineList');
         ul.innerHTML = '';
         if (structuredNotes.medicines) {
-            console.log("Loading medicines from Firebase:", structuredNotes.medicines);
-            Object.values(structuredNotes.medicines).forEach(med => {
-                console.log("Loading medicine item:", med);
+            structuredNotes.medicines.forEach(med => {
                 const li = addMedicineItem(med);
                 calculateTotals(li);
             });
-        } else {
-            console.log("No medicines found in Firebase for this visit.");
         }
     } catch (error) {
         console.error('Error fetching patient details:', error);
@@ -197,26 +192,16 @@ async function getPatientDetails(patientId, visitId = null) {
 // Function to save patient notes
 async function savePatientNotes(patientId, visitId = null) {
     const medicines = Array.from(document.querySelectorAll('.medicine-item')).map(item => ({
-        name: item.querySelector('.medicine-input').value || '',
-        dosage: item.querySelector('.dosage-select').value || '',
-        days: item.querySelector('.time-input').value || '',
-        morningDose: item.querySelector('.morning-dose').value || '',
-        afternoonDose: item.querySelector('.afternoon-dose').value || '',
-        eveningDose: item.querySelector('.evening-dose').value || '',
-        quantity: item.querySelector('.quantity-input').value || '',
-        retailPrice: item.querySelector('.retail-price-input').value || '',
-        totalPrice: item.querySelector('.total-price-input').value || '',
-        globalNote: item.querySelector('.medicine-table').dataset.globalNote || '',
-        itemId: item.querySelector('.medicine-table').dataset.itemId || ''
+        name: item.querySelector('.medicine-input').value,
+        dosage: item.querySelector('.dosage-select').value,
+        days: item.querySelector('.time-input').value,
+        morningDose: item.querySelector('.morning-dose').value,
+        afternoonDose: item.querySelector('.afternoon-dose').value,
+        eveningDose: item.querySelector('.evening-dose').value,
+        quantity: item.querySelector('.quantity-input').value,
+        retailPrice: item.querySelector('.retail-price-input').value,
+        totalPrice: item.querySelector('.total-price-input').value
     }));
-
-    console.log("Collected medicines from DOM:", medicines);
-
-    // Filter out incomplete medicine items (e.g., those without a name)
-    const validMedicines = medicines.filter(med => med.name.trim() !== '' && med.itemId);
-    if (validMedicines.length !== medicines.length) {
-        console.warn("Some medicine items were skipped due to missing name or itemId:", medicines.filter(med => !med.name.trim() || !med.itemId));
-    }
 
     const structuredNotes = {
         note1: document.getElementById('patientNote1').value.trim(),
@@ -224,8 +209,8 @@ async function savePatientNotes(patientId, visitId = null) {
         note3: document.getElementById('patientNote3').value.trim(),
         diagnosis: document.getElementById('patientNote4').value.trim(),
         note5: document.getElementById('patientNote5').value.trim(),
-        medicines: validMedicines,
-        totalPrice: document.getElementById('totalPriceValue').value.replace('$', '') || '0.00',
+        medicines,
+        totalPrice: document.getElementById('totalPriceValue').value || '0.00',
         createdAt: new Date().toISOString()
     };
 
@@ -241,35 +226,8 @@ async function savePatientNotes(patientId, visitId = null) {
             const visitsRef = ref(db, `patients/${patientId}/visits`);
             const newVisitRef = push(visitsRef);
             visitId = newVisitRef.key;
-            console.log("Generated new visitId:", visitId);
         }
-
-        // Save medicines with their itemId as the key
-        const medicinesRef = ref(db, `patients/${patientId}/visits/${visitId}/information/medicines`);
-        const medicinesData = {};
-        validMedicines.forEach(med => {
-            medicinesData[med.itemId] = {
-                name: med.name,
-                dosage: med.dosage,
-                days: med.days,
-                morningDose: med.morningDose,
-                afternoonDose: med.afternoonDose,
-                eveningDose: med.eveningDose,
-                quantity: med.quantity,
-                retailPrice: med.retailPrice,
-                totalPrice: med.totalPrice,
-                globalNote: med.globalNote
-            };
-        });
-
-        console.log("Prepared medicinesData for Firebase:", medicinesData);
-
-        await set(ref(db, `patients/${patientId}/visits/${visitId}/information`), {
-            ...structuredNotes,
-            medicines: medicinesData
-        });
-
-        console.log("Successfully saved data to Firebase at path:", `patients/${patientId}/visits/${visitId}/information`);
+        await set(ref(db, `patients/${patientId}/visits/${visitId}/information`), structuredNotes);
         alert('Notes saved successfully!');
         window.history.back();
     } catch (err) {
@@ -292,7 +250,7 @@ function initMedicineDropdown(parentElement) {
     // Fetch medicines only from Firebase
     const medicinesRef = ref(db, 'medicines');
     onValue(medicinesRef, (snapshot) => {
-        medicineOptions = [];
+        medicineOptions = []; // Reset the options array
         if (snapshot.exists()) {
             snapshot.forEach((childSnapshot) => {
                 const medicineData = childSnapshot.val();
@@ -358,9 +316,9 @@ function initMedicineDropdown(parentElement) {
             });
         }
     });
-}
-
+}      
 // Function to add a medicine item
+// Existing addMedicineItem function
 window.addMedicineItem = function (medicineData = null) {
     console.log("Adding medicine item");
     const ul = document.getElementById('medicineList');
@@ -371,12 +329,9 @@ window.addMedicineItem = function (medicineData = null) {
 
     const li = document.createElement('li');
     li.classList.add('medicine-item');
-    // Generate a unique ID for this medicine item
-    const itemId = 'medicine_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    li.dataset.itemId = itemId;
 
     li.innerHTML = `
-        <table class="medicine-table" data-item-id="${itemId}">
+        <table class="medicine-table">
             <thead>
                 <tr>
                     <th>ឈ្មោះថ្នាំ</th>
@@ -388,7 +343,7 @@ window.addMedicineItem = function (medicineData = null) {
                     <th>ចំនួន</th>
                     <th>តម្លៃរាយ</th>
                     <th>តម្លៃសរុប</th>
-                    <th><button class="global-note-icon"><i class="fa-solid fa-file"></i></button></th>
+                    <th>📝</th>
                 </tr>
             </thead>
             <tbody>
@@ -402,7 +357,7 @@ window.addMedicineItem = function (medicineData = null) {
                     <td>
                         <select class="dosage-select">
                             <option value="" selected disabled>...</option>
-                            <option value="ថ្នាំគ្រាប">ថ្នាំគ្រាប់</option>
+                            <option value="ថ្នាំគ្រាប់">ថ្នាំគ្រាប់</option>
                             <option value="អំពូល">អំពូល</option>
                             <option value="កញ្ចប់">កញ្ចប់</option>
                             <option value="បន្ទះ">បន្ទះ</option>
@@ -424,7 +379,7 @@ window.addMedicineItem = function (medicineData = null) {
                     </td>
                     <td>
                         <select class="dosage-select afternoon-dose">
-                            <option value="" selected disabled>...</option>
+                            <option value="" selected>...</option>
                             <option value="1/4">1/4</option>
                             <option value="1/2">1/2</option>
                             <option value="1">1</option>
@@ -437,7 +392,7 @@ window.addMedicineItem = function (medicineData = null) {
                     </td>
                     <td>
                         <select class="dosage-select evening-dose">
-                            <option value="" selected disabled>...</option>
+                            <option value="" selected>...</option>
                             <option value="1/4">1/4</option>
                             <option value="1/2">1/2</option>
                             <option value="1">1</option>
@@ -451,7 +406,7 @@ window.addMedicineItem = function (medicineData = null) {
                     <td><input type="text" class="quantity-input" readonly></td>
                     <td><input type="number" class="retail-price-input" placeholder="តម្លៃរាយ" min="0" step="0.01"></td>
                     <td><input type="text" class="total-price-input" readonly></td>
-                    <td><button class="btn-delete" onclick="window.deleteMedicineItem(this, '${itemId}')">❌</button></td>
+                    <td><button class="btn-delete" onclick="this.closest('li').remove()">❌</button></td>
                 </tr>
             </tbody>
         </table>
@@ -460,9 +415,7 @@ window.addMedicineItem = function (medicineData = null) {
     ul.appendChild(li);
     initMedicineDropdown(li);
 
-    // Load existing data if provided
     if (medicineData) {
-        console.log("Populating medicine item with data:", medicineData);
         li.querySelector('.medicine-input').value = medicineData.name || '';
         li.querySelector('.dosage-select').value = medicineData.dosage || '';
         li.querySelector('.time-input').value = medicineData.days || '';
@@ -472,7 +425,6 @@ window.addMedicineItem = function (medicineData = null) {
         li.querySelector('.quantity-input').value = medicineData.quantity || '';
         li.querySelector('.retail-price-input').value = medicineData.retailPrice || '';
         li.querySelector('.total-price-input').value = medicineData.totalPrice || '';
-        li.querySelector('.medicine-table').dataset.globalNote = medicineData.globalNote || '';
     }
 
     const daysInput = li.querySelector('.time-input');
@@ -485,106 +437,140 @@ window.addMedicineItem = function (medicineData = null) {
         if (elem) elem.addEventListener('change', () => calculateTotals(li));
     });
 
-    calculateTotals(li);
+    calculateTotals(li); // Ensure totals are calculated after adding
 
     return li;
 }
 
-// Function to delete a medicine item and its associated note
-window.deleteMedicineItem = function (button, itemId) {
-    const patientId = new URLSearchParams(window.location.search).get('patientId');
-    const visitId = new URLSearchParams(window.location.search).get('visitId');
-    if (patientId && visitId) {
-        const noteRef = ref(db, `patients/${patientId}/visits/${visitId}/information/medicines/${itemId}`);
-        remove(noteRef).then(() => {
-            console.log(`Successfully removed medicine item ${itemId} from Firebase`);
-        }).catch(error => {
-            console.error('Error removing medicine item from Firebase:', error);
-        });
-    }
-    button.closest('li').remove();
-};
-
 // Function to show the global note popup
 window.showGlobalNotePopup = function () {
-    const medicineTable = this.closest('.medicine-table');
-    const itemId = medicineTable.dataset.itemId;
-    const patientId = new URLSearchParams(window.location.search).get('patientId');
-    const visitId = new URLSearchParams(window.location.search).get('visitId');
-
-    // Fetch existing note from Firebase
+    // Get the existing global note (if any) from the hidden input or default to empty
+    const medicineTable = document.querySelector('.medicine-table');
     let existingNote = medicineTable.dataset.globalNote || '';
-    if (patientId && visitId && itemId) {
-        const noteRef = ref(db, `patients/${patientId}/visits/${visitId}/information/medicines/${itemId}/globalNote`);
-        get(noteRef).then(snapshot => {
-            if (snapshot.exists()) {
-                existingNote = snapshot.val();
-                medicineTable.dataset.globalNote = existingNote;
-                noteTextarea.value = existingNote; // Update textarea if note is fetched after popup creation
-                console.log(`Loaded global note for item ${itemId}:`, existingNote);
-            } else {
-                console.log(`No global note found in Firebase for item ${itemId}`);
-            }
-        }).catch(error => {
-            console.error('Error fetching note from Firebase:', error);
-        });
-    }
 
+    // Create the popup element
     const popup = document.createElement('div');
     popup.classList.add('global-note-popup');
     popup.innerHTML = `
         <div class="global-note-popup-content">
             <span class="close-global-note-popup">×</span>
-            <h3>Note</h3>
+            <h3>កំណត់ចំណាំសាកល</h3>
             <textarea class="global-note-input-textarea" placeholder="បញ្ចូលកំណត់ចំណាំនៅទីនេះ...">${existingNote}</textarea>
             <button class="save-global-note-btn">រក្សាទុក</button>
         </div>
     `;
 
+    // Append the popup to the body
     document.body.appendChild(popup);
 
+    // Close the popup when clicking the close button
     const closeBtn = popup.querySelector('.close-global-note-popup');
     closeBtn.addEventListener('click', () => {
         popup.remove();
     });
 
+    // Close the popup when clicking outside
     const handleOutsideClick = (event) => {
-        if (!popup.contains(event.target) && !event.target.closest('.global-note-icon')) {
+        if (!popup.contains(event.target) && !event.target.closest('th').textContent.includes('📝')) {
             popup.remove();
             document.removeEventListener('click', handleOutsideClick);
         }
     };
     document.addEventListener('click', handleOutsideClick);
 
+    // Save the note when clicking the save button
     const saveBtn = popup.querySelector('.save-global-note-btn');
     const noteTextarea = popup.querySelector('.global-note-input-textarea');
     saveBtn.addEventListener('click', () => {
         const noteText = noteTextarea.value.trim();
-        medicineTable.dataset.globalNote = noteText;
-
-        // Save note to Firebase
-        if (patientId && visitId && itemId) {
-            const noteRef = ref(db, `patients/${patientId}/visits/${visitId}/information/medicines/${itemId}/globalNote`);
-            set(noteRef, noteText).then(() => {
-                console.log(`Successfully saved global note for item ${itemId}:`, noteText);
-            }).catch(error => {
-                console.error('Error saving note to Firebase:', error);
-            });
-        }
-
+        medicineTable.dataset.globalNote = noteText; // Store the note in the table's dataset
         popup.remove();
     });
 };
 
-// Add event listener for the note icon in the thead using event delegation
+// Add event listener for the note icon in the thead
 document.addEventListener('DOMContentLoaded', () => {
-    document.addEventListener('click', (event) => {
-        const noteIcon = event.target.closest('.global-note-icon');
-        if (noteIcon) {
-            showGlobalNotePopup.call(noteIcon);
-        }
-    });
+    const noteIcon = document.querySelector('.medicine-table thead th:last-child');
+    if (noteIcon) {
+        noteIcon.addEventListener('click', showGlobalNotePopup);
+    }
 });
+
+// Add styles for the popup
+const styleSheet = document.createElement('style');
+styleSheet.textContent = `
+    .global-note-popup {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+    .global-note-popup-content {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        width: 400px;
+        max-width: 90%;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        position: relative;
+    }
+    .close-global-note-popup {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 24px;
+        cursor: pointer;
+        color: #666;
+    }
+    .close-global-note-popup:hover {
+        color: #000;
+    }
+    .global-note-popup-content h3 {
+        margin: 0 0 15px 0;
+        font-size: 18px;
+        color: #333;
+        text-align: center;
+    }
+    .global-note-input-textarea {
+        width: 100%;
+        height: 120px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        resize: vertical;
+        font-size: 14px;
+        color: #333;
+        box-sizing: border-box;
+    }
+    .global-note-input-textarea:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+    }
+    .save-global-note-btn {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        margin-top: 15px;
+        background: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+    .save-global-note-btn:hover {
+        background: #0056b3;
+    }
+`;
+document.head.appendChild(styleSheet);
 
 // Function to update medicine list display with scrollbar
 function updateMedicineListDisplay() {
@@ -596,8 +582,9 @@ function updateMedicineListDisplay() {
         const medicineItems = ul.querySelectorAll('.medicine-item');
         const maxVisibleItems = 5;
         medicineItems.forEach((item, index) => {
-            item.style.display = 'table-row';
+            item.style.display = 'table-row'; // Ensure all items are visible
         });
+        // Enable horizontal scrolling if needed
         container.style.overflowX = 'auto';
         container.style.whiteSpace = 'nowrap';
         container.style.maxWidth = '100%';
@@ -663,11 +650,11 @@ function showTotalPricePopup() {
         okButton.textContent = 'OK';
         okButton.onclick = () => {
             const checkboxes = table.querySelectorAll('input[type="checkbox"]:checked');
-            selectedTotal = 0;
+            selectedTotal = 0; // Reset to calculate new total
             checkboxes.forEach(checkbox => {
                 selectedTotal += parseFloat(checkbox.dataset.total);
             });
-            total.value = selectedTotal.toFixed(2);
+            total.value = selectedTotal.toFixed(2); // Update the input value on screen
             popup.remove();
         };
         popup.appendChild(table);
@@ -722,7 +709,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     addMedicineItem();
-    updateMedicineListDisplay();
+    updateMedicineListDisplay(); // Initialize scrollbar
+
     document.addEventListener('click', event => {
         const note4Input = document.getElementById('patientNote4');
         const note4Dropdown = document.getElementById('note4-dropdown');

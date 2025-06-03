@@ -180,14 +180,10 @@ async function getPatientDetails(patientId, visitId = null) {
         const ul = document.getElementById('medicineList');
         ul.innerHTML = '';
         if (structuredNotes.medicines) {
-            console.log("Loading medicines from Firebase:", structuredNotes.medicines);
             Object.values(structuredNotes.medicines).forEach(med => {
-                console.log("Loading medicine item:", med);
                 const li = addMedicineItem(med);
                 calculateTotals(li);
             });
-        } else {
-            console.log("No medicines found in Firebase for this visit.");
         }
     } catch (error) {
         console.error('Error fetching patient details:', error);
@@ -197,26 +193,18 @@ async function getPatientDetails(patientId, visitId = null) {
 // Function to save patient notes
 async function savePatientNotes(patientId, visitId = null) {
     const medicines = Array.from(document.querySelectorAll('.medicine-item')).map(item => ({
-        name: item.querySelector('.medicine-input').value || '',
-        dosage: item.querySelector('.dosage-select').value || '',
-        days: item.querySelector('.time-input').value || '',
-        morningDose: item.querySelector('.morning-dose').value || '',
-        afternoonDose: item.querySelector('.afternoon-dose').value || '',
-        eveningDose: item.querySelector('.evening-dose').value || '',
-        quantity: item.querySelector('.quantity-input').value || '',
-        retailPrice: item.querySelector('.retail-price-input').value || '',
-        totalPrice: item.querySelector('.total-price-input').value || '',
+        name: item.querySelector('.medicine-input').value,
+        dosage: item.querySelector('.dosage-select').value,
+        days: item.querySelector('.time-input').value,
+        morningDose: item.querySelector('.morning-dose').value,
+        afternoonDose: item.querySelector('.afternoon-dose').value,
+        eveningDose: item.querySelector('.evening-dose').value,
+        quantity: item.querySelector('.quantity-input').value,
+        retailPrice: item.querySelector('.retail-price-input').value,
+        totalPrice: item.querySelector('.total-price-input').value,
         globalNote: item.querySelector('.medicine-table').dataset.globalNote || '',
-        itemId: item.querySelector('.medicine-table').dataset.itemId || ''
+        itemId: item.querySelector('.medicine-table').dataset.itemId
     }));
-
-    console.log("Collected medicines from DOM:", medicines);
-
-    // Filter out incomplete medicine items (e.g., those without a name)
-    const validMedicines = medicines.filter(med => med.name.trim() !== '' && med.itemId);
-    if (validMedicines.length !== medicines.length) {
-        console.warn("Some medicine items were skipped due to missing name or itemId:", medicines.filter(med => !med.name.trim() || !med.itemId));
-    }
 
     const structuredNotes = {
         note1: document.getElementById('patientNote1').value.trim(),
@@ -224,7 +212,7 @@ async function savePatientNotes(patientId, visitId = null) {
         note3: document.getElementById('patientNote3').value.trim(),
         diagnosis: document.getElementById('patientNote4').value.trim(),
         note5: document.getElementById('patientNote5').value.trim(),
-        medicines: validMedicines,
+        medicines,
         totalPrice: document.getElementById('totalPriceValue').value.replace('$', '') || '0.00',
         createdAt: new Date().toISOString()
     };
@@ -241,13 +229,12 @@ async function savePatientNotes(patientId, visitId = null) {
             const visitsRef = ref(db, `patients/${patientId}/visits`);
             const newVisitRef = push(visitsRef);
             visitId = newVisitRef.key;
-            console.log("Generated new visitId:", visitId);
         }
 
         // Save medicines with their itemId as the key
         const medicinesRef = ref(db, `patients/${patientId}/visits/${visitId}/information/medicines`);
         const medicinesData = {};
-        validMedicines.forEach(med => {
+        medicines.forEach(med => {
             medicinesData[med.itemId] = {
                 name: med.name,
                 dosage: med.dosage,
@@ -262,14 +249,11 @@ async function savePatientNotes(patientId, visitId = null) {
             };
         });
 
-        console.log("Prepared medicinesData for Firebase:", medicinesData);
-
         await set(ref(db, `patients/${patientId}/visits/${visitId}/information`), {
             ...structuredNotes,
             medicines: medicinesData
         });
 
-        console.log("Successfully saved data to Firebase at path:", `patients/${patientId}/visits/${visitId}/information`);
         alert('Notes saved successfully!');
         window.history.back();
     } catch (err) {
@@ -460,19 +444,9 @@ window.addMedicineItem = function (medicineData = null) {
     ul.appendChild(li);
     initMedicineDropdown(li);
 
-    // Load existing data if provided
-    if (medicineData) {
-        console.log("Populating medicine item with data:", medicineData);
-        li.querySelector('.medicine-input').value = medicineData.name || '';
-        li.querySelector('.dosage-select').value = medicineData.dosage || '';
-        li.querySelector('.time-input').value = medicineData.days || '';
-        li.querySelector('.morning-dose').value = medicineData.morningDose || '';
-        li.querySelector('.afternoon-dose').value = medicineData.afternoonDose || '';
-        li.querySelector('.evening-dose').value = medicineData.eveningDose || '';
-        li.querySelector('.quantity-input').value = medicineData.quantity || '';
-        li.querySelector('.retail-price-input').value = medicineData.retailPrice || '';
-        li.querySelector('.total-price-input').value = medicineData.totalPrice || '';
-        li.querySelector('.medicine-table').dataset.globalNote = medicineData.globalNote || '';
+    // Load existing note from medicineData if provided
+    if (medicineData && medicineData.globalNote) {
+        li.querySelector('.medicine-table').dataset.globalNote = medicineData.globalNote;
     }
 
     const daysInput = li.querySelector('.time-input');
@@ -496,9 +470,7 @@ window.deleteMedicineItem = function (button, itemId) {
     const visitId = new URLSearchParams(window.location.search).get('visitId');
     if (patientId && visitId) {
         const noteRef = ref(db, `patients/${patientId}/visits/${visitId}/information/medicines/${itemId}`);
-        remove(noteRef).then(() => {
-            console.log(`Successfully removed medicine item ${itemId} from Firebase`);
-        }).catch(error => {
+        remove(noteRef).catch(error => {
             console.error('Error removing medicine item from Firebase:', error);
         });
     }
@@ -521,9 +493,6 @@ window.showGlobalNotePopup = function () {
                 existingNote = snapshot.val();
                 medicineTable.dataset.globalNote = existingNote;
                 noteTextarea.value = existingNote; // Update textarea if note is fetched after popup creation
-                console.log(`Loaded global note for item ${itemId}:`, existingNote);
-            } else {
-                console.log(`No global note found in Firebase for item ${itemId}`);
             }
         }).catch(error => {
             console.error('Error fetching note from Firebase:', error);
@@ -535,7 +504,7 @@ window.showGlobalNotePopup = function () {
     popup.innerHTML = `
         <div class="global-note-popup-content">
             <span class="close-global-note-popup">×</span>
-            <h3>Note</h3>
+            <h3>កំណត់ចំណាំសាកល</h3>
             <textarea class="global-note-input-textarea" placeholder="បញ្ចូលកំណត់ចំណាំនៅទីនេះ...">${existingNote}</textarea>
             <button class="save-global-note-btn">រក្សាទុក</button>
         </div>
@@ -565,9 +534,7 @@ window.showGlobalNotePopup = function () {
         // Save note to Firebase
         if (patientId && visitId && itemId) {
             const noteRef = ref(db, `patients/${patientId}/visits/${visitId}/information/medicines/${itemId}/globalNote`);
-            set(noteRef, noteText).then(() => {
-                console.log(`Successfully saved global note for item ${itemId}:`, noteText);
-            }).catch(error => {
+            set(noteRef, noteText).catch(error => {
                 console.error('Error saving note to Firebase:', error);
             });
         }

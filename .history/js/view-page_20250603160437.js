@@ -261,17 +261,6 @@ function generateMedicineTable(medicines) {
 }
 
 function showGlobalNotePopup(recordId, visitId, itemId, rowElement) {
-    // Create backdrop
-    const backdrop = document.createElement('div');
-    backdrop.classList.add('global-note-backdrop');
-    backdrop.style.position = 'fixed';
-    backdrop.style.top = '0';
-    backdrop.style.left = '0';
-    backdrop.style.width = '100%';
-    backdrop.style.height = '100%';
-    backdrop.style.background = 'rgba(0, 0, 0, 0.5)';
-    backdrop.style.zIndex = '999';
-
     const popup = document.createElement('div');
     popup.classList.add('global-note-popup');
 
@@ -280,7 +269,7 @@ function showGlobalNotePopup(recordId, visitId, itemId, rowElement) {
         popup.innerHTML = `
             <div class="global-note-popup-content">
                 <span class="close-global-note-popup">×</span>
-                <h3>Note</h3>
+                <h3>កំណត់ចំណាំសាកល</h3>
                 <p>Error: Missing recordId, visitId, or itemId</p>
             </div>
         `;
@@ -290,36 +279,40 @@ function showGlobalNotePopup(recordId, visitId, itemId, rowElement) {
             const globalNote = snapshot.exists() ? snapshot.val() : 'No global note available';
             popup.innerHTML = `
                 <div class="global-note-popup-content">
-                    <span class="close-global-note-popup"></span>
+                    <span class="close-global-note-popup">×</span>
                     <h3>Note</h3>
                     <p>${globalNote}</p>
                 </div>
             `;
 
-            popup.style.position = 'fixed';
-            popup.style.top = '50%';
-            popup.style.left = '50%';
-            popup.style.transform = 'translate(-50%, -50%)';
+            const rect = rowElement.getBoundingClientRect();
+            const popupWidth = 200; // Approximate width of the popup for calculation
+            let leftPos = rect.right + window.scrollX + 5; // Position to the right of the row
+
+            // Adjust if popup exceeds viewport width
+            const viewportWidth = window.innerWidth;
+            if (leftPos + popupWidth > viewportWidth) {
+                leftPos = rect.left + window.scrollX - popupWidth - 5; // Move to the left side if it overflows
+            }
+
+            popup.style.position = 'absolute';
+            popup.style.top = `${rect.top + window.scrollY}px`; // Align with the top of the row
+            popup.style.left = `${leftPos}px`;
             popup.style.zIndex = '1000';
             popup.style.background = '#fff';
             popup.style.border = '1px solid #ccc';
             popup.style.padding = '10px';
             popup.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
-            popup.style.minWidth = '200px';
+            popup.style.minWidth = '200px'; // Ensure consistent width
 
-            document.body.appendChild(backdrop);
             document.body.appendChild(popup);
 
             const closeBtn = popup.querySelector('.close-global-note-popup');
-            closeBtn.addEventListener('click', () => {
-                popup.remove();
-                backdrop.remove();
-            });
+            closeBtn.addEventListener('click', () => popup.remove());
 
             const handleOutsideClick = (event) => {
                 if (!popup.contains(event.target) && !rowElement.contains(event.target)) {
                     popup.remove();
-                    backdrop.remove();
                     document.removeEventListener('click', handleOutsideClick);
                 }
             };
@@ -333,31 +326,14 @@ function showGlobalNotePopup(recordId, visitId, itemId, rowElement) {
                     <p>Error loading note: ${error.message}</p>
                 </div>
             `;
-
-            popup.style.position = 'fixed';
-            popup.style.top = '50%';
-            popup.style.left = '50%';
-            popup.style.transform = 'translate(-50%, -50%)';
-            popup.style.zIndex = '1000';
-            popup.style.background = '#fff';
-            popup.style.border = '1px solid #ccc';
-            popup.style.padding = '10px';
-            popup.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
-            popup.style.minWidth = '200px';
-
-            document.body.appendChild(backdrop);
             document.body.appendChild(popup);
 
             const closeBtn = popup.querySelector('.close-global-note-popup');
-            closeBtn.addEventListener('click', () => {
-                popup.remove();
-                backdrop.remove();
-            });
+            closeBtn.addEventListener('click', () => popup.remove());
 
             const handleOutsideClick = (event) => {
                 if (!popup.contains(event.target) && !rowElement.contains(event.target)) {
                     popup.remove();
-                    backdrop.remove();
                     document.removeEventListener('click', handleOutsideClick);
                 }
             };
@@ -376,7 +352,7 @@ window.onload = function () {
             console.log(`Loaded data for recordId: ${recordId}, visitId: ${visitId}`);
 
             if (!visitId && visits && visits.length > 0) {
-                visitId = visits[0][0];
+                visitId = visits[0][0]; // Use the most recent visitId if not provided
                 console.log('Using default visitId:', visitId);
             }
 
