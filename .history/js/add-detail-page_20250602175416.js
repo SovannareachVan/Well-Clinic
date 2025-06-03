@@ -247,10 +247,10 @@ function initMedicineDropdown(parentElement) {
 
     let medicineOptions = [];
 
-    // Fetch medicines only from Firebase
+    // Fetch medicines from the global medicines node and combine with hardcoded list
     const medicinesRef = ref(db, 'medicines');
     onValue(medicinesRef, (snapshot) => {
-        medicineOptions = []; // Reset the options array
+        medicineOptions = [...hardcodedMedicineOptions]; // Start with hardcoded medicines
         if (snapshot.exists()) {
             snapshot.forEach((childSnapshot) => {
                 const medicineData = childSnapshot.val();
@@ -316,7 +316,8 @@ function initMedicineDropdown(parentElement) {
             });
         }
     });
-}      
+}
+
 // Function to add a medicine item
 window.addMedicineItem = function (medicineData = null) {
     console.log("Adding medicine item");
@@ -594,4 +595,4 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-});
+});.

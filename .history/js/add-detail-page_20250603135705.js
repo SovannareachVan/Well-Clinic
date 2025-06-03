@@ -316,7 +316,7 @@ function initMedicineDropdown(parentElement) {
             });
         }
     });
-}      
+}   
 // Function to add a medicine item
 window.addMedicineItem = function (medicineData = null) {
     console.log("Adding medicine item");
