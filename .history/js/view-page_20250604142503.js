@@ -123,21 +123,12 @@ async function getPatientDetails(recordId, visitId = null) {
                 visitId
             );
         } else {
-            // Fetch all visit information concurrently
-            const visitInfoPromises = visits.map(([currentVisitId, visit], index) => {
+            // Display all visits
+            visits.forEach(([currentVisitId, visit], index) => {
                 const infoRef = ref(db, `patients/${recordId}/visits/${currentVisitId}/information`);
-                return get(infoRef).then(infoSnapshot => ({
-                    visitId: currentVisitId,
-                    visit,
-                    visitInfo: infoSnapshot.exists() ? infoSnapshot.val() : {},
-                    index
-                }));
-            });
+                const infoSnapshot = get(infoRef);
+                const visitInfo = infoSnapshot.exists() ? infoSnapshot.val() : {};
 
-            const visitInfos = await Promise.all(visitInfoPromises);
-
-            // Generate HTML for each visit
-            visitInfos.forEach(({ visitId, visit, visitInfo, index }) => {
                 const isFirstVisit = index === visits.length - 1;
                 outputHtml += generateVisitHtml(
                     `ព័ត៌មានពិនិត្យលើកទី ${visits.length - index}`,
@@ -147,7 +138,7 @@ async function getPatientDetails(recordId, visitId = null) {
                     visit.doctor,
                     visitInfo,
                     isFirstVisit,
-                    visitId
+                    currentVisitId
                 );
             });
         }
@@ -167,7 +158,7 @@ function generateVisitHtml(title, checkIn, checkOut, clinic, doctor, info, isFir
     const checkOutDisplay = checkOut && checkOut !== 'N/A' && isValidDate(checkOut) ? checkOut : 'N/A';
 
     return `
-        <div class="visit-note" data-visit-id="${visitId}">
+        <div class="visit-note">
             <div class="visit-note-header">
                 <h3>${title}</h3>
                 <div class="visit-meta">
@@ -255,6 +246,7 @@ function generateMedicineTable(medicines) {
                 <div class="medicine-col">ថ្ងៃ</div>
                 <div class="medicine-col">ល្ងាច</div>
                 <div class="medicine-col">ចំនួន</div>
+                <div class="medicine-col">កំណត់ចំណាំ</div>
             </div>
             ${medicineArray.map((med, index) => `
                 <div class="medicine-row" data-item-id="${med.itemId || ''}">
@@ -266,6 +258,9 @@ function generateMedicineTable(medicines) {
                     <div class="medicine-col">${med.afternoonDose || ''}</div>
                     <div class="medicine-col">${med.eveningDose || ''}</div>
                     <div class="medicine-col">${med.quantity || ''}</div>
+                    <div class="medicine-col">
+                        ${med.globalNote ? `<button class="global-note-icon" title="View Note"><i class="fa-solid fa-file"></i></button>` : 'N/A'}
+                    </div>
                 </div>
             `).join('')}
         </div>
@@ -292,7 +287,7 @@ function showGlobalNotePopup(recordId, visitId, itemId, rowElement) {
         console.error('Missing required parameters:', { recordId, visitId, itemId });
         popup.innerHTML = `
             <div class="global-note-popup-content">
-                <span class="close-global-note-popup"></span>
+                <span class="close-global-note-popup">×</span>
                 <h3>Note</h3>
                 <p>Error: Missing recordId, visitId, or itemId</p>
             </div>
@@ -303,7 +298,7 @@ function showGlobalNotePopup(recordId, visitId, itemId, rowElement) {
             const globalNote = snapshot.exists() ? snapshot.val() : 'No global note available';
             popup.innerHTML = `
                 <div class="global-note-popup-content">
-                    <span class="close-global-note-popup"></span>
+                    <span class="close-global-note-popup">×</span>
                     <h3>Note</h3>
                     <p>${globalNote}</p>
                 </div>
@@ -341,7 +336,7 @@ function showGlobalNotePopup(recordId, visitId, itemId, rowElement) {
             console.error('Error fetching global note:', error);
             popup.innerHTML = `
                 <div class="global-note-popup-content">
-                    <span class="close-global-note-popup"></span>
+                    <span class="close-global-note-popup">×</span>
                     <h3>កំណត់ចំណាំសាកល</h3>
                     <p>Error loading note: ${error.message}</p>
                 </div>

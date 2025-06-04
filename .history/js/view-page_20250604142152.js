@@ -1,3 +1,4 @@
+
 import { db } from './firebase-config.js';
 import { ref, get } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js';
 
@@ -110,46 +111,32 @@ async function getPatientDetails(recordId, visitId = null) {
             const infoSnapshot = await get(infoRef);
             const visitInfo = infoSnapshot.exists() ? infoSnapshot.val() : {};
 
-            const visitIndex = visits.findIndex(v => v[0] === visitId);
-            const isFirstVisit = visitIndex === visits.length - 1;
+            const isFirstVisit = visits.findIndex(v => v[0] === visitId) === visits.length - 1;
             outputHtml += generateVisitHtml(
-                `ព័ត៌មានពិនិត្យលើកទី ${visits.length - visitIndex}`,
+                'ព័ត៌មានពិនិត្យ',
                 visit.checkIn,
                 visit.checkOut,
                 visit.clinic,
                 visit.doctor,
                 visitInfo,
-                isFirstVisit,
-                visitId
+                isFirstVisit
             );
         } else {
-            // Fetch all visit information concurrently
-            const visitInfoPromises = visits.map(([currentVisitId, visit], index) => {
-                const infoRef = ref(db, `patients/${recordId}/visits/${currentVisitId}/information`);
-                return get(infoRef).then(infoSnapshot => ({
-                    visitId: currentVisitId,
-                    visit,
-                    visitInfo: infoSnapshot.exists() ? infoSnapshot.val() : {},
-                    index
-                }));
-            });
+            const [currentVisitId, visit] = visits[0];
+            const infoRef = ref(db, `patients/${recordId}/visits/${currentVisitId}/information`);
+            const infoSnapshot = await get(infoRef);
+            const visitInfo = infoSnapshot.exists() ? infoSnapshot.val() : {};
 
-            const visitInfos = await Promise.all(visitInfoPromises);
-
-            // Generate HTML for each visit
-            visitInfos.forEach(({ visitId, visit, visitInfo, index }) => {
-                const isFirstVisit = index === visits.length - 1;
-                outputHtml += generateVisitHtml(
-                    `ព័ត៌មានពិនិត្យលើកទី ${visits.length - index}`,
-                    visit.checkIn,
-                    visit.checkOut,
-                    visit.clinic,
-                    visit.doctor,
-                    visitInfo,
-                    isFirstVisit,
-                    visitId
-                );
-            });
+            const isFirstVisit = visits.findIndex(v => v[0] === currentVisitId) === visits.length - 1;
+            outputHtml += generateVisitHtml(
+                `ព័ត៌មានពិនិត្យលើកទី ${visits.length - visits.findIndex(v => v[0] === currentVisitId)}`,
+                visit.checkIn,
+                visit.checkOut,
+                visit.clinic,
+                visit.doctor,
+                visitInfo,
+                isFirstVisit
+            );
         }
 
         patientNotesContainer.innerHTML = outputHtml;
@@ -162,12 +149,12 @@ async function getPatientDetails(recordId, visitId = null) {
     }
 }
 
-function generateVisitHtml(title, checkIn, checkOut, clinic, doctor, info, isFirstVisit = false, visitId) {
+function generateVisitHtml(title, checkIn, checkOut, clinic, doctor, info, isFirstVisit = false) {
     const checkInDisplay = checkIn && checkIn !== 'N/A' && isValidDate(checkIn) ? checkIn : 'N/A';
     const checkOutDisplay = checkOut && checkOut !== 'N/A' && isValidDate(checkOut) ? checkOut : 'N/A';
 
     return `
-        <div class="visit-note" data-visit-id="${visitId}">
+        <div class="visit-note">
             <div class="visit-note-header">
                 <h3>${title}</h3>
                 <div class="visit-meta">
@@ -203,9 +190,9 @@ function isValidDate(dateStr) {
 
 function generateFirstVisitContent(info) {
     return `
-        <div class="note-item"><strong>សញ្ញាណតម្អូញ:</strong> ${info.note1 || info.treatmentHistory || 'មិនទាន់បំពេញ'}</div>
-        <div class="note-item"><strong>ប្រវត្តិព្យាបាល:</strong> ${info.note2 || info.treatmentHistory || 'មិនទាន់បំពេញ'}</div>
-        <div class="note-item"><strong>តេស្តមន្ទីពិសោធន៍:</strong> ${info.note3 || info.labTest || 'មិនទាន់បំពេញ'}</div>
+        <div class="note-item"><strong>សញ្ញាណតម្អូញ:</strong> ${info.note1 || 'មិនទាន់បំពេញ'}</div>
+        <div class="note-item"><strong>ប្រវត្តិព្យាបាល:</strong> ${info.note2 || 'មិនទាន់បំពេញ'}</div>
+        <div class="note-item"><strong>តេស្តមន្ទីពិសោធន៍:</strong> ${info.note3 || 'មិនទាន់បំពេញ'}</div>
         <div class="note-item"><strong>រោគវិនិច្ឆ័យ:</strong> ${info.diagnosis || 'មិនទាន់បំពេញ'}</div>
         <div class="note-item"><strong>រោគវិនិច្ឆ័យញែក:</strong> ${info.note5 || 'មិនទាន់បំពេញ'}</div>
         <div class="note-item"><strong>របៀបប្រើប្រាស់ថ្នាំ:</strong> ${info.medicines ? generateMedicineTable(info.medicines) : 'មិនទាន់បំពេញ'}</div>
@@ -214,8 +201,8 @@ function generateFirstVisitContent(info) {
 
 function generateSecondVisitContent(info) {
     return `
-        <div class="note-item"><strong>ប្រវត្តិព្យាបាល:</strong> ${info.treatmentHistory || info.note2 || 'មិនទាន់បំពេញ'}</div>
-        <div class="note-item"><strong>តេស្តមន្ទីពិសោធន៍:</strong> ${info.labTest || info.note3 || 'មិនទាន់បំពេញ'}</div>
+        <div class="note-item"><strong>ប្រវត្តិព្យាបាល:</strong> ${info.treatmentHistory || 'មិនទាន់បំពេញ'}</div>
+        <div class="note-item"><strong>តេស្តមន្ទីពិសោធន៍:</strong> ${info.labTest || 'មិនទាន់បំពេញ'}</div>
         <div class="note-item"><strong>រោគវិនិច្ឆ័យ:</strong> ${info.diagnosis || 'មិនទាន់បំពេញ'}</div>
         <div class="note-item"><strong>របៀបប្រើប្រាស់ថ្នាំ:</strong> ${info.medicines ? generateMedicineTable(info.medicines) : 'មិនទាន់បំពេញ'}</div>
     `;
@@ -292,7 +279,7 @@ function showGlobalNotePopup(recordId, visitId, itemId, rowElement) {
         console.error('Missing required parameters:', { recordId, visitId, itemId });
         popup.innerHTML = `
             <div class="global-note-popup-content">
-                <span class="close-global-note-popup"></span>
+                <span class="close-global-note-popup">×</span>
                 <h3>Note</h3>
                 <p>Error: Missing recordId, visitId, or itemId</p>
             </div>
@@ -341,7 +328,7 @@ function showGlobalNotePopup(recordId, visitId, itemId, rowElement) {
             console.error('Error fetching global note:', error);
             popup.innerHTML = `
                 <div class="global-note-popup-content">
-                    <span class="close-global-note-popup"></span>
+                    <span class="close-global-note-popup">×</span>
                     <h3>កំណត់ចំណាំសាកល</h3>
                     <p>Error loading note: ${error.message}</p>
                 </div>
@@ -398,16 +385,11 @@ window.onload = function () {
                 const row = event.target.closest('.medicine-row');
                 if (row) {
                     const itemId = row.dataset.itemId;
-                    console.log('Clicked row itemId:', itemId, 'recordId:', recordId, 'visitId:', row.closest('.visit-note').dataset.visitId || visitId);
-                    if (itemId && recordId) {
-                        const effectiveVisitId = row.closest('.visit-note').dataset.visitId || visitId;
-                        if (effectiveVisitId) {
-                            showGlobalNotePopup(recordId, effectiveVisitId, itemId, row);
-                        } else {
-                            console.warn('No visitId available for this row');
-                        }
+                    console.log('Clicked row itemId:', itemId, 'recordId:', recordId, 'visitId:', visitId);
+                    if (itemId && recordId && visitId) {
+                        showGlobalNotePopup(recordId, visitId, itemId, row);
                     } else {
-                        console.warn('Missing itemId or recordId:', { itemId, recordId });
+                        console.warn('Missing itemId, recordId, or visitId:', { itemId, recordId, visitId });
                     }
                 }
             });

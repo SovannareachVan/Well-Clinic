@@ -255,6 +255,7 @@ function generateMedicineTable(medicines) {
                 <div class="medicine-col">ថ្ងៃ</div>
                 <div class="medicine-col">ល្ងាច</div>
                 <div class="medicine-col">ចំនួន</div>
+                <div class="medicine-col">កំណត់ចំណាំ</div>
             </div>
             ${medicineArray.map((med, index) => `
                 <div class="medicine-row" data-item-id="${med.itemId || ''}">
@@ -266,6 +267,7 @@ function generateMedicineTable(medicines) {
                     <div class="medicine-col">${med.afternoonDose || ''}</div>
                     <div class="medicine-col">${med.eveningDose || ''}</div>
                     <div class="medicine-col">${med.quantity || ''}</div>
+
                 </div>
             `).join('')}
         </div>
@@ -303,7 +305,7 @@ function showGlobalNotePopup(recordId, visitId, itemId, rowElement) {
             const globalNote = snapshot.exists() ? snapshot.val() : 'No global note available';
             popup.innerHTML = `
                 <div class="global-note-popup-content">
-                    <span class="close-global-note-popup"></span>
+                    <span class="close-global-note-popup">×</span>
                     <h3>Note</h3>
                     <p>${globalNote}</p>
                 </div>

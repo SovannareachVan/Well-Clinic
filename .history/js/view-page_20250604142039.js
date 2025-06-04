@@ -95,6 +95,7 @@ async function getPatientDetails(recordId, visitId = null) {
             return dateB - dateA;
         });
 
+        // If a specific visitId is provided, display only that visit
         if (visitId) {
             const visitRef = ref(db, `patients/${recordId}/visits/${visitId}`);
             const visitSnapshot = await get(visitRef);
@@ -119,25 +120,15 @@ async function getPatientDetails(recordId, visitId = null) {
                 visit.clinic,
                 visit.doctor,
                 visitInfo,
-                isFirstVisit,
-                visitId
+                isFirstVisit
             );
         } else {
-            // Fetch all visit information concurrently
-            const visitInfoPromises = visits.map(([currentVisitId, visit], index) => {
+            // Display all visits
+            visits.forEach(([currentVisitId, visit], index) => {
                 const infoRef = ref(db, `patients/${recordId}/visits/${currentVisitId}/information`);
-                return get(infoRef).then(infoSnapshot => ({
-                    visitId: currentVisitId,
-                    visit,
-                    visitInfo: infoSnapshot.exists() ? infoSnapshot.val() : {},
-                    index
-                }));
-            });
+                const infoSnapshot = get(infoRef);
+                const visitInfo = infoSnapshot.exists() ? infoSnapshot.val() : {};
 
-            const visitInfos = await Promise.all(visitInfoPromises);
-
-            // Generate HTML for each visit
-            visitInfos.forEach(({ visitId, visit, visitInfo, index }) => {
                 const isFirstVisit = index === visits.length - 1;
                 outputHtml += generateVisitHtml(
                     `ព័ត៌មានពិនិត្យលើកទី ${visits.length - index}`,
@@ -146,8 +137,7 @@ async function getPatientDetails(recordId, visitId = null) {
                     visit.clinic,
                     visit.doctor,
                     visitInfo,
-                    isFirstVisit,
-                    visitId
+                    isFirstVisit
                 );
             });
         }
@@ -162,12 +152,12 @@ async function getPatientDetails(recordId, visitId = null) {
     }
 }
 
-function generateVisitHtml(title, checkIn, checkOut, clinic, doctor, info, isFirstVisit = false, visitId) {
+function generateVisitHtml(title, checkIn, checkOut, clinic, doctor, info, isFirstVisit = false) {
     const checkInDisplay = checkIn && checkIn !== 'N/A' && isValidDate(checkIn) ? checkIn : 'N/A';
     const checkOutDisplay = checkOut && checkOut !== 'N/A' && isValidDate(checkOut) ? checkOut : 'N/A';
 
     return `
-        <div class="visit-note" data-visit-id="${visitId}">
+        <div class="visit-note">
             <div class="visit-note-header">
                 <h3>${title}</h3>
                 <div class="visit-meta">
@@ -255,6 +245,7 @@ function generateMedicineTable(medicines) {
                 <div class="medicine-col">ថ្ងៃ</div>
                 <div class="medicine-col">ល្ងាច</div>
                 <div class="medicine-col">ចំនួន</div>
+                <div class="medicine-col">កំណត់ចំណាំ</div>
             </div>
             ${medicineArray.map((med, index) => `
                 <div class="medicine-row" data-item-id="${med.itemId || ''}">
@@ -266,6 +257,9 @@ function generateMedicineTable(medicines) {
                     <div class="medicine-col">${med.afternoonDose || ''}</div>
                     <div class="medicine-col">${med.eveningDose || ''}</div>
                     <div class="medicine-col">${med.quantity || ''}</div>
+                    <div class="medicine-col">
+                        ${med.globalNote ? `<button class="global-note-icon" title="View Note"><i class="fa-solid fa-file"></i></button>` : 'N/A'}
+                    </div>
                 </div>
             `).join('')}
         </div>
@@ -292,7 +286,7 @@ function showGlobalNotePopup(recordId, visitId, itemId, rowElement) {
         console.error('Missing required parameters:', { recordId, visitId, itemId });
         popup.innerHTML = `
             <div class="global-note-popup-content">
-                <span class="close-global-note-popup"></span>
+                <span class="close-global-note-popup">×</span>
                 <h3>Note</h3>
                 <p>Error: Missing recordId, visitId, or itemId</p>
             </div>
@@ -303,7 +297,7 @@ function showGlobalNotePopup(recordId, visitId, itemId, rowElement) {
             const globalNote = snapshot.exists() ? snapshot.val() : 'No global note available';
             popup.innerHTML = `
                 <div class="global-note-popup-content">
-                    <span class="close-global-note-popup"></span>
+                    <span class="close-global-note-popup">×</span>
                     <h3>Note</h3>
                     <p>${globalNote}</p>
                 </div>
@@ -341,7 +335,7 @@ function showGlobalNotePopup(recordId, visitId, itemId, rowElement) {
             console.error('Error fetching global note:', error);
             popup.innerHTML = `
                 <div class="global-note-popup-content">
-                    <span class="close-global-note-popup"></span>
+                    <span class="close-global-note-popup">×</span>
                     <h3>កំណត់ចំណាំសាកល</h3>
                     <p>Error loading note: ${error.message}</p>
                 </div>
@@ -382,35 +376,11 @@ function showGlobalNotePopup(recordId, visitId, itemId, rowElement) {
 window.onload = function () {
     const urlParams = new URLSearchParams(window.location.search);
     const recordId = urlParams.get('recordId');
-    let visitId = urlParams.get('visitId');
+    const visitId = urlParams.get('visitId');
 
     if (recordId) {
         getPatientDetails(recordId, visitId).then(({ visits }) => {
             console.log(`Loaded data for recordId: ${recordId}, visitId: ${visitId}`);
-
-            if (!visitId && visits && visits.length > 0) {
-                visitId = visits[0][0];
-                console.log('Using default visitId:', visitId);
-            }
-
-            const patientNotesContainer = document.getElementById('patientNotes');
-            patientNotesContainer.addEventListener('click', (event) => {
-                const row = event.target.closest('.medicine-row');
-                if (row) {
-                    const itemId = row.dataset.itemId;
-                    console.log('Clicked row itemId:', itemId, 'recordId:', recordId, 'visitId:', row.closest('.visit-note').dataset.visitId || visitId);
-                    if (itemId && recordId) {
-                        const effectiveVisitId = row.closest('.visit-note').dataset.visitId || visitId;
-                        if (effectiveVisitId) {
-                            showGlobalNotePopup(recordId, effectiveVisitId, itemId, row);
-                        } else {
-                            console.warn('No visitId available for this row');
-                        }
-                    } else {
-                        console.warn('Missing itemId or recordId:', { itemId, recordId });
-                    }
-                }
-            });
         }).catch(error => {
             console.error('Failed to load patient details:', error);
             document.getElementById('patientNotes').innerHTML = `

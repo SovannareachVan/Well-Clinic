@@ -1,5 +1,5 @@
 import { db } from './firebase-config.js';
-import { ref, get, set, push, onValue, remove } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js';
+import { ref, get, set, push, onValue } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js';
 import { diagnosisOptions } from './add-info-dropdown.js';
 import { medicineOptions as hardcodedMedicineOptions } from './medicine-dropdown.js'; // Import hardcoded list
 
@@ -271,7 +271,6 @@ function initMedicineDropdown(parentElement) {
 
 // Function to add a medicine item
 window.addMedicineItem = function (medicineData = null, forceAdd = true) {
-    console.log("Adding medicine item");
     const ul = document.getElementById('medicineList');
     if (!ul) {
         console.error("Error: 'medicineList' element not found!");
@@ -280,12 +279,9 @@ window.addMedicineItem = function (medicineData = null, forceAdd = true) {
 
     const li = document.createElement('li');
     li.classList.add('medicine-item');
-    // Generate a unique ID for this medicine item
-    const itemId = 'medicine_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    li.dataset.itemId = itemId;
 
     li.innerHTML = `
-        <table class="medicine-table" data-item-id="${itemId}">
+        <table class="medicine-table">
             <thead>
                 <tr>
                     <th>ឈ្មោះថ្នាំ</th>
@@ -294,10 +290,10 @@ window.addMedicineItem = function (medicineData = null, forceAdd = true) {
                     <th>ព្រឹក</th>
                     <th>ថ្ងៃ</th>
                     <th>ល្ងាច</th>
-                    <th>ចំនួន</th>
+                    <th>ចំនួនថ្នាំ</th>
                     <th>តម្លៃរាយ</th>
                     <th>តម្លៃសរុប</th>
-                    <th><button class="global-note-icon"><i class="fa-solid fa-file"></i></button></th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -311,7 +307,7 @@ window.addMedicineItem = function (medicineData = null, forceAdd = true) {
                     <td>
                         <select class="dosage-select">
                             <option value="" selected disabled>...</option>
-                            <option value="ថ្នាំគ្រាប">ថ្នាំគ្រាប់</option>
+                            <option value="ថ្នាំគ្រាប់">ថ្នាំគ្រាប់</option>
                             <option value="អំពូល">អំពូល</option>
                             <option value="កញ្ចប់">កញ្ចប់</option>
                             <option value="បន្ទះ">បន្ទះ</option>
@@ -333,7 +329,7 @@ window.addMedicineItem = function (medicineData = null, forceAdd = true) {
                     </td>
                     <td>
                         <select class="dosage-select afternoon-dose">
-                            <option value="" selected disabled>...</option>
+                            <option value="" selected>...</option>
                             <option value="1/4">1/4</option>
                             <option value="1/2">1/2</option>
                             <option value="1">1</option>
@@ -346,7 +342,7 @@ window.addMedicineItem = function (medicineData = null, forceAdd = true) {
                     </td>
                     <td>
                         <select class="dosage-select evening-dose">
-                            <option value="" selected disabled>...</option>
+                            <option value="" selected>...</option>
                             <option value="1/4">1/4</option>
                             <option value="1/2">1/2</option>
                             <option value="1">1</option>
@@ -360,7 +356,7 @@ window.addMedicineItem = function (medicineData = null, forceAdd = true) {
                     <td><input type="text" class="quantity-input" readonly></td>
                     <td><input type="number" class="retail-price-input" placeholder="តម្លៃរាយ" min="0" step="0.01"></td>
                     <td><input type="text" class="total-price-input" readonly></td>
-                    <td><button class="btn-delete" onclick="window.deleteMedicineItem(this, '${itemId}')">❌</button></td>
+                    <td><button class="btn-delete" onclick="this.closest('li').remove()">❌</button></td>
                 </tr>
             </tbody>
         </table>
@@ -369,9 +365,7 @@ window.addMedicineItem = function (medicineData = null, forceAdd = true) {
     ul.appendChild(li);
     initMedicineDropdown(li);
 
-    // Load existing data if provided
     if (medicineData) {
-        console.log("Populating medicine item with data:", medicineData);
         li.querySelector('.medicine-input').value = medicineData.name || '';
         li.querySelector('.dosage-select').value = medicineData.dosage || '';
         li.querySelector('.time-input').value = medicineData.days || '';
@@ -381,7 +375,7 @@ window.addMedicineItem = function (medicineData = null, forceAdd = true) {
         li.querySelector('.quantity-input').value = medicineData.quantity || '';
         li.querySelector('.retail-price-input').value = medicineData.retailPrice || '';
         li.querySelector('.total-price-input').value = medicineData.totalPrice || '';
-        li.querySelector('.medicine-table').dataset.globalNote = medicineData.globalNote || '';
+        calculateTotals(li);
     }
 
     const daysInput = li.querySelector('.time-input');
@@ -394,100 +388,12 @@ window.addMedicineItem = function (medicineData = null, forceAdd = true) {
         if (elem) elem.addEventListener('change', () => calculateTotals(li));
     });
 
-    calculateTotals(li);
-
     medicinesInitialized = true;
 
     // Update display to show only last 5 items
     updateMedicineListDisplay();
 
     return li;
-};
-
-// Function to delete a medicine item and its associated note
-window.deleteMedicineItem = function (button, itemId) {
-    const patientId = new URLSearchParams(window.location.search).get('patientId');
-    const visitId = new URLSearchParams(window.location.search).get('visitId');
-    if (patientId && visitId) {
-        const noteRef = ref(db, `patients/${patientId}/visits/${visitId}/information/medicines/${itemId}`);
-        remove(noteRef).then(() => {
-            console.log(`Successfully removed medicine item ${itemId} from Firebase`);
-        }).catch(error => {
-            console.error('Error removing medicine item from Firebase:', error);
-        });
-    }
-    button.closest('li').remove();
-};
-
-// Function to show the global note popup
-window.showGlobalNotePopup = function () {
-    const medicineTable = this.closest('.medicine-table');
-    const itemId = medicineTable.dataset.itemId;
-    const patientId = new URLSearchParams(window.location.search).get('patientId');
-    const visitId = new URLSearchParams(window.location.search).get('visitId');
-
-    // Fetch existing note from Firebase
-    let existingNote = medicineTable.dataset.globalNote || '';
-    if (patientId && visitId && itemId) {
-        const noteRef = ref(db, `patients/${patientId}/visits/${visitId}/information/medicines/${itemId}/globalNote`);
-        get(noteRef).then(snapshot => {
-            if (snapshot.exists()) {
-                existingNote = snapshot.val();
-                medicineTable.dataset.globalNote = existingNote;
-                noteTextarea.value = existingNote; // Update textarea if note is fetched after popup creation
-                console.log(`Loaded global note for item ${itemId}:`, existingNote);
-            } else {
-                console.log(`No global note found in Firebase for item ${itemId}`);
-            }
-        }).catch(error => {
-            console.error('Error fetching note from Firebase:', error);
-        });
-    }
-
-    const popup = document.createElement('div');
-    popup.classList.add('global-note-popup');
-    popup.innerHTML = `
-        <div class="global-note-popup-content">
-            <span class="close-global-note-popup">×</span>
-            <h3>Note</h3>
-            <textarea class="global-note-input-textarea" placeholder="បញ្ចូលកំណត់ចំណាំនៅទីនេះ...">${existingNote}</textarea>
-            <button class="save-global-note-btn">រក្សាទុក</button>
-        </div>
-    `;
-
-    document.body.appendChild(popup);
-
-    const closeBtn = popup.querySelector('.close-global-note-popup');
-    closeBtn.addEventListener('click', () => {
-        popup.remove();
-    });
-
-    const handleOutsideClick = (event) => {
-        if (!popup.contains(event.target) && !event.target.closest('.global-note-icon')) {
-            popup.remove();
-            document.removeEventListener('click', handleOutsideClick);
-        }
-    };
-    document.addEventListener('click', handleOutsideClick);
-
-    const saveBtn = popup.querySelector('.save-global-note-btn');
-    const noteTextarea = popup.querySelector('.global-note-input-textarea');
-    saveBtn.addEventListener('click', () => {
-        const noteText = noteTextarea.value.trim();
-        medicineTable.dataset.globalNote = noteText;
-
-        // Save note to Firebase
-        if (patientId && visitId && itemId) {
-            const noteRef = ref(db, `patients/${patientId}/visits/${visitId}/information/medicines/${itemId}/globalNote`);
-            set(noteRef, noteText).then(() => {
-                console.log(`Successfully saved global note for item ${itemId}:`, noteText);
-            }).catch(error => {
-                console.error('Error saving note to Firebase:', error);
-            });
-        }
-
-        popup.remove();
-    });
 };
 
 // Function to update medicine list display
@@ -580,9 +486,7 @@ async function savePatientInformation() {
         eveningDose: item.querySelector('.evening-dose').value,
         quantity: item.querySelector('.quantity-input').value,
         retailPrice: item.querySelector('.retail-price-input').value,
-        totalPrice: item.querySelector('.total-price-input').value,
-        globalNote: item.querySelector('.medicine-table').dataset.globalNote || '',
-        itemId: item.querySelector('.medicine-table').dataset.itemId || ''
+        totalPrice: item.querySelector('.total-price-input').value
     })).filter(med => med.name && med.dosage && med.days);
 
     const patientInfo = {
@@ -596,29 +500,7 @@ async function savePatientInformation() {
 
     try {
         const visitInfoRef = ref(db, `patients/${patientId}/visits/${visitId}/information`);
-        // Save medicines with their itemId as the key
-        const medicinesData = {};
-        medicines.forEach(med => {
-            if (med.itemId) {
-                medicinesData[med.itemId] = {
-                    name: med.name,
-                    dosage: med.dosage,
-                    days: med.days,
-                    morningDose: med.morningDose,
-                    afternoonDose: med.afternoonDose,
-                    eveningDose: med.eveningDose,
-                    quantity: med.quantity,
-                    retailPrice: med.retailPrice,
-                    totalPrice: med.totalPrice,
-                    globalNote: med.globalNote
-                };
-            }
-        });
-
-        await set(visitInfoRef, {
-            ...patientInfo,
-            medicines: medicinesData
-        });
+        await set(visitInfoRef, patientInfo);
         alert('ព័ត៌មានត្រូវបានរក្សាទុកដោយជោគជ័យ!');
         window.history.back();
     } catch (error) {
@@ -640,11 +522,8 @@ async function displayVisitInfo(patientId, info, isNewVisit) {
 
     const medicineList = document.getElementById('medicineList');
     medicineList.innerHTML = '';
-    if (info?.medicines && Object.keys(info.medicines).length > 0) {
-        Object.entries(info.medicines).forEach(([itemId, med]) => {
-            const li = addMedicineItem(med, true);
-            if (li) li.querySelector('.medicine-table').dataset.itemId = itemId;
-        });
+    if (info?.medicines && info.medicines.length > 0) {
+        info.medicines.forEach(med => addMedicineItem(med, true));
     } else {
         addMedicineItem(null, true);
     }
@@ -713,14 +592,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (event.target.matches('.total-price-section button')) {
             event.stopPropagation();
             showTotalPricePopup();
-        }
-    });
-
-    // Add event listener for the note icon in the thead using event delegation
-    document.addEventListener('click', (event) => {
-        const noteIcon = event.target.closest('.global-note-icon');
-        if (noteIcon) {
-            showGlobalNotePopup.call(noteIcon);
         }
     });
 
