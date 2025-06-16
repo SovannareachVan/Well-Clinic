@@ -24,7 +24,7 @@ function isValidDateString(dateStr) {
     if (!dateStr || dateStr === 'N/A') return false;
     const [day, month, year] = dateStr.split('/').map(num => parseInt(num, 10));
     if (isNaN(day) || isNaN(month) || isNaN(year)) return false;
-    if (day < 1 || day > 31 || month < 1 || month > 12 || year < 1900 || year > new Date().getFullYear() + 10) return false;
+    if (day < 1 || day > 31 || month < 1 || month > 12 || year < 1900 || year > new Date().getFullYear()) return false;
     const date = new Date(year, month - 1, day);
     return !isNaN(date.getTime());
 }
@@ -52,7 +52,7 @@ function combineDateTime(day, month, year, time) {
     const yearNum = parseInt(year, 10);
 
     if (isNaN(dayNum) || isNaN(monthNum) || isNaN(yearNum)) return null;
-    if (dayNum < 1 || dayNum > 31 || monthNum < 0 || monthNum > 11 || yearNum < 1900 || yearNum > new Date().getFullYear() + 10) return null;
+    if (dayNum < 1 || dayNum > 31 || monthNum < 0 || monthNum > 11 || yearNum < 1900 || yearNum > new Date().getFullYear()) return null;
 
     const date = new Date(yearNum, monthNum, dayNum);
     if (isNaN(date.getTime())) return null;
@@ -313,8 +313,8 @@ function setupDateInputs(cell) {
 
     yearInput.addEventListener('change', () => {
         let year = parseInt(yearInput.value) || 0;
-        if (year < 1900 || year > new Date().getFullYear() + 10) {
-            alert(`Year must be between 1900 and ${new Date().getFullYear() + 10}`);
+        if (year < 1900 || year > new Date().getFullYear()) {
+            alert(`Year must be between 1900 and ${new Date().getFullYear()}`);
             yearInput.value = '';
         } else {
             yearInput.value = year.toString().padStart(4, '0');
@@ -349,7 +349,8 @@ function checkIn() {
     const visitId = push(ref(db, `patients/${patientId}/visits`)).key;
     newRow.dataset.visitId = visitId;
 
-    const { timeStr } = formatDateTime(new Date());
+    const { dateStr, timeStr } = formatDateTime(new Date());
+    const [day, month, year] = dateStr.split('/');
 
     const serialCell = newRow.insertCell(0);
     serialCell.textContent = rowCount++;
@@ -357,9 +358,9 @@ function checkIn() {
     const checkInCell = newRow.insertCell(1);
     checkInCell.innerHTML = `
         <div class="date-inputs">
-            <input type="text" class="day-input" placeholder="DD" maxlength="2" size="2">/
-            <input type="text" class="month-input" placeholder="MM" maxlength="2" size="2">/
-            <input type="text" class="year-input" placeholder="YYYY" maxlength="4" size="4">
+            <input type="text" class="day-input" value="${day}" placeholder="DD" maxlength="2" size="2">/
+            <input type="text" class="month-input" value="${month}" placeholder="MM" maxlength="2" size="2">/
+            <input type="text" class="year-input" value="${year}" placeholder="YYYY" maxlength="4" size="4">
             <span class="time-display">${timeStr}</span>
         </div>
     `;
@@ -422,12 +423,15 @@ function checkIn() {
     actionCell.appendChild(checkOutBtn);
     actionCell.appendChild(viewBtn);
 
+    const checkInDateTime = combineDateTime(day, month, year, timeStr);
     const visitData = {
-        checkIn: 'N/A',
+        checkIn: checkInDateTime || 'N/A',
         checkOut: 'N/A',
         clinic: clinicSelect.value,
         doctor: 'Dr. Minh Hong'
     };
+
+    console.log(`Saving new visit ${visitId} with data:`, visitData);
 
     withRetry(() => set(ref(db, `patients/${patientId}/visits/${visitId}`), visitData))
         .then(() => console.log('New visit saved:', visitId, visitData))
@@ -438,12 +442,21 @@ function checkOutAction(row) {
     const visitId = row.dataset.visitId;
     if (!visitId || !patientId) return;
 
-    const { timeStr } = formatDateTime(new Date());
+    const { dateStr, timeStr } = formatDateTime(new Date());
+    const [day, month, year] = dateStr.split('/');
     
     const checkOutCell = row.cells[2];
     const checkOutInputs = checkOutCell.querySelector('.date-inputs');
     const timeDisplay = checkOutInputs.querySelector('.time-display');
     timeDisplay.textContent = timeStr;
+
+    const checkOutDayInput = checkOutInputs.querySelector('.day-input');
+    const checkOutMonthInput = checkOutInputs.querySelector('.month-input');
+    const checkOutYearInput = checkOutInputs.querySelector('.year-input');
+
+    checkOutDayInput.value = day;
+    checkOutMonthInput.value = month;
+    checkOutYearInput.value = year;
 
     const checkInCell = row.cells[1];
     const checkInInputs = checkInCell.querySelector('.date-inputs');
@@ -452,15 +465,11 @@ function checkOutAction(row) {
     const checkInYear = checkInInputs.querySelector('.year-input').value.trim();
     const checkInTime = checkInInputs.querySelector('.time-display').textContent;
 
-    const checkOutDayInput = checkOutInputs.querySelector('.day-input').value.trim();
-    const checkOutMonthInput = checkOutInputs.querySelector('.month-input').value.trim();
-    const checkOutYearInput = checkOutInputs.querySelector('.year-input').value.trim();
-
     const checkInDateTime = combineDateTime(checkInDay, checkInMonth, checkInYear, checkInTime);
-    const checkOutDateTime = combineDateTime(checkOutDayInput, checkOutMonthInput, checkOutYearInput, timeStr);
+    const checkOutDateTime = combineDateTime(checkOutDayInput.value, checkOutMonthInput.value, checkOutYearInput.value, timeStr);
 
     if (!checkInDateTime || !checkOutDateTime) {
-        alert('Please enter valid check-in and check-out dates.');
+        alert('Invalid check-in or check-out date.');
         timeDisplay.textContent = 'N/A';
         return;
     }
@@ -471,6 +480,9 @@ function checkOutAction(row) {
     if (checkInDate && checkOutDate && checkOutDate <= checkInDate) {
         alert('Check-out date must be after check-in date.');
         timeDisplay.textContent = 'N/A';
+        checkOutDayInput.value = '';
+        checkOutMonthInput.value = '';
+        checkOutYearInput.value = '';
         return;
     }
 

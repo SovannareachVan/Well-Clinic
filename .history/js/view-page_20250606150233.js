@@ -101,36 +101,39 @@ async function getPatientDetails(recordId, visitId = null) {
             }
             if (isNaN(dateA.getTime())) {
                 console.warn(`Invalid checkIn date for visit ${a[0]}:`, checkInA);
-                return 1;
+                return -1;
             }
             if (isNaN(dateB.getTime())) {
                 console.warn(`Invalid checkIn date for visit ${b[0]}:`, checkInB);
-                return -1;
+                return 1;
             }
 
-            return dateA - dateB; // Oldest to newest
+            return dateB - dateA; // Newest to oldest
         });
 
         console.log("Visits data after sorting:", visits.map(([visitId, visit]) => ({ visitId, checkIn: visit.checkIn, checkOut: visit.checkOut })));
 
         if (visitId) {
-            const visitIndex = visits.findIndex(v => v[0] === visitId);
-            if (visitIndex === -1) {
-                console.error(`Visit ID ${visitId} not found in sorted visits.`);
+            const visitRef = ref(db, `patients/${recordId}/visits/${visitId}`);
+            const visitSnapshot = await get(visitRef);
+            if (!visitSnapshot.exists()) {
+                console.error(`Visit ID ${visitId} not found.`);
                 outputHtml += `<div>Visit not found.</div>`;
                 patientNotesContainer.innerHTML = outputHtml;
                 return { visits };
             }
 
-            const [currentVisitId, visit] = visits[visitIndex];
-            const infoRef = ref(db, `patients/${recordId}/visits/${currentVisitId}/information`);
+            const visit = visitSnapshot.val();
+            console.log(`Visit data for ${visitId}:`, visit);
+            const infoRef = ref(db, `patients/${recordId}/visits/${visitId}/information`);
             const infoSnapshot = await get(infoRef);
             const visitInfo = infoSnapshot.exists() ? infoSnapshot.val() : {};
-            console.log(`Visit info for ${currentVisitId}:`, visitInfo);
+            console.log(`Visit info for ${visitId}:`, visitInfo);
 
-            const isFirstVisit = visitIndex === 0;
-            const visitNumber = visitIndex + 1;
-            console.log(`Rendering visit ${currentVisitId} as "ព័ត៌មានពិនិត្យលើកទី ${visitNumber}" with checkIn: ${visit.checkIn}, checkOut: ${visit.checkOut}`);
+            const visitIndex = visits.findIndex(v => v[0] === visitId);
+            const isFirstVisit = visitIndex === visits.length - 1;
+            const visitNumber = visits.length - visitIndex;
+            console.log(`Rendering visit ${visitId} as "ព័ត៌មានពិនិត្យលើកទី ${visitNumber}" with checkIn: ${visit.checkIn}, checkOut: ${visit.checkOut}`);
             outputHtml += generateVisitHtml(
                 `ព័ត៌មានពិនិត្យលើកទី ${visitNumber}`,
                 visit.checkIn,
@@ -139,7 +142,7 @@ async function getPatientDetails(recordId, visitId = null) {
                 visit.doctor,
                 visitInfo,
                 isFirstVisit,
-                currentVisitId
+                visitId
             );
         } else {
             const visitInfoPromises = visits.map(([currentVisitId, visit], index) => {
@@ -166,8 +169,8 @@ async function getPatientDetails(recordId, visitId = null) {
             const visitInfos = await Promise.all(visitInfoPromises);
 
             visitInfos.forEach(({ visitId, visit, visitInfo, index }) => {
-                const isFirstVisit = index === 0;
-                const visitNumber = index + 1; // Ensures 1, 2, 3 from oldest to newest
+                const isFirstVisit = index === visits.length - 1;
+                const visitNumber = visits.length - index; // Ensures 1, 2, 3 from newest to oldest
                 try {
                     console.log(`Rendering visit ${visitId} as "ព័ត៌មានពិនិត្យលើកទី ${visitNumber}" with checkIn: ${visit.checkIn}, checkOut: ${visit.checkOut}`);
                     outputHtml += generateVisitHtml(
@@ -200,7 +203,6 @@ async function getPatientDetails(recordId, visitId = null) {
 function generateVisitHtml(title, checkIn, checkOut, clinic, doctor, info, isFirstVisit = false, visitId) {
     const checkInDisplay = checkIn && isValidDate(checkIn) ? checkIn : 'N/A';
     const checkOutDisplay = checkOut && isValidDate(checkOut) ? checkOut : 'N/A';
-    console.log(`Generating HTML for visit ${visitId}: checkInDisplay=${checkInDisplay}, checkOutDisplay=${checkOutDisplay}`);
 
     return `
         <div class="visit-note" data-visit-id="${visitId}">

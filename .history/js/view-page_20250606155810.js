@@ -101,14 +101,14 @@ async function getPatientDetails(recordId, visitId = null) {
             }
             if (isNaN(dateA.getTime())) {
                 console.warn(`Invalid checkIn date for visit ${a[0]}:`, checkInA);
-                return 1;
+                return -1;
             }
             if (isNaN(dateB.getTime())) {
                 console.warn(`Invalid checkIn date for visit ${b[0]}:`, checkInB);
-                return -1;
+                return 1;
             }
 
-            return dateA - dateB; // Oldest to newest
+            return dateB - dateA; // Newest to oldest
         });
 
         console.log("Visits data after sorting:", visits.map(([visitId, visit]) => ({ visitId, checkIn: visit.checkIn, checkOut: visit.checkOut })));
@@ -128,8 +128,8 @@ async function getPatientDetails(recordId, visitId = null) {
             const visitInfo = infoSnapshot.exists() ? infoSnapshot.val() : {};
             console.log(`Visit info for ${currentVisitId}:`, visitInfo);
 
-            const isFirstVisit = visitIndex === 0;
-            const visitNumber = visitIndex + 1;
+            const isFirstVisit = visitIndex === visits.length - 1;
+            const visitNumber = visits.length - visitIndex;
             console.log(`Rendering visit ${currentVisitId} as "ព័ត៌មានពិនិត្យលើកទី ${visitNumber}" with checkIn: ${visit.checkIn}, checkOut: ${visit.checkOut}`);
             outputHtml += generateVisitHtml(
                 `ព័ត៌មានពិនិត្យលើកទី ${visitNumber}`,
@@ -166,8 +166,8 @@ async function getPatientDetails(recordId, visitId = null) {
             const visitInfos = await Promise.all(visitInfoPromises);
 
             visitInfos.forEach(({ visitId, visit, visitInfo, index }) => {
-                const isFirstVisit = index === 0;
-                const visitNumber = index + 1; // Ensures 1, 2, 3 from oldest to newest
+                const isFirstVisit = index === visits.length - 1;
+                const visitNumber = visits.length - index; // Ensures 1, 2, 3 from newest to oldest
                 try {
                     console.log(`Rendering visit ${visitId} as "ព័ត៌មានពិនិត្យលើកទី ${visitNumber}" with checkIn: ${visit.checkIn}, checkOut: ${visit.checkOut}`);
                     outputHtml += generateVisitHtml(

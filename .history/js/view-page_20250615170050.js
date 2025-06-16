@@ -362,7 +362,7 @@ function showGlobalNotePopup(recordId, visitId, itemId, rowElement) {
         popup.innerHTML = `
             <div class="global-note-popup-content">
                 <span class="close-global-note-popup">×</span>
-                <h3>កំណត់ចំណាំសាកល</h3>
+                <h3>កំណត់ចំណ</h3>
                 <p>Error loading note: ${error.message}</p>
             </div>
         `;

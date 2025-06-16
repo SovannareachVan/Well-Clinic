@@ -4,10 +4,6 @@ import { ref, get } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-data
 async function getPatientDetails(recordId, visitId = null) {
     console.log("Fetching patient data for ID:", recordId, "Visit ID:", visitId);
     const patientNotesContainer = document.getElementById('patientNotes');
-    if (!patientNotesContainer) {
-        console.error("patientNotes container not found in DOM.");
-        return { visits: [] };
-    }
     patientNotesContainer.innerHTML = '<div class="loading">Loading...</div>';
 
     try {
@@ -74,8 +70,7 @@ async function getPatientDetails(recordId, visitId = null) {
         }
 
         const visits = patientData.visits ? Object.entries(patientData.visits).filter(([_, visit]) => visit && typeof visit === 'object') : [];
-        console.log("Visits data before sorting:", visits.map(([visitId, visit]) => ({ visitId, checkIn: visit.checkIn, checkOut: visit.checkOut })));
-
+        console.log("Visits data:", visits);
         let outputHtml = '';
 
         if (patientData.notes) {
@@ -92,54 +87,50 @@ async function getPatientDetails(recordId, visitId = null) {
             const checkInA = a[1].checkIn || 'N/A';
             const checkInB = b[1].checkIn || 'N/A';
 
-            const dateA = checkInA === 'N/A' ? new Date(0) : new Date(checkInA);
-            const dateB = checkInB === 'N/A' ? new Date(0) : new Date(checkInB);
+            const dateA = checkInA === 'N/A' ? new Date() : new Date(checkInA);
+            const dateB = checkInB === 'N/A' ? new Date() : new Date(checkInB);
 
-            if (isNaN(dateA.getTime()) && isNaN(dateB.getTime())) {
-                console.warn(`Both checkIn dates are invalid: ${a[0]} (${checkInA}) and ${b[0]} (${checkInB})`);
-                return 0;
-            }
+            if (isNaN(dateA.getTime()) && isNaN(dateB.getTime())) return 0;
             if (isNaN(dateA.getTime())) {
                 console.warn(`Invalid checkIn date for visit ${a[0]}:`, checkInA);
-                return 1;
+                return -1;
             }
             if (isNaN(dateB.getTime())) {
                 console.warn(`Invalid checkIn date for visit ${b[0]}:`, checkInB);
-                return -1;
+                return 1;
             }
 
-            return dateA - dateB; // Oldest to newest
+            return dateB - dateA;
         });
 
-        console.log("Visits data after sorting:", visits.map(([visitId, visit]) => ({ visitId, checkIn: visit.checkIn, checkOut: visit.checkOut })));
-
         if (visitId) {
-            const visitIndex = visits.findIndex(v => v[0] === visitId);
-            if (visitIndex === -1) {
-                console.error(`Visit ID ${visitId} not found in sorted visits.`);
+            const visitRef = ref(db, `patients/${recordId}/visits/${visitId}`);
+            const visitSnapshot = await get(visitRef);
+            if (!visitSnapshot.exists()) {
+                console.error(`Visit ID ${visitId} not found.`);
                 outputHtml += `<div>Visit not found.</div>`;
                 patientNotesContainer.innerHTML = outputHtml;
                 return { visits };
             }
 
-            const [currentVisitId, visit] = visits[visitIndex];
-            const infoRef = ref(db, `patients/${recordId}/visits/${currentVisitId}/information`);
+            const visit = visitSnapshot.val();
+            console.log(`Visit data for ${visitId}:`, visit);
+            const infoRef = ref(db, `patients/${recordId}/visits/${visitId}/information`);
             const infoSnapshot = await get(infoRef);
             const visitInfo = infoSnapshot.exists() ? infoSnapshot.val() : {};
-            console.log(`Visit info for ${currentVisitId}:`, visitInfo);
+            console.log(`Visit info for ${visitId}:`, visitInfo);
 
-            const isFirstVisit = visitIndex === 0;
-            const visitNumber = visitIndex + 1;
-            console.log(`Rendering visit ${currentVisitId} as "ព័ត៌មានពិនិត្យលើកទី ${visitNumber}" with checkIn: ${visit.checkIn}, checkOut: ${visit.checkOut}`);
+            const visitIndex = visits.findIndex(v => v[0] === visitId);
+            const isFirstVisit = visitIndex === visits.length - 1;
             outputHtml += generateVisitHtml(
-                `ព័ត៌មានពិនិត្យលើកទី ${visitNumber}`,
+                `ព័ត៌មានពិនិត្យលើកទី ${visits.length - visitIndex}`,
                 visit.checkIn,
                 visit.checkOut,
                 visit.clinic,
                 visit.doctor,
                 visitInfo,
                 isFirstVisit,
-                currentVisitId
+                visitId
             );
         } else {
             const visitInfoPromises = visits.map(([currentVisitId, visit], index) => {
@@ -166,12 +157,10 @@ async function getPatientDetails(recordId, visitId = null) {
             const visitInfos = await Promise.all(visitInfoPromises);
 
             visitInfos.forEach(({ visitId, visit, visitInfo, index }) => {
-                const isFirstVisit = index === 0;
-                const visitNumber = index + 1; // Ensures 1, 2, 3 from oldest to newest
+                const isFirstVisit = index === visits.length - 1;
                 try {
-                    console.log(`Rendering visit ${visitId} as "ព័ត៌មានពិនិត្យលើកទី ${visitNumber}" with checkIn: ${visit.checkIn}, checkOut: ${visit.checkOut}`);
                     outputHtml += generateVisitHtml(
-                        `ព័ត៌មានពិនិត្យលើកទី ${visitNumber}`,
+                        `ព័ត៌មានពិនិត្យលើកទី ${visits.length - index}`,
                         visit.checkIn,
                         visit.checkOut,
                         visit.clinic,
@@ -200,7 +189,6 @@ async function getPatientDetails(recordId, visitId = null) {
 function generateVisitHtml(title, checkIn, checkOut, clinic, doctor, info, isFirstVisit = false, visitId) {
     const checkInDisplay = checkIn && isValidDate(checkIn) ? checkIn : 'N/A';
     const checkOutDisplay = checkOut && isValidDate(checkOut) ? checkOut : 'N/A';
-    console.log(`Generating HTML for visit ${visitId}: checkInDisplay=${checkInDisplay}, checkOutDisplay=${checkOutDisplay}`);
 
     return `
         <div class="visit-note" data-visit-id="${visitId}">
@@ -240,7 +228,7 @@ function isValidDate(dateStr) {
 function generateFirstVisitContent(info) { 
     console.log("Generating first visit content with info:", info);
     return `
-        <div class="note-item"><strong>សញ្ញាណតម្អូញ:</strong> ${info.note1 || 'មិនទាន់បំពេញ'}</div>
+        <div class="note-item"><strong>សញ្ញាណតម្អូញ:</strong> ${info.note1 ||  'មិនទាន់បំពេញ'}</div>
         <div class="note-item"><strong>ប្រវត្តិព្យាបាល:</strong> ${info.note2 || 'មិនទាន់បំពេញ'}</div>
         <div class="note-item"><strong>តេស្តមន្ទីពិសោធន៍:</strong> ${info.note3 || 'មិនទាន់បំពេញ'}</div>
         <div class="note-item"><strong>រោគវិនិច្ឆ័យ:</strong> ${info.diagnosis || 'មិនទាន់បំពេញ'}</div>
@@ -252,8 +240,8 @@ function generateFirstVisitContent(info) {
 function generateSecondVisitContent(info) {
     console.log("Generating second visit content with info:", info);
     return `
-        <div class="note-item"><strong>ប្រវត្តិព្យាបាល:</strong> ${info.treatmentHistory || 'មិនទាន់បំពេញ'}</div>
-        <div class="note-item"><strong>តេស្តមន្ទីពិសោធន៍:</strong> ${info.labTest || 'មិនទាន់បំពេញ'}</div>
+        <div class="note-item"><strong>ប្រវត្តិព្យាបាល:</strong> ${info.treatmentHistory ||  'មិនទាន់បំពេញ'}</div>
+        <div class="note-item"><strong>តេស្តមន្ទីពិសោធន៍:</strong> ${info.labTest ||  'នទាន់បំពេញ'}</div>
         <div class="note-item"><strong>រោគវិនិច្ឆ័យ:</strong> ${info.diagnosis || 'មិនទាន់បំពេញ'}</div>
         <div class="note-item"><strong>របៀបប្រើប្រាស់ថ្នាំ:</strong> ${info.medicines ? generateMedicineTable(info.medicines) : 'មិនទាន់បំពេញ'}</div>
     `;
@@ -417,26 +405,24 @@ window.onload = function () {
             }
 
             const patientNotesContainer = document.getElementById('patientNotes');
-            if (patientNotesContainer) {
-                patientNotesContainer.addEventListener('click', (event) => {
-                    const button = event.target.closest('.global-note-icon');
-                    if (button) {
-                        const row = button.closest('.medicine-row');
-                        const itemId = row ? row.dataset.itemId : null;
-                        console.log('Clicked row itemId:', itemId, 'recordId:', recordId, 'visitId:', row?.closest('.visit-note')?.dataset.visitId || visitId);
-                        if (itemId && recordId) {
-                            const effectiveVisitId = row?.closest('.visit-note')?.dataset.visitId || visitId;
-                            if (effectiveVisitId) {
-                                showGlobalNotePopup(recordId, effectiveVisitId, itemId, row);
-                            } else {
-                                console.warn('No visitId available for this row');
-                            }
+            patientNotesContainer.addEventListener('click', (event) => {
+                const button = event.target.closest('.global-note-icon');
+                if (button) {
+                    const row = button.closest('.medicine-row');
+                    const itemId = row ? row.dataset.itemId : null;
+                    console.log('Clicked row itemId:', itemId, 'recordId:', recordId, 'visitId:', row?.closest('.visit-note')?.dataset.visitId || visitId);
+                    if (itemId && recordId) {
+                        const effectiveVisitId = row?.closest('.visit-note')?.dataset.visitId || visitId;
+                        if (effectiveVisitId) {
+                            showGlobalNotePopup(recordId, effectiveVisitId, itemId, row);
                         } else {
-                            console.warn('Missing itemId or recordId:', { itemId, recordId });
+                            console.warn('No visitId available for this row');
                         }
+                    } else {
+                        console.warn('Missing itemId or recordId:', { itemId, recordId });
                     }
-                });
-            }
+                }
+            });
         }).catch(error => {
             console.error('Failed to load patient details:', error);
             document.getElementById('patientNotes').innerHTML = `
