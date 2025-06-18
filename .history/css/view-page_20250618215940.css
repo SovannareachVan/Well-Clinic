@@ -701,20 +701,194 @@ html, body {
 }
 
 
-.medicine-usage-container {
-  max-height: 200px; /* adjust height to show around 5 rows */
-  overflow-y: auto;
-  padding-right: 10px; /* space for scrollbar */
+
+
+
+/* Medication Table Styles */
+.medication-table {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    max-height: 300px; /* 5 rows at ~60px each */
+    overflow-y: auto;
+    position: relative;
+    display: block;
 }
 
-/* Optional: styling for individual medicine rows */
+.medication-header {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr); /* Adjusted for 8 columns */
+    background-color: var(--primary);
+    color: white;
+    font-weight: 500;
+    padding: 12px 15px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    border-bottom: 1px solid #e0e0e0;
+}
+
 .medicine-row {
-  padding: 6px;
-  border-bottom: 1px solid #ccc;
+    grid-template-columns: repeat(8, 1fr); /* Adjusted for 8 columns */
+    padding: 12px 15px;
+    border-bottom: 1px solid #e0e0e0;
+    background-color: white;
+    text-align: center;
+    align-items: center;
+    min-height: 60px;
+    box-sizing: border-box;
 }
-.sidebar {
-    overflow-y: auto;
+
+.medicine-row:last-child {
+    border-bottom: none;
 }
-.sidebar {
-    transition: left 0.3s ease;
+
+.medicine-row:hover {
+    background-color: #f5f7fa;
+}
+
+/* Scrollbar styling */
+.medication-table::-webkit-scrollbar {
+    width: 8px;
+}
+
+.medication-table::-webkit-scrollbar-thumb {
+    background: var(--gray);
+    border-radius: 10px;
+}
+
+.medication-table::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+/* Medicine Container */
+.medicine-container {
+    margin-top: 10px;
+    width: 100%;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .medication-header {
+        display: none;
+    }
+
+    .medication-table {
+        max-height: 400px; /* Adjusted for mobile */
+    }
+
+    .medicine-row {
+        grid-template-columns: 1fr;
+        padding: 15px;
+        border-bottom: 1px solid #e0e0e0;
+        position: relative;
+        padding-left: 120px;
+        min-height: auto;
+    }
+
+    .medicine-row > div {
+        text-align: left;
+        padding: 5px 0;
+    }
+
+    .medicine-row > div::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 15px;
+        width: 100px;
+        font-weight: 500;
+        color: var(--primary-dark);
+    }
+
+    /* Add data labels */
+    .medicine-row > div:nth-child(1)::before { content: "ល.រ:"; }
+    .medicine-row > div:nth-child(2)::before { content: "ឈ្មោះថ្នាំ:"; }
+    .medicine-row > div:nth-child(3)::before { content: "ប្រភេទថ្នាំ:"; }
+    .medicine-row > div:nth-child(4)::before { content: "រយៈពេល:"; }
+    .medicine-row > div:nth-child(5)::before { content: "ព្រឹក:"; }
+    .medicine-row > div:nth-child(6)::before { content: "ថ្ងៃ:"; }
+    .medicine-row > div:nth-child(7)::before { content: "ល្ងាច:"; }
+    .medicine-row > div:nth-child(8)::before { content: "ចំនួន:"; }
+}
+
+.visit-meta div span.date-time {
+    white-space: nowrap; /* Prevent wrapping */
+}
+
+.visit-meta div span.date-time::before {
+    content: "\00a0"; /* Non-breaking space with smaller width */
+}
+
+.global-note-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+.global-note-popup {
+    position: fixed;
+    background: linear-gradient(135deg, #ffffff, #f9f9f9);
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    min-width: 250px;
+    max-width: 450px;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.global-note-popup-content {
+    position: relative;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    line-height: 1.5;
+}
+
+.global-note-popup-content h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.25rem;
+    color: white;
+    font-weight: 600;
+    text-align: center; /* Center the text */
+    background-color: var(--primary);
+}
+
+.global-note-popup-content p {
+    margin: 0;
+    font-size: 1rem;
+    color: #000000;
+    text-align: center; 
+}
+
+.close-global-note-popup {
+    position: absolute;
+    top: 3px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 24px;
+    color: #888;
+    transition: color 0.2s ease, transform 0.2s ease;
+    line-height: 1;
+}
+
+.close-global-note-popup:hover {
+    color: #e74c3c;
+    transform: scale(1.2);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -40%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
 }

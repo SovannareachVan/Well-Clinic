@@ -868,11 +868,11 @@ html, body {
 
 .close-global-note-popup {
     position: absolute;
-    top: 10px;
+    top: 1px;
     right: 10px;
     cursor: pointer;
-    font-size: 24px;
-    color: #888;
+    font-size: 28px;
+    color: #000000;
     transition: color 0.2s ease, transform 0.2s ease;
     line-height: 1;
 }
