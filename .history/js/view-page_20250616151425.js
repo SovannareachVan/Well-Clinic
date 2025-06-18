@@ -235,11 +235,14 @@ function generateSecondVisitContent(info) {
 
 function generateMedicineTable(medicines) {
     console.log("Processing medicines:", medicines);
+
     if (!medicines) {
         console.log("Medicines is undefined or null");
         return 'មិនទាន់បំពេញ';
     }
+
     let medicineArray = [];
+
     if (Array.isArray(medicines)) {
         medicineArray = medicines.filter(med => med && typeof med === 'object');
     } else if (typeof medicines === 'object') {
@@ -250,10 +253,12 @@ function generateMedicineTable(medicines) {
         console.warn("Unexpected medicines format:", typeof medicines, medicines);
         return 'មិនទាន់បំពេញ';
     }
+
     if (medicineArray.length === 0) {
         console.log("No valid medicines found");
         return 'មិនទាន់បំពេញ';
     }
+
     return `
     <div class="medicine-container">
         <div class="medication-table">

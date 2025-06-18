@@ -16,16 +16,15 @@ async function getPatientDetails(recordId, visitId = null) {
             patientNotesContainer.textContent = 'No patient records available.';
             return { visits: [] };
         }
+
         const patientData = snapshot.val();
         console.log("Patient data:", patientData);
 
-        // Update patient name header
         const patientNameHeader = document.getElementById('patientName');
         if (patientNameHeader) {
             patientNameHeader.textContent = patientData.fullName || 'N/A';
         }
 
-        // Update patient details
         const fields = [
             { id: 'patientFullName', key: 'fullName' },
             { id: 'patientAge', key: 'age' },
@@ -40,13 +39,13 @@ async function getPatientDetails(recordId, visitId = null) {
             }
         });
 
-        // Update patient address
         const addressMapping = {
             village: {},
             commune: {},
             district: {},
             province: {}
         };
+
         if (patientData.address) {
             let addressString = '';
             const { village, commune, district, province } = patientData.address;
@@ -69,7 +68,6 @@ async function getPatientDetails(recordId, visitId = null) {
             }
         }
 
-        // Process visits
         const visits = patientData.visits ? Object.entries(patientData.visits).filter(([_, visit]) => visit && typeof visit === 'object') : [];
         console.log("Visits data before sorting:", visits.map(([visitId, visit]) => ({ visitId, checkIn: visit.checkIn, checkOut: visit.checkOut })));
 
@@ -95,6 +93,7 @@ async function getPatientDetails(recordId, visitId = null) {
             if (isNaN(dateB.getTime())) return -1;
             return dateA - dateB; // Oldest to newest
         });
+
         console.log("Sorted visits:", visits);
 
         if (visitId) {
@@ -143,6 +142,7 @@ async function getPatientDetails(recordId, visitId = null) {
                     };
                 });
             });
+
             const visitInfos = await Promise.all(visitInfoPromises);
             visitInfos.forEach(({ visitId, visit, visitInfo, index }) => {
                 const isFirstVisit = index === 0;
@@ -174,9 +174,20 @@ async function getPatientDetails(recordId, visitId = null) {
     }
 }
 
+function isValidDate(dateStr) {
+    if (!dateStr || dateStr === 'N/A') return false;
+    const [datePart, timePart] = dateStr.split(' ');
+    if (!datePart || !timePart) return false;
+    const [day, month, year] = datePart.split('/').map(num => parseInt(num, 10));
+    const [hours, minutes, seconds] = timePart.split(':').map(num => parseInt(num, 10));
+    const date = new Date(year, month - 1, day, hours, minutes, seconds);
+    return !isNaN(date.getTime());
+}
+
 function generateVisitHtml(title, checkIn, checkOut, clinic, doctor, info, isFirstVisit = false, visitId) {
     const checkInDisplay = checkIn && isValidDate(checkIn) ? checkIn : 'N/A';
     const checkOutDisplay = checkOut && isValidDate(checkOut) ? checkOut : 'N/A';
+
     return `
         <div class="visit-note" data-visit-id="${visitId}">
             <div class="visit-note-header">
@@ -195,29 +206,12 @@ function generateVisitHtml(title, checkIn, checkOut, clinic, doctor, info, isFir
     `;
 }
 
-function isValidDate(dateStr) {
-    if (!dateStr || dateStr === 'N/A') return false;
-    const [datePart, timePart] = dateStr.split(' ');
-    if (!datePart || !timePart) return false;
-    const [day, month, year] = datePart.split('/').map(num => parseInt(num, 10));
-    const [hours, minutes, seconds] = timePart.split(':').map(num => parseInt(num, 10));
-    const date = new Date(year, month - 1, day, hours, minutes, seconds);
-    return !isNaN(date.getTime()) &&
-           dateStr.match(/^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$/) &&
-           day >= 1 && day <= 31 &&
-           month >= 1 && month <= 12 &&
-           year >= 1900 && year <= new Date().getFullYear() &&
-           hours >= 0 && hours <= 23 &&
-           minutes >= 0 && minutes <= 59 &&
-           seconds >= 0 && seconds <= 59;
-}
-
 function generateFirstVisitContent(info) {
     console.log("Generating first visit content with info:", info);
     return `
         <div class="note-item"><strong>សញ្ញាណតម្អូញ:</strong> ${info.note1 || 'មិនទាន់បំពេញ'}</div>
         <div class="note-item"><strong>ប្រវត្តិព្យាបាល:</strong> ${info.note2 || 'មិនទាន់បំពេញ'}</div>
-        <div class="note-item"><strong>តេស្ដមន្ទីពិសោធន៍:</strong> ${info.note3 || 'មិនទាន់បំពេញ'}</div>
+        <div class="note-item"><strong>តេស្តមន្ទីពិសោធន៍:</strong> ${info.note3 || 'មិនទាន់បំពេញ'}</div>
         <div class="note-item"><strong>រោគវិនិច្ឆ័យ:</strong> ${info.diagnosis || 'មិនទាន់បំពេញ'}</div>
         <div class="note-item"><strong>របៀបប្រើប្រាស់ថ្នាំ:</strong> ${info.medicines ? generateMedicineTable(info.medicines) : 'មិនទាន់បំពេញ'}</div>
     `;
@@ -227,7 +221,7 @@ function generateSecondVisitContent(info) {
     console.log("Generating second visit content with info:", info);
     return `
         <div class="note-item"><strong>ប្រវត្តិព្យាបាល:</strong> ${info.treatmentHistory || 'មិនទាន់បំពេញ'}</div>
-        <div class="note-item"><strong>តេស្ដមន្ទីពិសោធន៍:</strong> ${info.labTest || 'មិនទាន់បំពេញ'}</div>
+        <div class="note-item"><strong>តេស្តមន្ទីពិសោធន៍:</strong> ${info.labTest || 'មិនទាន់បំពេញ'}</div>
         <div class="note-item"><strong>រោគវិនិច្ឆ័យ:</strong> ${info.diagnosis || 'មិនទាន់បំពេញ'}</div>
         <div class="note-item"><strong>របៀបប្រើប្រាស់ថ្នាំ:</strong> ${info.medicines ? generateMedicineTable(info.medicines) : 'មិនទាន់បំពេញ'}</div>
     `;
@@ -235,11 +229,14 @@ function generateSecondVisitContent(info) {
 
 function generateMedicineTable(medicines) {
     console.log("Processing medicines:", medicines);
+
     if (!medicines) {
         console.log("Medicines is undefined or null");
         return 'មិនទាន់បំពេញ';
     }
+
     let medicineArray = [];
+
     if (Array.isArray(medicines)) {
         medicineArray = medicines.filter(med => med && typeof med === 'object');
     } else if (typeof medicines === 'object') {
@@ -250,10 +247,12 @@ function generateMedicineTable(medicines) {
         console.warn("Unexpected medicines format:", typeof medicines, medicines);
         return 'មិនទាន់បំពេញ';
     }
+
     if (medicineArray.length === 0) {
         console.log("No valid medicines found");
         return 'មិនទាន់បំពេញ';
     }
+
     return `
     <div class="medicine-container">
         <div class="medication-table">
@@ -299,6 +298,7 @@ function showGlobalNotePopup(recordId, visitId, itemId, rowElement) {
     backdrop.style.height = '100%';
     backdrop.style.background = 'rgba(0, 0, 0, 0.5)';
     backdrop.style.zIndex = '999';
+
     const popup = document.createElement('div');
     popup.classList.add('global-note-popup');
 
@@ -320,7 +320,6 @@ function showGlobalNotePopup(recordId, visitId, itemId, rowElement) {
         `;
         finalizePopup();
     }).catch(error => {
-        console.error(`Error fetching global note for ${recordId}/${visitId}/${itemId}:`, error);
         popup.innerHTML = `<div class="global-note-popup-content"><span class="close-global-note-popup">×</span><p>Error: ${error.message}</p></div>`;
         finalizePopup();
     });
