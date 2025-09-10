@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Date Register</title>
+    <link rel="stylesheet" href=".css/date-register.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@100..900&family=Siemreap&display=swap" rel="stylesheet">
+    <link rel="icon" href="/image/DC1D71C0-68A8-47C5-8634-5585C79D5CF4_1_102_o.jpeg" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body class="date-register-page">
+
+
+    <div class="main-content">
+        <h1 class="page-title"> Date Register</h1>
+
+        <!-- Patient Header -->
+        <div class="patient-header">
+            <h2 id="patientName">Patient Name</h2>
+        </div>
+
+        <!-- Patient Details Section -->
+        <div class="patient-details">
+            <div class="detail-row">
+                <div class="detail-label">ឈ្មោះ</div>
+                <div class="detail-value" id="patientFullName"></div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">អាយុ</div>
+                <div class="detail-value" id="patientAge"></div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">ភេទ</div>
+                <div class="detail-value" id="patientGender"></div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">លេខទូរស័ព្ទ</div>
+                <div class="detail-value" id="patientPhone"></div>
+            </div>
+                        <div class="detail-row">
+                <div class="detail-label">Telegram</div>
+                <div class="detail-value" id="patientTelegram"></div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">អាស័យដ្ឋាន</div>
+                <div class="detail-value" id="patientAddress"></div> 
+            </div>      
+                
+            <div class="notes-section">
+                <div class="detail-label">វេជ្ជបញ្ជា</div>
+                <div class="detail-value" id="patientNotes"></div>
+            </div>
+        </div>
+
+        <!-- Date Register Section -->
+        <div class="container">
+            <h2>Check-in/Register</h2>
+            <div class="button-container">
+                <button id="checkInBtn">Check-in</button>
+                <button id="backBtn">Back</button>
+            </div>
+            
+
+            <table id="checkInTable">
+                <thead>
+                    <tr>
+                        <th>លេខរៀង</th>
+                        <th>ថ្ងៃចូលមន្ទីពេទ្យ</th>
+                        <th>ថ្ងៃចេញពីមន្ទីពេទ្យ</th>
+                        <th>មន្ទីពេទ្យ</th>
+                        <th>ពិគ្រោះដោយ</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dynamic Rows will be added here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+    <script type="module" src="/js/date-register.js"></script>
+</body>
+</html>

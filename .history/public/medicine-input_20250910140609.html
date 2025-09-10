@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medicine Input</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="../public/css/medicine-input.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="icon" href="/image/DC1D71C0-68A8-47C5-8634-5585C79D5CF4_1_102_o.jpeg" type="image/png">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@100..900&family=Siemreap&display=swap" rel="stylesheet">
+
+    <style>
+        body, input, textarea, select, button {
+            font-family: "Noto Sans Khmer", sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div class="logo">
+            <img src="/image/Logo copy - Copy-01.png" alt="Well Clinic Logo" class="logo-image">
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item" onclick="location.href='index.html'">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </li>
+            <li class="nav-item" onclick="location.href='receptionist.html'">
+                <i class="fas fa-user-tie"></i>
+                <span>Receptionist</span>
+            </li>
+            <li class="nav-item" onclick="location.href='doctor.html'">
+                <i class="fas fa-user-md"></i>
+                <span>Doctor</span>
+            </li>
+            <li class="nav-item active" onclick="location.href='medicine-input.html'">
+                <i class="fas fa-pills"></i>
+                <span>Medicine</span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Wrapper for centering content and handling sidebar toggle -->
+    <div class="wrapper">
+        <!-- Mobile Menu Toggle -->
+        <div class="mobile-menu-toggle">
+            <i class="fas fa-bars" id="menuIcon"></i>
+        </div>
+
+        <!-- Main Content -->
+        <div class="container">
+            <h1>បញ្ជីថ្នាំ</h1>
+            <button id="addMedicineBtn" class="add-medicine-btn">បញ្ចូលឈ្មោះថ្នាំ</button>
+            <table id="medicinesTable">
+                <thead>
+                    <tr>
+                        <th>ឈ្មោះថ្នាំ</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="medicinesTableBody"></tbody>
+            </table>
+        </div>
+
+        <!-- Modal for adding medicine -->
+        <div id="medicineModal" class="modal">
+            <div class="modal-content">
+                <span class="close">×</span>
+                <h2>Add Medicine</h2>
+                <form id="medicineForm">
+                    <label for="medicineName">Medicine Name:</label>
+                    <input type="text" id="medicineName" name="medicineName" placeholder="Enter medicine name" required>
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="/js/medicine-input.js"></script>
+    <script>
+        const menuToggle = document.querySelector('.mobile-menu-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        const menuIcon = document.getElementById('menuIcon');
+        
+        menuToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
+            
+            // Change icon between bars and times (X)
+            if (sidebar.classList.contains('active')) {
+                menuIcon.classList.remove('fa-bars');
+                menuIcon.classList.add('fa-times');
+            } else {
+                menuIcon.classList.remove('fa-times');
+                menuIcon.classList.add('fa-bars');
+            }
+        });
+    </script>
+</body>
+</html>
