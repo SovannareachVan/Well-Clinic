@@ -1,4 +1,3 @@
-// Import Firebase functions
 import { db } from './firebase-config.js';
 import { ref, onValue, remove } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js';
 
@@ -14,6 +13,8 @@ function fetchPatients() {
         patientsTableBody.innerHTML = ""; // Clear existing list
 
         if (snapshot.exists()) {
+            let count = 1; // Initialize counter for numbering
+
             snapshot.forEach((childSnapshot) => {
                 const patientData = childSnapshot.val();
                 const patientId = childSnapshot.key; // Unique ID from Firebase
@@ -21,13 +22,19 @@ function fetchPatients() {
                 // Create table row
                 const row = document.createElement("tr");
                 row.innerHTML = `
-                    <td>${patientData.fullName}</td>
+                    <td>${count++}</td> <td>${patientData.fullName}</td>
                     <td>
                         <button class="view-btn" onclick="viewPatient('${patientId}')">
                             <i class="fas fa-eye"></i> View
                         </button>
                         <button class="edit-btn" onclick="editPatient('${patientId}')">
                             <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="date-detail-btn" onclick="goToDateDetail('${patientId}')">
+                            <i class="fas fa-calendar-alt"></i> Date-Detail
+                        </button>
+                        <button class="add-detail-btn" onclick="addPatientDetail('${patientId}')">
+                            <i class="fas fa-plus"></i> Add Detail
                         </button>
                         <button class="delete-btn" onclick="deletePatient('${patientId}')">
                             <i class="fas fa-trash"></i> Delete
@@ -37,7 +44,8 @@ function fetchPatients() {
                 patientsTableBody.appendChild(row);
             });
         } else {
-            patientsTableBody.innerHTML = "<tr><td colspan='2'>No patients found.</td></tr>";
+            // Updated colspan to 3 to match new column count
+            patientsTableBody.innerHTML = "<tr><td colspan='3'>No patients found.</td></tr>";
         }
     });
 }
@@ -48,7 +56,8 @@ searchInput.addEventListener("input", function () {
     const rows = patientsTableBody.getElementsByTagName("tr");
 
     for (let row of rows) {
-        const nameCell = row.getElementsByTagName("td")[0];
+        // Changed [0] to [1] because Name is now the 2nd column
+        const nameCell = row.getElementsByTagName("td")[1]; 
         if (nameCell) {
             const nameText = nameCell.textContent.toLowerCase();
             row.style.display = nameText.includes(searchText) ? "" : "none";
@@ -56,23 +65,44 @@ searchInput.addEventListener("input", function () {
     }
 });
 
-// Function to view patient details (placeholder for now)
+// Function to view patient details
 window.viewPatient = function (patientId) {
-    alert("Viewing patient details: " + patientId);
+    window.location.href = `view-page.html?recordId=${patientId}`;
 };
 
-// Function to edit patient (redirect to edit page)
+// Function to edit patient
 window.editPatient = function (patientId) {
-    window.location.href = `edit.html?id=${patientId}`; // Redirect with patient ID
+    window.location.href = `edit-page.html?id=${patientId}`;
 };
 
 // Function to delete patient
 window.deletePatient = function (patientId) {
-    if (confirm("Are you sure you want to delete this patient?")) {
-        remove(ref(db, "patients/" + patientId))
-            .then(() => alert("Patient deleted successfully!"))
-            .catch((error) => alert("Error deleting patient: " + error));
+    const password = prompt("បញ្ចូលលេខសំងាត់12345 ដើម្បីលុប:");
+
+    if (password === "12345") {
+        if (confirm("Are you sure you want to delete this patient?")) {
+            remove(ref(db, "patients/" + patientId))
+                .then(() => alert("Patient deleted successfully!"))
+                .catch((error) => alert("Error deleting patient: " + error));
+        }
+    } else if (password !== null) {
+        alert("Incorrect password. Deletion cancelled.");
     }
+};
+
+// Function to go to date detail
+window.goToDateDetail = function (patientId) {
+    window.location.href = `date-register.html?id=${patientId}`;
+};
+
+// Function to add patient details
+window.addPatientDetail = function (patientId) {
+    window.location.href = `add-detail-page.html?id=${patientId}`;
+};
+
+// Function to go to medicine input page
+window.goToMedicineInput = function (patientId) {
+    window.location.href = `medicine-input.html?id=${patientId}`;
 };
 
 // Fetch patients when page loads

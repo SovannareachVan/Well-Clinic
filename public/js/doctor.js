@@ -13,6 +13,8 @@ function fetchPatients() {
         patientsTableBody.innerHTML = ""; // Clear existing list
 
         if (snapshot.exists()) {
+            let count = 1; // Initialize counter for numbering
+
             snapshot.forEach((childSnapshot) => {
                 const patientData = childSnapshot.val();
                 const patientId = childSnapshot.key; // Unique ID from Firebase
@@ -20,7 +22,7 @@ function fetchPatients() {
                 // Create table row
                 const row = document.createElement("tr");
                 row.innerHTML = `
-                    <td>${patientData.fullName}</td>
+                    <td>${count++}</td> <td>${patientData.fullName}</td>
                     <td>
                         <button class="view-btn" onclick="viewPatient('${patientId}')">
                             <i class="fas fa-eye"></i> View
@@ -42,7 +44,8 @@ function fetchPatients() {
                 patientsTableBody.appendChild(row);
             });
         } else {
-            patientsTableBody.innerHTML = "<tr><td colspan='2'>No patients found.</td></tr>";
+            // Updated colspan to 3 to match new column count
+            patientsTableBody.innerHTML = "<tr><td colspan='3'>No patients found.</td></tr>";
         }
     });
 }
@@ -53,7 +56,8 @@ searchInput.addEventListener("input", function () {
     const rows = patientsTableBody.getElementsByTagName("tr");
 
     for (let row of rows) {
-        const nameCell = row.getElementsByTagName("td")[0];
+        // Changed [0] to [1] because Name is now the 2nd column
+        const nameCell = row.getElementsByTagName("td")[1]; 
         if (nameCell) {
             const nameText = nameCell.textContent.toLowerCase();
             row.style.display = nameText.includes(searchText) ? "" : "none";
